@@ -10,4 +10,8 @@
     <string name="title_notifications">Notifications</string>
 
     <string name="home_second">Home Second</string>
+
+    <string name="notification_channel_id">com.doancnpm.edoctor</string>
+    <string name="notification_channel_name">Edoctor</string>
+    <string name="notification_channel_description">Notification channel of edoctor app</string>
 </resources>
