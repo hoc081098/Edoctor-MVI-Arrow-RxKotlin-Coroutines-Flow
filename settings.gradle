@@ -1,0 +1,2 @@
+rootProject.name='Edoctor-DoAnCNPM'
+include ':app'
