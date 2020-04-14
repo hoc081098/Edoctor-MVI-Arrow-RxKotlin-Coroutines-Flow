@@ -2,24 +2,32 @@ package com.doancnpm.edoctor.data
 
 import android.database.sqlite.SQLiteException
 import arrow.core.left
-import com.doancnpm.edoctor.data.remote.response.ErrorResponse
+import com.doancnpm.edoctor.data.local.model.UserLocal
+import com.doancnpm.edoctor.data.remote.response.ErrorResponseJsonAdapter
+import com.doancnpm.edoctor.data.remote.response.UserResponse
 import com.doancnpm.edoctor.domain.entity.AppError
 import com.doancnpm.edoctor.domain.entity.DomainResult
 import retrofit2.HttpException
-import retrofit2.Retrofit
 import java.io.IOException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 
 object Mappers {
-
+  fun userReponseToUserLocal(userResponse: UserResponse): UserLocal {
+    return UserLocal(
+      name = userResponse.name,
+      email = userResponse.email,
+      createdAt = userResponse.createdAt,
+      imageUrl = userResponse.imageUrl,
+    )
+  }
 }
 
-class ErrorMapper(private val retrofit: Retrofit) {
+class ErrorMapper(private val errorResponseJsonAdapter: ErrorResponseJsonAdapter) {
   /**
    * Transform [throwable] to [AppError]
    */
-  private fun map(throwable: Throwable): AppError {
+  fun map(throwable: Throwable): AppError {
     return when (throwable) {
       is AppError -> throwable
       is SQLiteException -> {
@@ -39,13 +47,8 @@ class ErrorMapper(private val retrofit: Retrofit) {
         throwable.response()!!
           .takeUnless { it.isSuccessful }!!
           .errorBody()!!
-          .let { body ->
-            retrofit
-              .responseBodyConverter<ErrorResponse>(
-                ErrorResponse::class.java,
-                ErrorResponse::class.java.annotations,
-              )
-              .convert(body)!!
+          .use { body ->
+            body.use { errorResponseJsonAdapter.fromJson(it.string()) }!!
           }
           .let { response ->
             AppError.Remote.ServerError(

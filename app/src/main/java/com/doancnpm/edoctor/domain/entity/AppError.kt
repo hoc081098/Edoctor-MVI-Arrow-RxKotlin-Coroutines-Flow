@@ -9,7 +9,7 @@ sealed class AppError(cause: Throwable?) : Throwable(cause) {
     data class ServerError(
       val errorMessage: String,
       val statusCode: Int,
-      override val cause: Throwable
+      override val cause: Throwable? = null,
     ) : Remote(cause)
 
   }
@@ -20,7 +20,7 @@ sealed class AppError(cause: Throwable?) : Throwable(cause) {
 
   data class UnexpectedError(
     val errorMessage: String,
-    override val cause: Throwable
+    override val cause: Throwable,
   ) : AppError(cause)
 }
 
