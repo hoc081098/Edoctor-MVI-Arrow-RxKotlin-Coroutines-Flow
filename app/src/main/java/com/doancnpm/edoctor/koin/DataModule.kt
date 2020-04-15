@@ -14,9 +14,12 @@ import com.doancnpm.edoctor.data.local.model.UserLocalJsonAdapter
 import com.doancnpm.edoctor.data.remote.ApiService
 import com.doancnpm.edoctor.data.remote.AuthInterceptor
 import com.doancnpm.edoctor.data.remote.response.ErrorResponseJsonAdapter
+import com.doancnpm.edoctor.domain.dispatchers.AppDispatchers
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import okhttp3.logging.HttpLoggingInterceptor.Level
@@ -62,6 +65,11 @@ val dataModule = module {
   single { provideRxkPrefs(get()) }
 
   factory { provideUserLocalJsonAdapter(get()) }
+
+  /*
+   * App
+   */
+  single { CoroutineScope(get<AppDispatchers>().io + SupervisorJob()) }
 }
 
 private fun provideUserLocalJsonAdapter(moshi: Moshi): UserLocalJsonAdapter {

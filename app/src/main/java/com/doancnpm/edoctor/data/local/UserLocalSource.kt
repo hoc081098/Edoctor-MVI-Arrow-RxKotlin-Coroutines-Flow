@@ -24,4 +24,6 @@ interface UserLocalSource {
   suspend fun saveUser(user: UserLocal)
 
   fun userObservable(): Observable<Option<UserLocal>>
+
+  suspend fun removeUserAndToken()
 }

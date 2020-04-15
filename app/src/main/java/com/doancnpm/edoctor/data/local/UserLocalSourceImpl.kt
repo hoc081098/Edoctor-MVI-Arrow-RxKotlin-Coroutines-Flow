@@ -56,7 +56,18 @@ class UserLocalSourceImpl(
 
   override fun userObservable() = userObservable
 
-  private fun String.toUserLocal() = userLocalJsonAdapter.fromJson(this)
+  override suspend fun removeUserAndToken() {
+    withContext(dispatchers.io) {
+      sharedPreferences.edit(commit = true) {
+        putString(TOKEN_KEY, "")
+        putString(USER_KEY, "")
+      }
+    }
+  }
+
+  private fun String.toUserLocal() =
+    kotlin.runCatching { userLocalJsonAdapter.fromJson(this) }
+      .getOrNull()
 
   private companion object {
     fun String.nullIfBlank() = if (this.isBlank()) null else this
