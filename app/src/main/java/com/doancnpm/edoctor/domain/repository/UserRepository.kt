@@ -9,4 +9,6 @@ interface UserRepository {
   suspend fun login(email: String, password: String): DomainResult<Unit>
 
   fun userObservable(): Observable<DomainResult<Option<User>>>
+
+  suspend fun checkAuth(): DomainResult<Boolean>
 }

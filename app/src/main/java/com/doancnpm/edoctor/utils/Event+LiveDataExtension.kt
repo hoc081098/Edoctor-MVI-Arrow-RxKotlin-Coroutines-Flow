@@ -2,6 +2,7 @@ package com.doancnpm.edoctor.utils
 
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import io.reactivex.Observable
 import io.reactivex.ObservableEmitter
@@ -60,3 +61,6 @@ fun <T : Any> LiveData<T>.toObservable(fallbackNullValue: (() -> T)? = null): Ob
     emitter.setCancellable { removeObserver(observer) }
   }.subscribeOn(AndroidSchedulers.mainThread())
 }
+
+@Suppress("NOTHING_TO_INLINE")
+inline fun <T : Any> MutableLiveData<T>.asLiveData(): LiveData<T> = this

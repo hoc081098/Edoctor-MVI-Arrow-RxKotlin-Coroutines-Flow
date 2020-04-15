@@ -4,8 +4,6 @@ import android.util.Base64
 import arrow.core.Either
 import arrow.core.Option
 import arrow.core.extensions.fx
-import arrow.core.right
-import arrow.core.some
 import com.doancnpm.edoctor.data.ErrorMapper
 import com.doancnpm.edoctor.data.Mappers
 import com.doancnpm.edoctor.data.local.UserLocalSource
@@ -19,6 +17,7 @@ import com.doancnpm.edoctor.domain.repository.UserRepository
 import com.doancnpm.edoctor.utils.catchError
 import io.reactivex.Observable
 import io.reactivex.rxkotlin.Observables
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -32,25 +31,20 @@ class UserRepositoryImpl(
   private val userLocalSource: UserLocalSource,
   appCoroutineScope: CoroutineScope,
 ) : UserRepository {
+  private val checkAuthDeferred = CompletableDeferred<Unit>()
+
   init {
-    appCoroutineScope.launch {
-      userLocalSource.token()
-        ?: return@launch userLocalSource.removeUserAndToken()
-      val user = userLocalSource.user()
-        ?: return@launch userLocalSource.removeUserAndToken()
+    appCoroutineScope.launch { checkAuthInternal() }
+  }
 
-      try {
-        val userResponse = apiService.getUserProfile(user.email)
-        userLocalSource.saveUser(Mappers.userReponseToUserLocal(userResponse))
-        Timber.d("[USER_REPO] init success")
-      } catch (e: Exception) {
-        Timber.d(e, "[USER_REPO] init failure: $e")
+  /*
+   * Implement UserRepository
+   */
 
-        if ((e as? HttpException)?.code() == 401) {
-          userLocalSource.removeUserAndToken()
-          Timber.d(e, "[USER_REPO] Login again!")
-        }
-      }
+  override suspend fun checkAuth(): DomainResult<Boolean> {
+    return Either.catch(errorMapper::map) {
+      checkAuthDeferred.await()
+      userLocalSource.token() !== null && userLocalSource.user() !== null
     }
   }
 
@@ -90,5 +84,32 @@ class UserRepositoryImpl(
         )
       }.rightResult()
     }.catchError(errorMapper)
+  }
+
+  /*
+   * Private helpers
+   */
+
+  private suspend fun checkAuthInternal() {
+    try {
+      userLocalSource.token()
+        ?: return userLocalSource.removeUserAndToken()
+      val user = userLocalSource.user()
+        ?: return userLocalSource.removeUserAndToken()
+
+      val userResponse = apiService.getUserProfile(user.email)
+      userLocalSource.saveUser(Mappers.userReponseToUserLocal(userResponse))
+      Timber.d("[USER_REPO] init success")
+
+    } catch (e: Exception) {
+      Timber.d(e, "[USER_REPO] init failure: $e")
+
+      if ((e as? HttpException)?.code() == 401) {
+        userLocalSource.removeUserAndToken()
+        Timber.d(e, "[USER_REPO] Login again!")
+      }
+    } finally {
+      checkAuthDeferred.complete(Unit)
+    }
   }
 }
