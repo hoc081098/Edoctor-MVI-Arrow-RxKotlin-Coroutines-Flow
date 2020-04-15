@@ -4,6 +4,8 @@ import android.util.Base64
 import arrow.core.Either
 import arrow.core.Option
 import arrow.core.extensions.fx
+import arrow.core.right
+import arrow.core.some
 import com.doancnpm.edoctor.data.ErrorMapper
 import com.doancnpm.edoctor.data.Mappers
 import com.doancnpm.edoctor.data.local.UserLocalSource
@@ -12,7 +14,9 @@ import com.doancnpm.edoctor.domain.dispatchers.AppDispatchers
 import com.doancnpm.edoctor.domain.entity.AppError
 import com.doancnpm.edoctor.domain.entity.DomainResult
 import com.doancnpm.edoctor.domain.entity.User
+import com.doancnpm.edoctor.domain.entity.rightResult
 import com.doancnpm.edoctor.domain.repository.UserRepository
+import com.doancnpm.edoctor.utils.catchError
 import io.reactivex.Observable
 import io.reactivex.rxkotlin.Observables
 import kotlinx.coroutines.CoroutineScope
@@ -67,7 +71,9 @@ class UserRepositoryImpl(
     }
   }
 
-  override fun userObservable(): Observable<Option<User>> {
+  override fun userObservable(): Observable<DomainResult<Option<User>>> {
+    val a = Observable.just(Either.right("") as Either<AppError, String>)
+
     return Observables.combineLatest(
       userLocalSource.tokenObservable(),
       userLocalSource.userObservable(),
@@ -82,7 +88,7 @@ class UserRepositoryImpl(
           imageUrl = user.imageUrl,
           token = token,
         )
-      }
-    }
+      }.rightResult()
+    }.catchError(errorMapper)
   }
 }
