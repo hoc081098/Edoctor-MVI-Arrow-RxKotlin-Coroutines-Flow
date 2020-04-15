@@ -25,3 +25,9 @@ sealed class AppError(cause: Throwable?) : Throwable(cause) {
 }
 
 typealias DomainResult<T> = Either<AppError, T>
+
+@Suppress("NOTHING_TO_INLINE")
+inline fun <R> AppError.leftResult(): Either<AppError, R> = Either.Left(this)
+
+@Suppress("NOTHING_TO_INLINE")
+inline fun <R> R.rightResult(): Either<AppError, R> = Either.Right(this)

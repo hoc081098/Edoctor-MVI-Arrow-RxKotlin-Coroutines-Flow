@@ -3,6 +3,8 @@ package com.doancnpm.edoctor.utils
 import androidx.annotation.CheckResult
 import arrow.core.Some
 import arrow.core.toOption
+import com.doancnpm.edoctor.data.ErrorMapper
+import com.doancnpm.edoctor.domain.entity.DomainResult
 import com.jakewharton.rxrelay2.Relay
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Observable
@@ -34,4 +36,10 @@ inline fun <T : Any, R : Any> Observable<T>.mapNotNull(crossinline transform: (T
   return map { transform(it).toOption() }
     .ofType<Some<R>>()
     .map { it.t }
+}
+
+@Suppress("NOTHING_TO_INLINE")
+@CheckResult
+inline fun <T> Observable<DomainResult<T>>.catchError(errorMapper: ErrorMapper): Observable<DomainResult<T>> {
+  return onErrorReturn { errorMapper.mapAsLeft(it) }
 }

@@ -8,5 +8,5 @@ import io.reactivex.Observable
 interface UserRepository {
   suspend fun login(email: String, password: String): DomainResult<Unit>
 
-  fun userObservable(): Observable<Option<User>>
+  fun userObservable(): Observable<DomainResult<Option<User>>>
 }

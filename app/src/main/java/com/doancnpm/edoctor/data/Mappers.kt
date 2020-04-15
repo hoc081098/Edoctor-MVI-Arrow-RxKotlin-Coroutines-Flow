@@ -1,12 +1,12 @@
 package com.doancnpm.edoctor.data
 
 import android.database.sqlite.SQLiteException
-import arrow.core.left
 import com.doancnpm.edoctor.data.local.model.UserLocal
 import com.doancnpm.edoctor.data.remote.response.ErrorResponseJsonAdapter
 import com.doancnpm.edoctor.data.remote.response.UserResponse
 import com.doancnpm.edoctor.domain.entity.AppError
 import com.doancnpm.edoctor.domain.entity.DomainResult
+import com.doancnpm.edoctor.domain.entity.leftResult
 import retrofit2.HttpException
 import java.io.IOException
 import java.net.SocketTimeoutException
@@ -70,5 +70,5 @@ class ErrorMapper(private val errorResponseJsonAdapter: ErrorResponseJsonAdapter
   /**
    * Transform [throwable] to left branch of [DomainResult]
    */
-  fun <T> mapAsLeft(throwable: Throwable): DomainResult<T> = map(throwable).left()
+  fun <T> mapAsLeft(throwable: Throwable) = map(throwable).leftResult<T>()
 }
