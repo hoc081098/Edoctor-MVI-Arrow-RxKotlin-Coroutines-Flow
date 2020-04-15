@@ -92,6 +92,8 @@ class UserRepositoryImpl(
 
   private suspend fun checkAuthInternal() {
     try {
+      Timber.d("[USER_REPO] started")
+
       userLocalSource.token()
         ?: return userLocalSource.removeUserAndToken()
       val user = userLocalSource.user()
