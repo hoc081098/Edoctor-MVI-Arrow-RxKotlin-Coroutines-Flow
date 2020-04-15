@@ -4,16 +4,10 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.ui.setupActionBarWithNavController
 import com.doancnpm.edoctor.databinding.ActivityMainBinding
-import com.doancnpm.edoctor.domain.repository.UserRepository
 import com.doancnpm.edoctor.utils.setupWithNavController
-import io.reactivex.rxkotlin.subscribeBy
-import kotlinx.coroutines.launch
-import org.koin.android.ext.android.get
-import timber.log.Timber
 import kotlin.LazyThreadSafetyMode.NONE
 
 class MainActivity : AppCompatActivity() {
@@ -31,13 +25,6 @@ class MainActivity : AppCompatActivity() {
     if (savedInstanceState === null) {
       setupBottomNavigationBar()
     }
-
-    get<UserRepository>().userObservable().subscribeBy {
-      Timber.d("User: $it")
-    }
-//    lifecycleScope.launch {
-//      get<UserRepository>().login("hoc081098@gmail.com", "123456")
-//    }
   }
 
   override fun onRestoreInstanceState(savedInstanceState: Bundle) {
