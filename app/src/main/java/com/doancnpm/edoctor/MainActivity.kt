@@ -10,6 +10,7 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import com.doancnpm.edoctor.databinding.ActivityMainBinding
 import com.doancnpm.edoctor.domain.repository.UserRepository
 import com.doancnpm.edoctor.utils.setupWithNavController
+import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.get
 import timber.log.Timber
@@ -31,10 +32,12 @@ class MainActivity : AppCompatActivity() {
       setupBottomNavigationBar()
     }
 
-    lifecycleScope.launch {
-      val r = get<UserRepository>().login("hoc081098@gmail.com", "123456")
-      Timber.d("Login: $r")
+    get<UserRepository>().userObservable().subscribeBy {
+      Timber.d("User: $it")
     }
+//    lifecycleScope.launch {
+//      get<UserRepository>().login("hoc081098@gmail.com", "123456")
+//    }
   }
 
   override fun onRestoreInstanceState(savedInstanceState: Bundle) {

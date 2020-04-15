@@ -16,5 +16,5 @@ val domainModule = module {
   single<AppDispatchers> { AppDispatchersImpl(get()) }
   single<AppSchedulers> { AppSchedulersImpl() }
 
-  single<UserRepository> { UserRepositoryImpl(get(API_QUALIFIER), get(), get(), get()) }
+  single<UserRepository> { UserRepositoryImpl(get(API_QUALIFIER), get(), get(), get(), get()) }
 }
