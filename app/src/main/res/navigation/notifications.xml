@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/notificationsFragment"
-        android:name="com.doancnpm.edoctor.ui.notifications.NotificationsFragment"
+        android:name="com.doancnpm.edoctor.ui.main.notifications.NotificationsFragment"
         android:label="fragment_notifications"
         tools:layout="@layout/fragment_notifications" />
 </navigation>

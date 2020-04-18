@@ -1,4 +1,4 @@
-package com.doancnpm.edoctor.ui.home
+package com.doancnpm.edoctor.ui.main.home
 
 import android.os.Bundle
 import android.view.LayoutInflater

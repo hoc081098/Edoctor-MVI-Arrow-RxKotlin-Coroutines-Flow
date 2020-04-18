@@ -1,4 +1,4 @@
-package com.doancnpm.edoctor.ui.dashboard
+package com.doancnpm.edoctor.ui.main.dashboard
 
 import android.os.Bundle
 import android.view.LayoutInflater

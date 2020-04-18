@@ -1,4 +1,4 @@
-package com.doancnpm.edoctor
+package com.doancnpm.edoctor.ui.main
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.navigation.NavController
 import androidx.navigation.ui.setupActionBarWithNavController
+import com.doancnpm.edoctor.R
 import com.doancnpm.edoctor.databinding.ActivityMainBinding
 import com.doancnpm.edoctor.utils.setupWithNavController
 import kotlin.LazyThreadSafetyMode.NONE
