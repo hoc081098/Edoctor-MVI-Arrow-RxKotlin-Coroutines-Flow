@@ -1,4 +1,4 @@
-package com.doancnpm.edoctor
+package com.doancnpm.edoctor.ui.splash
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope

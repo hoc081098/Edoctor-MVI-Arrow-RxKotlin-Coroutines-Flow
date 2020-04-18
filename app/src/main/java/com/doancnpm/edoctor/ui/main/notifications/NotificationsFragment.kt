@@ -1,4 +1,4 @@
-package com.doancnpm.edoctor.ui.notifications
+package com.doancnpm.edoctor.ui.main.notifications
 
 import android.os.Bundle
 import android.view.LayoutInflater
