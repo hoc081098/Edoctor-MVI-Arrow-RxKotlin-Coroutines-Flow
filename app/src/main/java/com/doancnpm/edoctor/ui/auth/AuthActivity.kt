@@ -9,10 +9,10 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import com.doancnpm.edoctor.R
 import com.doancnpm.edoctor.core.BaseActivity
 import com.doancnpm.edoctor.databinding.ActivityAuthBinding
-import kotlin.LazyThreadSafetyMode.NONE
+import com.doancnpm.edoctor.utils.viewBinding
 
 class AuthActivity : BaseActivity() {
-  private val binding by lazy(NONE) { ActivityAuthBinding.inflate(layoutInflater) }
+  private val binding by viewBinding(ActivityAuthBinding::inflate)
   private lateinit var appBarConfiguration: AppBarConfiguration
 
   override fun onCreate(savedInstanceState: Bundle?) {
