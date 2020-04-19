@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.navigation.fragment.findNavController
 import com.doancnpm.edoctor.core.BaseFragment
 import com.doancnpm.edoctor.databinding.FragmentLoginBinding
 
@@ -24,5 +25,8 @@ class LoginFragment : BaseFragment() {
     super.onViewCreated(view, savedInstanceState)
     binding.editEmail.error = "Invalid email address"
     binding.editPassword.error = "Too short password"
+    binding.signUpButton.setOnClickListener {
+      findNavController().navigate(LoginFragmentDirections.actionLoginFragmentToRegisterFragment())
+    }
   }
 }
