@@ -66,15 +66,13 @@ class UserRepositoryImpl(
   }
 
   override fun userObservable(): Observable<DomainResult<Option<User>>> {
-    val a = Observable.just(Either.right("") as Either<AppError, String>)
-
     return Observables.combineLatest(
       userLocalSource.tokenObservable(),
       userLocalSource.userObservable(),
     ) { tokenOptional, userOptional ->
       Option.fx {
-        val token = tokenOptional.bind()
-        val user = userOptional.bind()
+        val token = !tokenOptional
+        val user = !userOptional
         User(
           name = user.name,
           email = user.email,
