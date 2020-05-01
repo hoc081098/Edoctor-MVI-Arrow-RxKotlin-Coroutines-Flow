@@ -7,12 +7,14 @@ import android.os.Build
 import com.doancnpm.edoctor.koin.dataModule
 import com.doancnpm.edoctor.koin.domainModule
 import com.doancnpm.edoctor.koin.viewModelModule
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
 import org.koin.core.logger.Level
 import timber.log.Timber
 
+@ExperimentalCoroutinesApi
 @Suppress("unused")
 class MyApp : Application() {
   override fun onCreate() {
