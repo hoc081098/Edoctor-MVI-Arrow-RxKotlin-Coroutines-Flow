@@ -13,7 +13,7 @@ import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 
 object Mappers {
-  fun userReponseToUserLocal(userResponse: UserResponse): UserLocal {
+  fun userResponseToUserLocal(userResponse: UserResponse): UserLocal {
     return UserLocal(
       name = userResponse.name,
       email = userResponse.email,
