@@ -4,18 +4,16 @@ import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.os.Build
-import androidx.preference.PreferenceManager
 import com.doancnpm.edoctor.koin.dataModule
 import com.doancnpm.edoctor.koin.domainModule
 import com.doancnpm.edoctor.koin.viewModelModule
-import com.doancnpm.edoctor.utils.MySettings
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
 import org.koin.core.logger.Level
 import timber.log.Timber
-import java.util.*
 
+@Suppress("unused")
 class MyApp : Application() {
   override fun onCreate() {
     super.onCreate()
@@ -23,13 +21,6 @@ class MyApp : Application() {
     startKoin()
     setupTimber()
     createNotificationChannel()
-
-    val mySettings = MySettings(PreferenceManager.getDefaultSharedPreferences(this))
-    Timber.d("${mySettings.darkTheme}..${mySettings.userName}..${mySettings.favoriteIds}")
-    mySettings.darkTheme = true
-    mySettings.userName = "User name"
-    mySettings.favoriteIds = setOf("@@@@@@")
-    Timber.d("${mySettings.darkTheme}..${mySettings.userName}..${mySettings.favoriteIds}")
   }
 
   private fun setupTimber() {
