@@ -39,18 +39,27 @@ class LoginFragment : BaseFragment(R.layout.fragment_login) {
 
   private fun bindVM() {
     viewModel.stateLiveData.observe(owner = viewLifecycleOwner) { (emailErrors, passwordErrors, isLoading) ->
-      if (binding.editEmail.error != emailErrors) {
-        binding.editEmail.error = if (ValidationError.INVALID_EMAIL_ADDRESS in emailErrors) {
-          "Invalid email address"
-        } else {
-          null
+      binding.run {
+        if (editEmail.error != emailErrors) {
+          editEmail.error = if (ValidationError.INVALID_EMAIL_ADDRESS in emailErrors) {
+            "Invalid email address"
+          } else {
+            null
+          }
         }
-      }
-      if (binding.editPassword.error != passwordErrors) {
-        binding.editPassword.error = if (ValidationError.TOO_SHORT_PASSWORD in passwordErrors) {
-          "Too short password"
+        if (editPassword.error != passwordErrors) {
+          editPassword.error = if (ValidationError.TOO_SHORT_PASSWORD in passwordErrors) {
+            "Too short password"
+          } else {
+            null
+          }
+        }
+        if (isLoading) {
+          progressBar.visible()
+          buttonLogin.invisible()
         } else {
-          null
+          progressBar.invisible()
+          buttonLogin.visible()
         }
       }
     }
