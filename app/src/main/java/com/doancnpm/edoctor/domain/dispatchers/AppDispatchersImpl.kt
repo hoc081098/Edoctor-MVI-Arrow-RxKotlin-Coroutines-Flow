@@ -1,7 +1,7 @@
 package com.doancnpm.edoctor.domain.dispatchers
 
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.rx2.asCoroutineDispatcher
+import kotlinx.coroutines.rx3.asCoroutineDispatcher
 
 class AppDispatchersImpl(
   private val appSchedulers: AppSchedulers,

@@ -5,13 +5,13 @@ import arrow.core.Some
 import arrow.core.toOption
 import com.doancnpm.edoctor.data.ErrorMapper
 import com.doancnpm.edoctor.domain.entity.DomainResult
-import com.jakewharton.rxrelay2.Relay
-import io.reactivex.BackpressureStrategy
-import io.reactivex.Observable
-import io.reactivex.annotations.CheckReturnValue
-import io.reactivex.annotations.SchedulerSupport
-import io.reactivex.rxkotlin.ofType
-import io.reactivex.subjects.Subject
+import com.jakewharton.rxrelay3.Relay
+import io.reactivex.rxjava3.annotations.CheckReturnValue
+import io.reactivex.rxjava3.annotations.SchedulerSupport
+import io.reactivex.rxjava3.core.BackpressureStrategy
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.kotlin.ofType
+import io.reactivex.rxjava3.subjects.Subject
 
 @CheckReturnValue
 @SchedulerSupport(SchedulerSupport.NONE)

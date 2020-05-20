@@ -4,8 +4,6 @@ package com.doancnpm.edoctor.koin
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.preference.PreferenceManager
-import com.afollestad.rxkprefs.RxkPrefs
-import com.afollestad.rxkprefs.rxkPrefs
 import com.doancnpm.edoctor.BuildConfig
 import com.doancnpm.edoctor.data.ErrorMapper
 import com.doancnpm.edoctor.data.local.UserLocalSource
@@ -58,11 +56,9 @@ val dataModule = module {
    * Local
    */
 
-  single<UserLocalSource> { UserLocalSourceImpl(get(), get(), get(), get()) }
+  single<UserLocalSource> { UserLocalSourceImpl(get(), get(), get()) }
 
   single { provideSharedPreferences(androidApplication()) }
-
-  single { provideRxkPrefs(get()) }
 
   factory { provideUserLocalJsonAdapter(get()) }
 
@@ -74,10 +70,6 @@ val dataModule = module {
 
 private fun provideUserLocalJsonAdapter(moshi: Moshi): UserLocalJsonAdapter {
   return UserLocalJsonAdapter(moshi)
-}
-
-private fun provideRxkPrefs(sharedPreferences: SharedPreferences): RxkPrefs {
-  return rxkPrefs(sharedPreferences)
 }
 
 private fun provideSharedPreferences(context: Context): SharedPreferences {
