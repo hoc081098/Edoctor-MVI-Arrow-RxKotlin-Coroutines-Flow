@@ -11,10 +11,10 @@ import com.doancnpm.edoctor.domain.entity.getMessage
 import com.doancnpm.edoctor.ui.auth.login.LoginContract.*
 import com.doancnpm.edoctor.ui.main.MainActivity
 import com.doancnpm.edoctor.utils.*
-import com.jakewharton.rxbinding3.view.clicks
-import com.jakewharton.rxbinding3.widget.textChanges
-import io.reactivex.Observable
-import io.reactivex.rxkotlin.addTo
+import com.jakewharton.rxbinding4.view.clicks
+import com.jakewharton.rxbinding4.widget.textChanges
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.kotlin.addTo
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class LoginFragment : BaseFragment(R.layout.fragment_login) {
