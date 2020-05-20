@@ -4,7 +4,8 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.android.MainThreadDisposable
+import io.reactivex.rxjava3.android.MainThreadDisposable.verifyMainThread
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.ObservableEmitter
 
@@ -51,6 +52,8 @@ inline fun <T : Any> LiveData<Event<T>>.observeEvent(
 
 fun <T : Any> LiveData<T>.toObservable(fallbackNullValue: (() -> T)? = null): Observable<T> {
   return Observable.create { emitter: ObservableEmitter<T> ->
+    verifyMainThread()
+
     val observer = Observer<T> { value: T? ->
       if (!emitter.isDisposed) {
         val notnullValue = value ?: fallbackNullValue?.invoke() ?: return@Observer
@@ -58,8 +61,13 @@ fun <T : Any> LiveData<T>.toObservable(fallbackNullValue: (() -> T)? = null): Ob
       }
     }
     observeForever(observer)
-    emitter.setCancellable { removeObserver(observer) }
-  }.subscribeOn(AndroidSchedulers.mainThread())
+
+    emitter.setDisposable(object : MainThreadDisposable() {
+      override fun onDispose() {
+        removeObserver(observer)
+      }
+    })
+  }
 }
 
 @Suppress("NOTHING_TO_INLINE")

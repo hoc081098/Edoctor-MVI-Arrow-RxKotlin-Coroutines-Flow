@@ -24,6 +24,15 @@ sealed class AppError(cause: Throwable?) : Throwable(cause) {
   ) : AppError(cause)
 }
 
+fun AppError.getMessage(): String {
+  return when (this) {
+    is AppError.Remote.NetworkError -> "Network error"
+    is AppError.Remote.ServerError -> "Server error"
+    is AppError.Local.DatabaseError -> "Database error"
+    is AppError.UnexpectedError -> "Unexpected error"
+  }
+}
+
 typealias DomainResult<T> = Either<AppError, T>
 
 @Suppress("NOTHING_TO_INLINE")
