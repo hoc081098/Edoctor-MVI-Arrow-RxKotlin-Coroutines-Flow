@@ -4,10 +4,10 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
-import io.reactivex.Observable
-import io.reactivex.ObservableEmitter
-import io.reactivex.android.MainThreadDisposable
-import io.reactivex.android.MainThreadDisposable.verifyMainThread
+import io.reactivex.rxjava3.android.MainThreadDisposable
+import io.reactivex.rxjava3.android.MainThreadDisposable.verifyMainThread
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.core.ObservableEmitter
 
 /**
  * Used as a wrapper for data that is exposed via a LiveData that represents an event.
