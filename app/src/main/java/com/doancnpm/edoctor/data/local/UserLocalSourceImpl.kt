@@ -3,8 +3,6 @@ package com.doancnpm.edoctor.data.local
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import arrow.core.toOption
-import com.afollestad.rxkprefs.RxkPrefs
-import com.afollestad.rxkprefs.rxjava.observe
 import com.doancnpm.edoctor.data.local.model.UserLocal
 import com.doancnpm.edoctor.data.local.model.UserLocalJsonAdapter
 import com.doancnpm.edoctor.domain.dispatchers.AppDispatchers
