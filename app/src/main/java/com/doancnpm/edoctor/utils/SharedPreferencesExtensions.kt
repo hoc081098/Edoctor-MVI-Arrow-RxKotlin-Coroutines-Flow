@@ -4,9 +4,12 @@ import android.content.SharedPreferences
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener
 import androidx.core.content.edit
 import arrow.core.Option
+import arrow.core.getOrElse
 import arrow.core.toOption
 import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.core.ObservableEmitter
 import timber.log.Timber
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
@@ -83,41 +86,69 @@ fun <T : Any?> SharedPreferences.delegate(
   } as ReadWriteProperty<Any, T>
 }
 
+private val listeners = ConcurrentHashMap<ObservableEmitter<*>, OnSharedPreferenceChangeListener>()
+
 /**
- * Valid type of [defaultValue]: `String?`, `Set<*>?`, `Boolean`, `Int`, `Long`, `Float`
+ * Valid type of [defValue]: `String?`, `Set<*>?`, `Boolean`, `Int`, `Long`, `Float`
  */
 @Suppress("UNCHECKED_CAST", "IMPLICIT_CAST_TO_ANY")
-fun <T : Any> SharedPreferences.observe(defaultValue: T?, key: String): Observable<Option<T>> {
-  /**
-   * @throws IllegalStateException
-   */
-  fun getValue(): T? = when (defaultValue) {
-    is String? -> getString(key, defaultValue)
-    is Set<*>? -> getStringSet(key, defaultValue?.filterIsInstanceTo(mutableSetOf<String>()))
-    is Boolean? -> getBoolean(key, defaultValue ?: false)
-    is Int? -> getInt(key, defaultValue ?: 0)
-    is Long? -> getLong(key, defaultValue ?: 0L)
-    is Float? -> getFloat(key, defaultValue ?: 0f)
-    else -> {
-      val clazz = (defaultValue ?: error("Cannot determine type of null value"))::class.java
-      error("Not support for type $clazz")
+private inline fun <reified T : Any> SharedPreferences.observe(
+  key: String,
+  defValue: T?
+): Observable<Option<T>> {
+  return Observable
+    .create<Unit> { emitter ->
+      registerOnSharedPreferenceChangeListener(
+        OnSharedPreferenceChangeListener { _, changedKey ->
+          if (changedKey == key) {
+            emitter.onNext(Unit)
+          }
+        }.also { listeners[emitter] = it }
+      )
+      emitter.setCancellable {
+        unregisterOnSharedPreferenceChangeListener(
+          listeners
+            .remove(emitter)
+            .also { Timber.d("Remove listener $it. Listeners count: ${listeners.size}") }
+        )
+      }
     }
-  } as T?
-
-  return Observable.create { emitter ->
-    fun emit() = runCatching { getValue().toOption() }
-      .onSuccess(emitter::onNext)
-      .onFailure(emitter::tryOnError)
-
-    val listener = OnSharedPreferenceChangeListener { _, changedKey ->
-      if (changedKey == key) emit()
+    .startWithItem(Unit)
+    .map {
+      (when (val clazz = T::class) {
+        String::class -> getString(key, defValue as String?)
+        Set::class -> getStringSet(key, (defValue as Set<*>?)?.filterIsInstanceTo(LinkedHashSet()))
+        Boolean::class -> getBoolean(key, defValue as Boolean)
+        Int::class -> getInt(key, defValue as Int)
+        Long::class -> getLong(key, defValue as Long)
+        Float::class -> getFloat(key, defValue as Float)
+        else -> error("Not support for type $clazz")
+      } as T?).toOption()
     }
-    registerOnSharedPreferenceChangeListener(listener)
-    emitter.setCancellable {
-      unregisterOnSharedPreferenceChangeListener(listener)
-      Timber.d("Remove listener")
-    }
-
-    emit() // emit seeded value
-  }
 }
+
+@Suppress("NOTHING_TO_INLINE")
+private inline fun <T> Observable<Option<T>>.unwrap(defValue: T): Observable<T> =
+  map { it.getOrElse { defValue } }
+
+fun SharedPreferences.observeString(
+  key: String,
+  defValue: String? = null,
+): Observable<Option<String>> = observe(key, defValue)
+
+fun SharedPreferences.observeStringSet(
+  key: String,
+  defValue: Set<String>? = null,
+): Observable<Option<Set<String>>> = observe(key, defValue)
+
+fun SharedPreferences.observeBoolean(key: String, defValue: Boolean = false): Observable<Boolean> =
+  observe(key, defValue).unwrap(defValue)
+
+fun SharedPreferences.observeInt(key: String, defValue: Int = 0): Observable<Int> =
+  observe(key, defValue).unwrap(defValue)
+
+fun SharedPreferences.observeLong(key: String, defValue: Long = 0L): Observable<Long> =
+  observe(key, defValue).unwrap(defValue)
+
+fun SharedPreferences.observeFloat(key: String, defValue: Float = 0f): Observable<Float> =
+  observe(key, defValue).unwrap(defValue)

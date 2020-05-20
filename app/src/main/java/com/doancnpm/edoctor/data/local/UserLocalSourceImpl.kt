@@ -5,7 +5,7 @@ import com.doancnpm.edoctor.data.local.model.UserLocal
 import com.doancnpm.edoctor.data.local.model.UserLocalJsonAdapter
 import com.doancnpm.edoctor.domain.dispatchers.AppDispatchers
 import com.doancnpm.edoctor.utils.delegate
-import com.doancnpm.edoctor.utils.observe
+import com.doancnpm.edoctor.utils.observeString
 import kotlinx.coroutines.withContext
 
 class UserLocalSourceImpl(
@@ -17,11 +17,11 @@ class UserLocalSourceImpl(
   private var token by sharedPreferences.delegate(null as String?, TOKEN_KEY, commit = true)
   private var userLocal by sharedPreferences.delegate(null as String?, USER_KEY, commit = true)
 
-  private val tokenObservable = sharedPreferences.observe(null as String?, TOKEN_KEY)
+  private val tokenObservable = sharedPreferences.observeString(TOKEN_KEY)
     .replay(1)
     .refCount()!!
 
-  private val userObservable = sharedPreferences.observe(null as String?, USER_KEY)
+  private val userObservable = sharedPreferences.observeString(USER_KEY)
     .map { json -> json.mapNotNull { it.toUserLocal() } }
     .replay(1)
     .refCount()!!
