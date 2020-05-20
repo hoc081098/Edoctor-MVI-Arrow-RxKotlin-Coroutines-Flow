@@ -2,7 +2,7 @@ package com.doancnpm.edoctor.core
 
 import androidx.annotation.CallSuper
 import androidx.lifecycle.ViewModel
-import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxjava3.disposables.CompositeDisposable
 import timber.log.Timber
 
 open class BaseVM : ViewModel() {
