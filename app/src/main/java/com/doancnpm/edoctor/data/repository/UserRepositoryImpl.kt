@@ -60,7 +60,7 @@ class UserRepositoryImpl(
         userLocalSource.saveToken(token)
 
         val userResponse = apiService.getUserProfile(email)
-        userLocalSource.saveUser(Mappers.userReponseToUserLocal(userResponse))
+        userLocalSource.saveUser(Mappers.userResponseToUserLocal(userResponse))
       }
     }
   }
@@ -98,7 +98,7 @@ class UserRepositoryImpl(
         ?: return userLocalSource.removeUserAndToken()
 
       val userResponse = apiService.getUserProfile(user.email)
-      userLocalSource.saveUser(Mappers.userReponseToUserLocal(userResponse))
+      userLocalSource.saveUser(Mappers.userResponseToUserLocal(userResponse))
       Timber.d("[USER_REPO] init success")
 
     } catch (e: Exception) {

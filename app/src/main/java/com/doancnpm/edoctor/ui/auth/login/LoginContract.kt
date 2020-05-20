@@ -8,9 +8,14 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.rx3.rxObservable
 
 interface LoginContract {
+  enum class ValidationError {
+    INVALID_EMAIL_ADDRESS,
+    TOO_SHORT_PASSWORD,
+  }
+
   data class ViewState(
-    val emailError: String?,
-    val passwordError: String?,
+    val emailErrors: Set<ValidationError>,
+    val passwordErrors: Set<ValidationError>,
     val isLoading: Boolean,
     // keep latest state when replace fragment
     val email: String?,
@@ -20,8 +25,8 @@ interface LoginContract {
       @JvmStatic
       fun initial() = ViewState(
         isLoading = false,
-        emailError = null,
-        passwordError = null,
+        emailErrors = emptySet(),
+        passwordErrors = emptySet(),
         email = null,
         password = null
       )
@@ -40,10 +45,10 @@ interface LoginContract {
   }
 
   sealed class PartialChange {
-    fun reducer(state: ViewState): ViewState {
+    fun reduce(state: ViewState): ViewState {
       return when (this) {
-        is EmailError -> state.copy(emailError = error)
-        is PasswordError -> state.copy(passwordError = error)
+        is EmailError -> state.copy(emailErrors = errors)
+        is PasswordError -> state.copy(passwordErrors = errors)
         Loading -> state.copy(isLoading = true)
         LoginSuccess -> state.copy(isLoading = false)
         is LoginFailure -> state.copy(isLoading = false)
@@ -52,8 +57,8 @@ interface LoginContract {
       }
     }
 
-    data class EmailError(val error: String?) : PartialChange()
-    data class PasswordError(val error: String?) : PartialChange()
+    data class EmailError(val errors: Set<ValidationError>) : PartialChange()
+    data class PasswordError(val errors: Set<ValidationError>) : PartialChange()
 
     data class EmailChanged(val email: String) : PartialChange()
     data class PasswordChanged(val password: String) : PartialChange()
