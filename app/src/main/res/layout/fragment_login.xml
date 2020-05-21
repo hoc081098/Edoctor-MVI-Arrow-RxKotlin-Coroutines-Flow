@@ -8,12 +8,12 @@
     android:background="@color/colorBackground">
 
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/edit_email"
+        android:id="@+id/edit_phone"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        android:hint="Email"
+        android:hint="Phone number"
         app:boxStrokeColor="@color/colorAccent"
         app:endIconMode="none"
         app:errorEnabled="true"
@@ -29,7 +29,7 @@
         app:layout_constraintTop_toBottomOf="@+id/textView3"
         app:layout_constraintVertical_bias="0.4"
         app:layout_constraintVertical_chainStyle="packed"
-        app:startIconDrawable="@drawable/ic_email_black_24dp"
+        app:startIconDrawable="@drawable/ic_phone_black_24dp"
         app:startIconTint="@color/colorIcon">
 
         <com.google.android.material.textfield.TextInputEditText
@@ -37,7 +37,8 @@
             android:layout_height="wrap_content"
             android:fontFamily="@font/google_sans"
             android:imeOptions="actionNext"
-            android:inputType="textEmailAddress"
+            android:inputType="phone"
+            android:digits="0123456789+"
             android:singleLine="true" />
 
     </com.google.android.material.textfield.TextInputLayout>
@@ -61,7 +62,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edit_email"
+        app:layout_constraintTop_toBottomOf="@id/edit_phone"
         app:passwordToggleEnabled="true"
         app:startIconDrawable="@drawable/ic_lock_black_24dp"
         app:startIconTint="@color/colorIcon">

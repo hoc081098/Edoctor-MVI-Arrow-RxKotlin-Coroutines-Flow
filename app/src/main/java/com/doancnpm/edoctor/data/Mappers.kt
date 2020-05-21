@@ -3,9 +3,10 @@ package com.doancnpm.edoctor.data
 import android.database.sqlite.SQLiteException
 import com.doancnpm.edoctor.data.local.model.UserLocal
 import com.doancnpm.edoctor.data.remote.response.ErrorResponseJsonAdapter
-import com.doancnpm.edoctor.data.remote.response.UserResponse
+import com.doancnpm.edoctor.data.remote.response.LoginUserResponse
 import com.doancnpm.edoctor.domain.entity.AppError
 import com.doancnpm.edoctor.domain.entity.DomainResult
+import com.doancnpm.edoctor.domain.entity.User
 import com.doancnpm.edoctor.domain.entity.leftResult
 import retrofit2.HttpException
 import java.io.IOException
@@ -13,12 +14,27 @@ import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 
 object Mappers {
-  fun userResponseToUserLocal(userResponse: UserResponse): UserLocal {
+  fun loginUserResponseToUserLocal(response: LoginUserResponse.User): UserLocal {
     return UserLocal(
-      name = userResponse.name,
-      email = userResponse.email,
-      createdAt = userResponse.createdAt,
-      imageUrl = userResponse.imageUrl,
+      id = response.id,
+      fullName = response.fullName,
+      phone = response.phone,
+      roleId = response.roleId,
+      status = response.status,
+      avatar = response.avatar,
+      birthday = response.birthday,
+    )
+  }
+
+  fun userLocalToUserDomain(local: UserLocal): User {
+    return User(
+      id = local.id,
+      fullName = local.fullName,
+      phone = local.phone,
+      roleId = local.roleId,
+      status = local.status,
+      avatar = local.avatar,
+      birthday = local.birthday,
     )
   }
 }
@@ -52,7 +68,7 @@ class ErrorMapper(private val errorResponseJsonAdapter: ErrorResponseJsonAdapter
           }
           .let { response ->
             AppError.Remote.ServerError(
-              errorMessage = response.message,
+              errorMessage = response.messages,
               statusCode = response.statusCode,
               cause = throwable,
             )

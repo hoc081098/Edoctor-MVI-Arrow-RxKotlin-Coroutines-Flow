@@ -9,7 +9,7 @@ interface UserLocalSource {
   * Token
   */
 
-  fun token(): String?
+  suspend fun token(): String?
 
   suspend fun saveToken(token: String)
 

@@ -10,7 +10,8 @@ import com.doancnpm.edoctor.data.local.UserLocalSource
 import com.doancnpm.edoctor.data.local.UserLocalSourceImpl
 import com.doancnpm.edoctor.data.local.model.UserLocalJsonAdapter
 import com.doancnpm.edoctor.data.remote.ApiService
-import com.doancnpm.edoctor.data.remote.AuthInterceptor
+import com.doancnpm.edoctor.data.remote.interceptor.ApiKeyInterceptor
+import com.doancnpm.edoctor.data.remote.interceptor.AuthInterceptor
 import com.doancnpm.edoctor.data.remote.response.ErrorResponseJsonAdapter
 import com.doancnpm.edoctor.domain.dispatchers.AppDispatchers
 import com.squareup.moshi.Moshi
@@ -30,13 +31,16 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 
 val API_QUALIFIER = named("com.doancnpm.edoctor.api")
+private val API_KEY_QUALIFIER = named("com.doancnpm.edoctor.api_key")
 
 val dataModule = module {
   /*
    * Remote
    */
 
-  single(API_QUALIFIER) { "https://node-auth-081098.herokuapp.com/" }
+  factory(API_QUALIFIER) { BuildConfig.BASE_URL }
+
+  factory(API_KEY_QUALIFIER) { BuildConfig.API_KEY }
 
   single(API_QUALIFIER) { provideRetrofit(get(API_QUALIFIER), get(), get()) }
 
@@ -44,13 +48,15 @@ val dataModule = module {
 
   single { provideMoshi() }
 
-  single { provideOkHttpClient(get()) }
+  single { provideOkHttpClient(get(), get()) }
 
   single { provideErrorMapper(get()) }
 
   factory { provideErrorResponseJsonAdapter(get()) }
 
   factory { provideAuthInterceptor(get()) }
+
+  factory { provideApiKeyInterceptor(get(API_KEY_QUALIFIER)) }
 
   /*
    * Local
@@ -77,7 +83,12 @@ private fun provideSharedPreferences(context: Context): SharedPreferences {
 }
 
 private fun provideAuthInterceptor(userLocalSource: UserLocalSource): AuthInterceptor {
-  return AuthInterceptor(userLocalSource)
+  return AuthInterceptor(
+    userLocalSource)
+}
+
+private fun provideApiKeyInterceptor(apiKey: String): ApiKeyInterceptor {
+  return ApiKeyInterceptor(apiKey)
 }
 
 private fun provideErrorResponseJsonAdapter(moshi: Moshi): ErrorResponseJsonAdapter {
@@ -106,7 +117,10 @@ private fun provideRetrofit(baseUrl: String, moshi: Moshi, client: OkHttpClient)
     .build()
 }
 
-private fun provideOkHttpClient(authInterceptor: AuthInterceptor): OkHttpClient {
+private fun provideOkHttpClient(
+  authInterceptor: AuthInterceptor,
+  apiKeyInterceptor: ApiKeyInterceptor,
+): OkHttpClient {
   return OkHttpClient.Builder()
     .connectTimeout(10, TimeUnit.SECONDS)
     .readTimeout(10, TimeUnit.SECONDS)
@@ -116,5 +130,6 @@ private fun provideOkHttpClient(authInterceptor: AuthInterceptor): OkHttpClient 
         .apply { level = if (BuildConfig.DEBUG) Level.BODY else Level.NONE }
     )
     .addInterceptor(authInterceptor)
+    .addInterceptor(apiKeyInterceptor)
     .build()
 }

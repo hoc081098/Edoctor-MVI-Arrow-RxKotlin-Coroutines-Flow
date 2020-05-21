@@ -32,41 +32,44 @@ class LoginVM(
   fun processIntents(intents: Observable<ViewIntent>): Disposable = intents.subscribe(intentS)!!
 
   init {
-    val emailObservable = intentS.ofType<ViewIntent.EmailChanged>()
-      .map { it.email }
-      .map { it to getEmailErrors(it) }
+    val phoneObservable = intentS.ofType<ViewIntent.PhoneChanged>()
+      .map { it.phone }
+      .distinctUntilChanged()
+      .map { it to getPhoneErrors(it) }
       .share()
     val passwordObservable = intentS.ofType<ViewIntent.PasswordChange>()
       .map { it.password }
+      .distinctUntilChanged()
       .map { it to getPasswordErrors(it) }
       .share()
 
     val loginChanges = intentS
       .ofType<ViewIntent.SubmitLogin>()
-      .withLatestFrom(emailObservable, passwordObservable) { _, email, password ->
-        email to password
+      .withLatestFrom(phoneObservable, passwordObservable) { _, phone, password ->
+        phone to password
       }
-      .mapNotNull { (emailPair, passwordPair) ->
-        val (email, emailErrors) = emailPair
+      .mapNotNull { (phonePair, passwordPair) ->
+        val (phone, phoneErrors) = phonePair
         val (password, passwordErrors) = passwordPair
-        if (emailErrors.isEmpty() && passwordErrors.isEmpty()) {
-          email to password
+
+        if (phoneErrors.isEmpty() && passwordErrors.isEmpty()) {
+          phone to password
         } else {
           null
         }
       }
-      .exhaustMap { (email, password) ->
+      .exhaustMap { (phone, password) ->
         interactor
-          .login(email, password)
+          .login(phone, password)
           .observeOn(schedulers.main)
           .doOnNext {
             eventD.value = Event(
               when (it) {
                 PartialChange.LoginSuccess -> SingleEvent.LoginSuccess
                 is PartialChange.LoginFailure -> SingleEvent.LoginFailure(it.error)
-                is PartialChange.EmailError -> return@doOnNext
+                is PartialChange.PhoneError -> return@doOnNext
                 is PartialChange.PasswordError -> return@doOnNext
-                is PartialChange.EmailChanged -> return@doOnNext
+                is PartialChange.PhoneChanged -> return@doOnNext
                 is PartialChange.PasswordChanged -> return@doOnNext
                 PartialChange.Loading -> return@doOnNext
               }
@@ -75,9 +78,9 @@ class LoginVM(
       }
 
     Observable.mergeArray(
-        emailObservable.map { PartialChange.EmailError(it.second) },
+        phoneObservable.map { PartialChange.PhoneError(it.second) },
         passwordObservable.map { PartialChange.PasswordError(it.second) },
-        emailObservable.map { PartialChange.EmailChanged(it.first) },
+        phoneObservable.map { PartialChange.PhoneChanged(it.first) },
         passwordObservable.map { PartialChange.PasswordChanged(it.first) },
         loginChanges,
       )
@@ -88,14 +91,18 @@ class LoginVM(
   }
 
   private companion object {
+    // Singleton set of error
+    val tooShortPassword = setOf(ValidationError.TOO_SHORT_PASSWORD)
+    val invalidPhoneNumber = setOf(ValidationError.INVALID_PHONE_NUMBER)
+
     /**
-     * @return error message or null if email is valid
+     * @return error message or null if phone is valid
      */
-    fun getEmailErrors(email: String): Set<ValidationError> {
-      return if (Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-        emptySet()
-      } else {
-        setOf(ValidationError.INVALID_EMAIL_ADDRESS)
+    fun getPhoneErrors(phone: String): Set<ValidationError> {
+      return when {
+        phone.isBlank() -> invalidPhoneNumber
+        !Patterns.PHONE.matcher(phone).matches() -> invalidPhoneNumber
+        else -> emptySet()
       }
     }
 
@@ -103,10 +110,9 @@ class LoginVM(
      * @return error message or null if password is valid
      */
     fun getPasswordErrors(password: String): Set<ValidationError> {
-      return if (password.length < 6) {
-        setOf(ValidationError.TOO_SHORT_PASSWORD)
-      } else {
-        emptySet()
+      return when {
+        password.length < 6 -> tooShortPassword
+        else -> emptySet()
       }
     }
   }

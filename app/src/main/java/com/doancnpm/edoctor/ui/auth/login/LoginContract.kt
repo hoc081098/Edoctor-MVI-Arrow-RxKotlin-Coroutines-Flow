@@ -9,32 +9,32 @@ import kotlinx.coroutines.rx3.rxObservable
 
 interface LoginContract {
   enum class ValidationError {
-    INVALID_EMAIL_ADDRESS,
+    INVALID_PHONE_NUMBER,
     TOO_SHORT_PASSWORD,
   }
 
   data class ViewState(
-    val emailErrors: Set<ValidationError>,
+    val phoneErrors: Set<ValidationError>,
     val passwordErrors: Set<ValidationError>,
     val isLoading: Boolean,
     // keep latest state when replace fragment
-    val email: String?,
+    val phone: String?,
     val password: String?,
   ) {
     companion object {
       @JvmStatic
       fun initial() = ViewState(
         isLoading = false,
-        emailErrors = emptySet(),
+        phoneErrors = emptySet(),
         passwordErrors = emptySet(),
-        email = null,
-        password = null
+        phone = null,
+        password = null,
       )
     }
   }
 
   sealed class ViewIntent {
-    data class EmailChanged(val email: String) : ViewIntent()
+    data class PhoneChanged(val phone: String) : ViewIntent()
     data class PasswordChange(val password: String) : ViewIntent()
     object SubmitLogin : ViewIntent()
   }
@@ -47,20 +47,20 @@ interface LoginContract {
   sealed class PartialChange {
     fun reduce(state: ViewState): ViewState {
       return when (this) {
-        is EmailError -> state.copy(emailErrors = errors)
+        is PhoneError -> state.copy(phoneErrors = errors)
         is PasswordError -> state.copy(passwordErrors = errors)
         Loading -> state.copy(isLoading = true)
         LoginSuccess -> state.copy(isLoading = false)
         is LoginFailure -> state.copy(isLoading = false)
-        is EmailChanged -> state.copy(email = email)
+        is PhoneChanged -> state.copy(phone = phone)
         is PasswordChanged -> state.copy(password = password)
       }
     }
 
-    data class EmailError(val errors: Set<ValidationError>) : PartialChange()
+    data class PhoneError(val errors: Set<ValidationError>) : PartialChange()
     data class PasswordError(val errors: Set<ValidationError>) : PartialChange()
 
-    data class EmailChanged(val email: String) : PartialChange()
+    data class PhoneChanged(val phone: String) : PartialChange()
     data class PasswordChanged(val password: String) : PartialChange()
 
     object Loading : PartialChange()
@@ -69,7 +69,7 @@ interface LoginContract {
   }
 
   interface Interactor {
-    fun login(email: String, password: String): Observable<PartialChange>
+    fun login(phone: String, password: String): Observable<PartialChange>
   }
 }
 
@@ -78,11 +78,11 @@ class LoginInteractor(
   private val dispatchers: AppDispatchers,
   private val userRepository: UserRepository,
 ) : LoginContract.Interactor {
-  override fun login(email: String, password: String): Observable<LoginContract.PartialChange> {
+  override fun login(phone: String, password: String): Observable<LoginContract.PartialChange> {
     return rxObservable(dispatchers.main) {
       send(LoginContract.PartialChange.Loading)
       userRepository
-        .login(email, password)
+        .login(phone, password)
         .fold(
           ifLeft = { LoginContract.PartialChange.LoginFailure(it) },
           ifRight = { LoginContract.PartialChange.LoginSuccess }

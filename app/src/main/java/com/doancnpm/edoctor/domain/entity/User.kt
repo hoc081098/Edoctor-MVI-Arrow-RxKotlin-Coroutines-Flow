@@ -1,11 +1,11 @@
 package com.doancnpm.edoctor.domain.entity
 
-import java.util.*
-
 data class User(
-  val name: String,
-  val email: String,
-  val createdAt: Date,
-  val imageUrl: String,
-  val token: String,
+  val id: Int,
+  val phone: String,
+  val fullName: String,
+  val roleId: Int,
+  val status: Int,
+  val avatar: String?,
+  val birthday: String?,
 )
