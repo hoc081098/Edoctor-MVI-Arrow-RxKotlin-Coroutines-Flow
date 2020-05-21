@@ -16,6 +16,7 @@ import com.jakewharton.rxbinding4.widget.textChanges
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.kotlin.addTo
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import timber.log.Timber
 
 class LoginFragment : BaseFragment(R.layout.fragment_login) {
   private val binding by viewBinding(FragmentLoginBinding::bind)
@@ -33,16 +34,16 @@ class LoginFragment : BaseFragment(R.layout.fragment_login) {
       findNavController().navigate(LoginFragmentDirections.actionLoginFragmentToRegisterFragment())
     }
     val state = viewModel.stateLiveData.value
-    binding.editEmail.editText!!.setText(state?.email)
+    binding.editPhone.editText!!.setText(state?.phone)
     binding.editPassword.editText!!.setText(state?.password)
   }
 
   private fun bindVM() {
     viewModel.stateLiveData.observe(owner = viewLifecycleOwner) { (emailErrors, passwordErrors, isLoading) ->
       binding.run {
-        if (editEmail.error != emailErrors) {
-          editEmail.error = if (ValidationError.INVALID_EMAIL_ADDRESS in emailErrors) {
-            "Invalid email address"
+        if (editPhone.error != emailErrors) {
+          editPhone.error = if (ValidationError.INVALID_PHONE_NUMBER in emailErrors) {
+            "Invalid phone number"
           } else {
             null
           }
@@ -79,6 +80,7 @@ class LoginFragment : BaseFragment(R.layout.fragment_login) {
           }
         }
         is SingleEvent.LoginFailure -> {
+          Timber.d("Login error: ${event.error}")
           view?.snack("Login error: ${event.error.getMessage()}")
         }
       }
@@ -86,12 +88,12 @@ class LoginFragment : BaseFragment(R.layout.fragment_login) {
 
     viewModel.processIntents(
       Observable.mergeArray(
-        binding.editEmail.editText!!.textChanges()
-          .map { ViewIntent.EmailChanged(it.toString()) },
+        binding.editPhone.editText!!.textChanges()
+          .map { ViewIntent.PhoneChanged(it.toString()) },
         binding.editPassword.editText!!.textChanges()
           .map { ViewIntent.PasswordChange(it.toString()) },
         binding.buttonLogin.clicks()
-          .map { ViewIntent.SubmitLogin }
+          .map { ViewIntent.SubmitLogin },
       )
     ).addTo(compositeDisposable)
   }

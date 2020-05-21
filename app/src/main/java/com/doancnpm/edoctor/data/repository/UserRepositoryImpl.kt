@@ -1,6 +1,5 @@
 package com.doancnpm.edoctor.data.repository
 
-import android.util.Base64
 import arrow.core.Either
 import arrow.core.Option
 import arrow.core.extensions.fx
@@ -8,8 +7,8 @@ import com.doancnpm.edoctor.data.ErrorMapper
 import com.doancnpm.edoctor.data.Mappers
 import com.doancnpm.edoctor.data.local.UserLocalSource
 import com.doancnpm.edoctor.data.remote.ApiService
+import com.doancnpm.edoctor.data.remote.body.LoginUserBody
 import com.doancnpm.edoctor.domain.dispatchers.AppDispatchers
-import com.doancnpm.edoctor.domain.entity.AppError
 import com.doancnpm.edoctor.domain.entity.DomainResult
 import com.doancnpm.edoctor.domain.entity.User
 import com.doancnpm.edoctor.domain.entity.rightResult
@@ -23,6 +22,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 import timber.log.Timber
+import java.net.HttpURLConnection.HTTP_FORBIDDEN
+import java.net.HttpURLConnection.HTTP_UNAUTHORIZED
 
 class UserRepositoryImpl(
   private val apiService: ApiService,
@@ -48,19 +49,18 @@ class UserRepositoryImpl(
     }
   }
 
-  override suspend fun login(email: String, password: String): DomainResult<Unit> {
+  override suspend fun login(phone: String, password: String): DomainResult<Unit> {
     return Either.catch(errorMapper::map) {
       withContext(dispatchers.io) {
-        val base64 = Base64.encodeToString(
-          "$email:$password".toByteArray(),
-          Base64.NO_WRAP,
+        val response = apiService.loginUser(
+          LoginUserBody(
+            phone = phone,
+            password = password,
+            deviceToken = "1234a" // TODO: Get device token
+          )
         )
-        val tokenResponse = apiService.login("Basic $base64")
-        val token = tokenResponse.token ?: throw AppError.Remote.ServerError("Login failed", 401)
-        userLocalSource.saveToken(token)
-
-        val userResponse = apiService.getUserProfile(email)
-        userLocalSource.saveUser(Mappers.userResponseToUserLocal(userResponse))
+        userLocalSource.saveToken(response.data.token)
+        userLocalSource.saveUser(Mappers.loginUserResponseToUserLocal(response.data.user))
       }
     }
   }
@@ -71,15 +71,9 @@ class UserRepositoryImpl(
       userLocalSource.userObservable(),
     ) { tokenOptional, userOptional ->
       Option.fx {
-        val token = !tokenOptional
+        !tokenOptional
         val user = !userOptional
-        User(
-          name = user.name,
-          email = user.email,
-          createdAt = user.createdAt,
-          imageUrl = user.imageUrl,
-          token = token,
-        )
+        Mappers.userLocalToUserDomain(user)
       }.rightResult()
     }.catchError(errorMapper)
   }
@@ -94,17 +88,16 @@ class UserRepositoryImpl(
 
       userLocalSource.token()
         ?: return userLocalSource.removeUserAndToken()
-      val user = userLocalSource.user()
+      userLocalSource.user()
         ?: return userLocalSource.removeUserAndToken()
 
-      val userResponse = apiService.getUserProfile(user.email)
-      userLocalSource.saveUser(Mappers.userResponseToUserLocal(userResponse))
-      Timber.d("[USER_REPO] init success")
+      apiService.getCategories(page = 1, perPage = 1)
 
+      Timber.d("[USER_REPO] init success")
     } catch (e: Exception) {
       Timber.d(e, "[USER_REPO] init failure: $e")
 
-      if ((e as? HttpException)?.code() == 401) {
+      if ((e as? HttpException)?.code() in arrayOf(HTTP_UNAUTHORIZED, HTTP_FORBIDDEN)) {
         userLocalSource.removeUserAndToken()
         Timber.d(e, "[USER_REPO] Login again!")
       }
