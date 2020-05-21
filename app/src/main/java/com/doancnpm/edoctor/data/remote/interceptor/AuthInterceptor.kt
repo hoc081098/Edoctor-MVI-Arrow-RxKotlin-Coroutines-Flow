@@ -21,7 +21,7 @@ class AuthInterceptor(private val userLocalSource: UserLocalSource) : Intercepto
           null -> request
           else -> request
             .newBuilder()
-            .addHeader("x-access-token", token)
+            .addHeader("Authorization", "Bearer $token")
             .build()
         }
       }
