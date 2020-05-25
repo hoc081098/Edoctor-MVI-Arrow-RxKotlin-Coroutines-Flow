@@ -8,7 +8,10 @@ import com.doancnpm.edoctor.data.Mappers
 import com.doancnpm.edoctor.data.local.UserLocalSource
 import com.doancnpm.edoctor.data.remote.ApiService
 import com.doancnpm.edoctor.data.remote.body.LoginUserBody
+import com.doancnpm.edoctor.data.remote.body.RegisterUserBody
+import com.doancnpm.edoctor.data.remote.response.BaseResponse
 import com.doancnpm.edoctor.domain.dispatchers.AppDispatchers
+import com.doancnpm.edoctor.domain.entity.AppError
 import com.doancnpm.edoctor.domain.entity.DomainResult
 import com.doancnpm.edoctor.domain.entity.User
 import com.doancnpm.edoctor.domain.entity.rightResult
@@ -24,6 +27,7 @@ import retrofit2.HttpException
 import timber.log.Timber
 import java.net.HttpURLConnection.HTTP_FORBIDDEN
 import java.net.HttpURLConnection.HTTP_UNAUTHORIZED
+import java.util.*
 
 class UserRepositoryImpl(
   private val apiService: ApiService,
@@ -52,15 +56,41 @@ class UserRepositoryImpl(
   override suspend fun login(phone: String, password: String): DomainResult<Unit> {
     return Either.catch(errorMapper::map) {
       withContext(dispatchers.io) {
-        val response = apiService.loginUser(
+        val (token, user) = apiService.loginUser(
           LoginUserBody(
             phone = phone,
             password = password,
             deviceToken = "1234a" // TODO: Get device token
           )
-        )
-        userLocalSource.saveToken(response.data.token)
-        userLocalSource.saveUser(Mappers.loginUserResponseToUserLocal(response.data.user))
+        ).let(::unwrapResponse)
+
+        userLocalSource.saveToken(token)
+        userLocalSource.saveUser(Mappers.loginUserResponseToUserLocal(user))
+      }
+    }
+  }
+
+  override suspend fun register(
+    phone: String,
+    password: String,
+    roleId: User.RoleId,
+    fullName: String,
+    birthday: Date?,
+  ): DomainResult<String> {
+    return Either.catch(errorMapper::map) {
+      withContext(dispatchers.io) {
+        apiService
+          .registerUser(
+            RegisterUserBody(
+              phone = phone,
+              password = password,
+              roleId = Mappers.roleIdToInt(roleId),
+              fullName = fullName,
+              birthday = birthday?.toString(),
+            )
+          )
+          .let(::unwrapResponse)
+          .phone
       }
     }
   }
@@ -91,7 +121,7 @@ class UserRepositoryImpl(
       userLocalSource.user()
         ?: return userLocalSource.removeUserAndToken()
 
-      apiService.getCategories(page = 1, perPage = 1)
+      apiService.getCategories(page = 1, perPage = 1).let(::unwrapResponse)
 
       Timber.d("[USER_REPO] init success")
     } catch (e: Exception) {
@@ -103,6 +133,26 @@ class UserRepositoryImpl(
       }
     } finally {
       checkAuthDeferred.complete(Unit)
+    }
+  }
+
+  private companion object {
+    /**
+     * Return data in [baseResponse] if [baseResponse.success] is true.
+     * Otherwise, throws [AppError.Remote.ServerError]
+     * @param  baseResponse that needed to unwrap
+     * @return Data in response
+     * @throws AppError.Remote.ServerError
+     */
+    private fun <Data : Any> unwrapResponse(baseResponse: BaseResponse<Data>): Data {
+      return if (baseResponse.success) {
+        baseResponse.data
+      } else {
+        throw AppError.Remote.ServerError(
+          errorMessage = "Response is not success",
+          statusCode = -1
+        )
+      }
     }
   }
 }
