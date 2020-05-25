@@ -19,7 +19,7 @@ import io.reactivex.rxjava3.kotlin.subscribeBy
 
 class LoginVM(
   private val interactor: Interactor,
-  private val schedulers: AppSchedulers,
+  schedulers: AppSchedulers,
 ) : BaseVM() {
   private val stateD = MutableLiveData<ViewState>().apply { value = initialState }
   private val eventD = MutableLiveData<Event<SingleEvent>>()
@@ -61,7 +61,6 @@ class LoginVM(
       .exhaustMap { (phone, password) ->
         interactor
           .login(phone, password)
-          .observeOn(schedulers.main)
           .doOnNext {
             eventD.value = Event(
               when (it) {
