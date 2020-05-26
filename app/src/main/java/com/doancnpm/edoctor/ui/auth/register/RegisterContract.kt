@@ -38,7 +38,6 @@ interface RegisterContract {
   enum class ValidationError {
     INVALID_PHONE_NUMBER,
     TOO_SHORT_PASSWORD,
-    MISSING_ROLE,
     TOO_SHORT_FULL_NAME,
     INVALID_BIRTH_DAY,
   }

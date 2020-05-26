@@ -27,7 +27,7 @@ sealed class AppError(cause: Throwable?) : Throwable(cause) {
 fun AppError.getMessage(): String {
   return when (this) {
     is AppError.Remote.NetworkError -> "Network error"
-    is AppError.Remote.ServerError -> "Server error"
+    is AppError.Remote.ServerError -> "Server error: $errorMessage"
     is AppError.Local.DatabaseError -> "Database error"
     is AppError.UnexpectedError -> "Unexpected error"
   }

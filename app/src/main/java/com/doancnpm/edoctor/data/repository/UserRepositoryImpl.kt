@@ -9,14 +9,14 @@ import com.doancnpm.edoctor.data.local.UserLocalSource
 import com.doancnpm.edoctor.data.remote.ApiService
 import com.doancnpm.edoctor.data.remote.body.LoginUserBody
 import com.doancnpm.edoctor.data.remote.body.RegisterUserBody
-import com.doancnpm.edoctor.data.remote.response.BaseResponse
+import com.doancnpm.edoctor.data.remote.response.unwrap
 import com.doancnpm.edoctor.domain.dispatchers.AppDispatchers
-import com.doancnpm.edoctor.domain.entity.AppError
 import com.doancnpm.edoctor.domain.entity.DomainResult
 import com.doancnpm.edoctor.domain.entity.User
 import com.doancnpm.edoctor.domain.entity.rightResult
 import com.doancnpm.edoctor.domain.repository.UserRepository
 import com.doancnpm.edoctor.utils.catchError
+import com.doancnpm.edoctor.utils.toString_yyyyMMdd
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.kotlin.Observables
 import kotlinx.coroutines.CompletableDeferred
@@ -62,7 +62,7 @@ class UserRepositoryImpl(
             password = password,
             deviceToken = "1234a" // TODO: Get device token
           )
-        ).let(::unwrapResponse)
+        ).unwrap()
 
         userLocalSource.saveToken(token)
         userLocalSource.saveUser(Mappers.loginUserResponseToUserLocal(user))
@@ -86,10 +86,10 @@ class UserRepositoryImpl(
               password = password,
               roleId = Mappers.roleIdToInt(roleId),
               fullName = fullName,
-              birthday = birthday?.toString(),
+              birthday = birthday?.toString_yyyyMMdd(),
             )
           )
-          .let(::unwrapResponse)
+          .unwrap()
           .phone
       }
     }
@@ -121,7 +121,7 @@ class UserRepositoryImpl(
       userLocalSource.user()
         ?: return userLocalSource.removeUserAndToken()
 
-      apiService.getCategories(page = 1, perPage = 1).let(::unwrapResponse)
+      apiService.getCategories(page = 1, perPage = 1).unwrap()
 
       Timber.d("[USER_REPO] init success")
     } catch (e: Exception) {
@@ -133,26 +133,6 @@ class UserRepositoryImpl(
       }
     } finally {
       checkAuthDeferred.complete(Unit)
-    }
-  }
-
-  private companion object {
-    /**
-     * Return data in [baseResponse] if [baseResponse.success] is true.
-     * Otherwise, throws [AppError.Remote.ServerError]
-     * @param  baseResponse that needed to unwrap
-     * @return Data in response
-     * @throws AppError.Remote.ServerError
-     */
-    private fun <Data : Any> unwrapResponse(baseResponse: BaseResponse<Data>): Data {
-      return if (baseResponse.success) {
-        baseResponse.data
-      } else {
-        throw AppError.Remote.ServerError(
-          errorMessage = "Response is not success",
-          statusCode = -1
-        )
-      }
     }
   }
 }
