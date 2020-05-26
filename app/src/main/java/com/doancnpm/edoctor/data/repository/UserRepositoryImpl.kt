@@ -19,10 +19,7 @@ import com.doancnpm.edoctor.utils.catchError
 import com.doancnpm.edoctor.utils.toString_yyyyMMdd
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.kotlin.Observables
-import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import retrofit2.HttpException
 import timber.log.Timber
 import java.net.HttpURLConnection.HTTP_FORBIDDEN
@@ -39,7 +36,12 @@ class UserRepositoryImpl(
   private val checkAuthDeferred = CompletableDeferred<Unit>()
 
   init {
-    appCoroutineScope.launch { checkAuthInternal() }
+    appCoroutineScope.launch {
+      while (isActive) {
+        checkAuthInternal()
+        delay(CHECK_AUTH_INTERVAL)
+      }
+    }
   }
 
   /*
@@ -114,7 +116,7 @@ class UserRepositoryImpl(
 
   private suspend fun checkAuthInternal() {
     try {
-      Timber.d("[USER_REPO] started")
+      Timber.d("[CHECK AUTH] started")
 
       userLocalSource.token()
         ?: return userLocalSource.removeUserAndToken()
@@ -123,16 +125,20 @@ class UserRepositoryImpl(
 
       apiService.getCategories(page = 1, perPage = 1).unwrap()
 
-      Timber.d("[USER_REPO] init success")
+      Timber.d("[CHECK AUTH] success")
     } catch (e: Exception) {
-      Timber.d(e, "[USER_REPO] init failure: $e")
+      Timber.d(e, "[CHECK AUTH] failure: $e")
 
       if ((e as? HttpException)?.code() in arrayOf(HTTP_UNAUTHORIZED, HTTP_FORBIDDEN)) {
         userLocalSource.removeUserAndToken()
-        Timber.d(e, "[USER_REPO] Login again!")
+        Timber.d(e, "[CHECK AUTH] Login again!")
       }
     } finally {
       checkAuthDeferred.complete(Unit)
     }
+  }
+
+  private companion object {
+    const val CHECK_AUTH_INTERVAL = 60_000L
   }
 }
