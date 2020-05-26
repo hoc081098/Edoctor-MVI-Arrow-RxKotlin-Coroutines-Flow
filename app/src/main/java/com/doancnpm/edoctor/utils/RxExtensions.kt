@@ -1,6 +1,5 @@
 package com.doancnpm.edoctor.utils
 
-import androidx.annotation.CheckResult
 import arrow.core.Some
 import arrow.core.toOption
 import com.doancnpm.edoctor.data.ErrorMapper
@@ -23,7 +22,7 @@ inline fun <T : Any> Relay<T>.asObservable(): Observable<T> = this
 @Suppress("nothing_to_inline")
 inline fun <T : Any> Subject<T>.asObservable(): Observable<T> = this
 
-@CheckResult
+@CheckReturnValue
 inline fun <T : Any, R : Any> Observable<T>.exhaustMap(crossinline transform: (T) -> Observable<R>): Observable<R> {
   return this
     .toFlowable(BackpressureStrategy.DROP)
@@ -31,7 +30,7 @@ inline fun <T : Any, R : Any> Observable<T>.exhaustMap(crossinline transform: (T
     .toObservable()
 }
 
-@CheckResult
+@CheckReturnValue
 inline fun <T : Any, R : Any> Observable<T>.mapNotNull(crossinline transform: (T) -> R?): Observable<R> {
   return map { transform(it).toOption() }
     .ofType<Some<R>>()
@@ -39,7 +38,7 @@ inline fun <T : Any, R : Any> Observable<T>.mapNotNull(crossinline transform: (T
 }
 
 @Suppress("NOTHING_TO_INLINE")
-@CheckResult
+@CheckReturnValue
 inline fun <T> Observable<DomainResult<T>>.catchError(errorMapper: ErrorMapper): Observable<DomainResult<T>> {
   return onErrorReturn { errorMapper.mapAsLeft(it) }
 }
