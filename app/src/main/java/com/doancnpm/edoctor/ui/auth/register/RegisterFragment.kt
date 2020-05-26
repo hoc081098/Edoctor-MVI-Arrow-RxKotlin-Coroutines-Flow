@@ -17,6 +17,7 @@ import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.kotlin.addTo
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
+import java.util.*
 
 class RegisterFragment : BaseFragment(R.layout.fragment_register) {
   private val binding by viewBinding(FragmentRegisterBinding::bind)
@@ -52,6 +53,11 @@ class RegisterFragment : BaseFragment(R.layout.fragment_register) {
             parse_yyyyMMdd("1998-10-08")!!
           )
         ),
+        binding.editBirthday
+          .editText!!
+          .clicks()
+          .exhaustMap { requireContext().pickDateObservable(1998, Calendar.OCTOBER, 8) }
+          .map { ViewIntent.BirthdayChanged(it) },
         binding.radioRole
           .checkedChanges()
           .map {
@@ -128,6 +134,7 @@ class RegisterFragment : BaseFragment(R.layout.fragment_register) {
 
   private fun setupViews() {
     binding.editBirthday.editText!!.inputType = InputType.TYPE_NULL
+    binding.editBirthday.editText!!.onFocusChangeListener = null
 
     val (phone, password, roleId, fullName, birthday) =
       viewModel.stateLiveData.value?.formData as? RegisterContract.FormData.Data ?: return
