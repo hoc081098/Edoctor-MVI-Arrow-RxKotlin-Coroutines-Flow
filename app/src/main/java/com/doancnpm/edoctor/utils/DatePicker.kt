@@ -1,89 +1,94 @@
 package com.doancnpm.edoctor.utils
 
-import android.app.DatePickerDialog
-import android.content.Context
 import android.content.DialogInterface
 import android.os.Looper
-import android.widget.DatePicker
+import android.view.View
+import androidx.fragment.app.FragmentActivity
+import com.google.android.material.datepicker.CalendarConstraints
+import com.google.android.material.datepicker.CalendarConstraints.DateValidator
+import com.google.android.material.datepicker.MaterialDatePicker
+import com.google.android.material.datepicker.MaterialDatePicker.INPUT_MODE_CALENDAR
 import io.reactivex.rxjava3.android.MainThreadDisposable
 import io.reactivex.rxjava3.core.Observable
-import io.reactivex.rxjava3.core.Observer
-import io.reactivex.rxjava3.disposables.Disposable
 import timber.log.Timber
 import java.util.*
+import java.util.Calendar.*
+import com.google.android.material.datepicker.MaterialPickerOnPositiveButtonClickListener as OnPositiveButtonClickListener
 
-fun Context.pickDateObservable(year: Int, month: Int, dayOfMonth: Int): Observable<Date> {
-  return PickDateObservable(
-    this,
-    year,
-    month,
-    dayOfMonth,
-  )
+fun FragmentActivity.pickDateObservable(
+  year: Int,
+  month: Int,
+  dayOfMonth: Int,
+  validator: DateValidator? = null,
+): Observable<Date> {
+  return Observable.create { emitter ->
+    if (Looper.myLooper() != Looper.getMainLooper()) {
+      emitter.onError(IllegalStateException("Expected to be called on the main thread but was " + Thread.currentThread().name))
+      return@create
+    }
+
+    val datePicker = materialDatePicker(year, month, dayOfMonth, validator)
+
+    val onPositiveButtonClickListener = OnPositiveButtonClickListener<Long> { selection ->
+      selection ?: return@OnPositiveButtonClickListener emitter.onComplete()
+
+      val date = Date(selection).also { Timber.d("[onDateSet] $it") }
+      emitter.onNext(date)
+      emitter.onComplete()
+    }
+    val onCancelListener = DialogInterface.OnCancelListener {
+      Timber.d("[onCancel]")
+      emitter.onComplete()
+    }
+    val onNegativeButtonClickListener = View.OnClickListener {
+      Timber.d("[onClickCancel]")
+      emitter.onComplete()
+    }
+
+    datePicker.addOnPositiveButtonClickListener(onPositiveButtonClickListener)
+    datePicker.addOnCancelListener(onCancelListener)
+    datePicker.addOnNegativeButtonClickListener(onNegativeButtonClickListener)
+
+    emitter.setDisposable(object : MainThreadDisposable() {
+      override fun onDispose() {
+
+        datePicker.removeOnPositiveButtonClickListener(onPositiveButtonClickListener)
+        datePicker.removeOnCancelListener(onCancelListener)
+        datePicker.removeOnNegativeButtonClickListener(onNegativeButtonClickListener)
+        runCatching { datePicker.dismissAllowingStateLoss() }
+
+        Timber.d("[onDispose]")
+      }
+    })
+  }
 }
 
-private class PickDateObservable(
-  private val context: Context,
-  private val year: Int,
-  private val month: Int,
-  private val dayOfMonth: Int,
-) : Observable<Date>() {
-  override fun subscribeActual(observer: Observer<in Date>) {
-
-    if (Looper.myLooper() != Looper.getMainLooper()) {
-      observer.onSubscribe(Disposable.empty())
-      observer.onError(IllegalStateException(
-        "Expected to be called on the main thread but was " + Thread.currentThread().name))
-      return
+private fun FragmentActivity.materialDatePicker(
+  year: Int,
+  month: Int,
+  dayOfMonth: Int,
+  validator: DateValidator?,
+): MaterialDatePicker<Long> {
+  val initialSelection = getInstance(Locale.getDefault())
+    .apply {
+      this[YEAR] = year
+      this[MONTH] = month
+      this[DAY_OF_MONTH] = dayOfMonth
     }
+    .timeInMillis
 
-    val dialog = DatePickerDialog(
-      context,
-      android.R.style.Theme_Material_Light_Dialog_Alert,
-      null,
-      year,
-      month,
-      dayOfMonth,
-    ).apply { show() }
-
-    val listener = Listener(dialog, observer)
-    observer.onSubscribe(listener)
-
-    dialog.setOnCancelListener(listener)
-    dialog.setOnDateSetListener(listener)
-  }
-
-  private class Listener(
-    private val dialog: DatePickerDialog,
-    private val observer: Observer<in Date>,
-  ) : MainThreadDisposable(),
-    DialogInterface.OnCancelListener,
-    DatePickerDialog.OnDateSetListener {
-
-    override fun onDispose() {
-      Timber.d("[onDispose]")
-
-      dialog.setOnCancelListener(null)
-      dialog.setOnDateSetListener(null)
-      dialog.dismiss()
-    }
-
-    override fun onCancel(dialog: DialogInterface?) {
-      if (!isDisposed) {
-        Timber.d("[onCancel]")
-        observer.onComplete()
-      }
-    }
-
-    override fun onDateSet(view: DatePicker?, year: Int, month: Int, dayOfMonth: Int) {
-      if (!isDisposed) {
-        val date = Calendar.getInstance(Locale.getDefault())
-          .apply { set(year, month, dayOfMonth, 0, 0, 0) }
-          .time
-          .also { Timber.d("[onDateSet] $it") }
-
-        observer.onNext(date)
-        observer.onComplete()
-      }
-    }
-  }
+  val datePicker = MaterialDatePicker.Builder
+    .datePicker()
+    .setSelection(initialSelection)
+    .setInputMode(INPUT_MODE_CALENDAR)
+    .setCalendarConstraints(
+      CalendarConstraints.Builder()
+        .apply {
+          validator?.let(::setValidator)
+        }
+        .build()
+    )
+    .build()
+    .apply { show(supportFragmentManager, this.toString()) }
+  return datePicker
 }
