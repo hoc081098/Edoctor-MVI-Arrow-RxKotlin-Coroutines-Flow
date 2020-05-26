@@ -5,9 +5,8 @@ package com.doancnpm.edoctor.utils
 import java.text.SimpleDateFormat
 import java.util.*
 
+private val dateFormatter get() = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
 
-private val dateFormatter by lazy { SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()) }
+fun parse_yyyyMMdd(source: String): Date? = dateFormatter.parse(source)
 
-fun parse_yyyyMMdd(source: String) = dateFormatter.parse(source)
-
-fun Date.toString_yyyyMMdd() = dateFormatter.format(this)
+fun Date.toString_yyyyMMdd(): String = dateFormatter.format(this)
