@@ -48,11 +48,6 @@ class RegisterFragment : BaseFragment(R.layout.fragment_register) {
         binding.editFullName.editText!!
           .textChanges()
           .map { ViewIntent.FullNameChanged(it.toString()) },
-        Observable.just(
-          ViewIntent.BirthdayChanged(
-            parse_yyyyMMdd("1998-10-08")!!
-          )
-        ),
         binding.editBirthday
           .editText!!
           .clicks()
