@@ -52,7 +52,8 @@ class RegisterFragment : BaseFragment(R.layout.fragment_register) {
           .editText!!
           .clicks()
           .exhaustMap { requireActivity().pickDateObservable(1998, Calendar.OCTOBER, 8) }
-          .map { ViewIntent.BirthdayChanged(it) },
+          .map { ViewIntent.BirthdayChanged(it) }
+          .startWithItem(ViewIntent.BirthdayChanged(null)),
         binding.radioRole
           .checkedChanges()
           .map {

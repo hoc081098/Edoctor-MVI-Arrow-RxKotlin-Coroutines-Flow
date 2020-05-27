@@ -62,7 +62,7 @@ interface RegisterContract {
     data class PasswordChanged(val password: String) : ViewIntent()
     data class RoleIdChanged(val roleId: RoleId) : ViewIntent()
     data class FullNameChanged(val fullName: String) : ViewIntent()
-    data class BirthdayChanged(val date: Date) : ViewIntent()
+    data class BirthdayChanged(val date: Date?) : ViewIntent()
     object Submit : ViewIntent()
   }
 

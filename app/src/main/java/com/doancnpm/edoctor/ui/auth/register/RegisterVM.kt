@@ -3,6 +3,8 @@ package com.doancnpm.edoctor.ui.auth.register
 import android.util.Patterns
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.distinctUntilChanged
+import arrow.core.getOrElse
+import arrow.core.toOption
 import com.doancnpm.edoctor.core.BaseVM
 import com.doancnpm.edoctor.domain.dispatchers.AppSchedulers
 import com.doancnpm.edoctor.ui.auth.register.RegisterContract.*
@@ -54,9 +56,9 @@ class RegisterVM(
       .map { getFullNameErrors(it) to it }
 
     val birthDayObservable = intentS.ofType<ViewIntent.BirthdayChanged>()
-      .map { it.date }
+      .map { it.date.toOption() }
       .distinctUntilChanged()
-      .map { getBirthDayErrors(it) to it }
+      .map { getBirthDayErrors(it.orNull()) to it }
 
     val errorsAndFormData = Observables.combineLatest(
         phoneObservable,
@@ -71,7 +73,7 @@ class RegisterVM(
           password = password.second,
           roleId = roleId.second,
           fullName = fullName.second,
-          birthday = birthDay.second,
+          birthday = birthDay.second.orNull(),
         )
         errors to formData
       }
@@ -149,7 +151,7 @@ class RegisterVM(
       }
     }
 
-    fun getBirthDayErrors(birthDay: Date): Set<ValidationError> {
+    fun getBirthDayErrors(birthDay: Date?): Set<ValidationError> {
       return emptySet() // TODO: getBirthDayErrors
     }
   }
