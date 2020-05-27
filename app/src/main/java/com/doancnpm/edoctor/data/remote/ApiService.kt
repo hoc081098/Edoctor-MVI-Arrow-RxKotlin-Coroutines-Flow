@@ -21,6 +21,11 @@ interface ApiService {
   @Headers("@: NoAuth")
   @POST("register")
   suspend fun registerUser(@Body userBody: RegisterUserBody): BaseResponse<RegisterUserResponse>
+
+  @Headers("@: NoAuth")
+  @POST("resend-code")
+  @FormUrlEncoded
+  suspend fun resendCode(@Field("phone") phone: String): BaseResponse<List<Any>>
   //endregion
 
   //region Category

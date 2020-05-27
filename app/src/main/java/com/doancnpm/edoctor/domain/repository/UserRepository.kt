@@ -23,4 +23,6 @@ interface UserRepository {
   fun userObservable(): Observable<DomainResult<Option<User>>>
 
   suspend fun checkAuth(): DomainResult<Boolean>
+
+  suspend fun resendCode(phone: String): DomainResult<Unit>
 }
