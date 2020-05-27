@@ -55,6 +55,14 @@ class UserRepositoryImpl(
     }
   }
 
+  override suspend fun resendCode(phone: String): DomainResult<Unit> {
+    return Either.catch(errorMapper::map) {
+      withContext(dispatchers.io) {
+        apiService.resendCode(phone).unwrap()
+      }
+    }
+  }
+
   override suspend fun login(phone: String, password: String): DomainResult<Unit> {
     return Either.catch(errorMapper::map) {
       withContext(dispatchers.io) {

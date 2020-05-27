@@ -6,6 +6,9 @@ import com.doancnpm.edoctor.ui.auth.login.LoginVM
 import com.doancnpm.edoctor.ui.auth.register.RegisterContract
 import com.doancnpm.edoctor.ui.auth.register.RegisterInteractor
 import com.doancnpm.edoctor.ui.auth.register.RegisterVM
+import com.doancnpm.edoctor.ui.auth.resendcode.ResendCodeContract
+import com.doancnpm.edoctor.ui.auth.resendcode.ResendCodeInteractor
+import com.doancnpm.edoctor.ui.auth.resendcode.ResendCodeVM
 import com.doancnpm.edoctor.ui.splash.SplashVM
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.koin.androidx.viewmodel.dsl.viewModel
@@ -20,4 +23,7 @@ val viewModelModule = module {
 
   factory<RegisterContract.Interactor> { RegisterInteractor(get(), get()) }
   viewModel { RegisterVM(get(), get()) }
+
+  factory<ResendCodeContract.Interactor> { ResendCodeInteractor(get(), get()) }
+  viewModel { ResendCodeVM(get(), get()) }
 }
