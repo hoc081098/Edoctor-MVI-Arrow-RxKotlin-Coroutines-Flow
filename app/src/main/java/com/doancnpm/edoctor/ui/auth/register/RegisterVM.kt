@@ -25,11 +25,12 @@ class RegisterVM(
 ) : BaseVM() {
   private val stateD = MutableLiveData<ViewState>().apply { value = initialState }
   private val eventD = MutableLiveData<Event<SingleEvent>>()
+  private val stateDistinctD = stateD.distinctUntilChanged()
 
   private val initialState = ViewState.initial()
   private val intentS = PublishRelay.create<ViewIntent>()
 
-  val stateLiveData get() = stateD.distinctUntilChanged()
+  val stateLiveData get() = stateDistinctD
   val eventLiveData get() = eventD.asLiveData()
   fun processIntents(intents: Observable<ViewIntent>): Disposable = intents.subscribe(intentS)!!
 

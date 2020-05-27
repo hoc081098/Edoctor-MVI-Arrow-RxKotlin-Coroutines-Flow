@@ -132,8 +132,9 @@ class RegisterFragment : BaseFragment(R.layout.fragment_register) {
     binding.editBirthday.editText!!.inputType = InputType.TYPE_NULL
     binding.editBirthday.editText!!.onFocusChangeListener = null
 
+    Timber.d("Form data: ${viewModel.stateLiveData.value?.formData}")
     val (phone, password, roleId, fullName, birthday) =
-      viewModel.stateLiveData.value?.formData as? RegisterContract.FormData.Data ?: return
+      viewModel.stateLiveData.value?.formData as? FormData.Data ?: return
 
     binding.run {
       editPhone.editText!!.setText(phone)
