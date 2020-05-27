@@ -9,7 +9,7 @@ import com.google.android.material.datepicker.CalendarConstraints.DateValidator
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.datepicker.MaterialDatePicker.INPUT_MODE_CALENDAR
 import io.reactivex.rxjava3.android.MainThreadDisposable
-import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.core.Maybe
 import timber.log.Timber
 import java.util.*
 import java.util.Calendar.*
@@ -20,8 +20,8 @@ fun FragmentActivity.pickDateObservable(
   month: Int,
   dayOfMonth: Int,
   validator: DateValidator? = null,
-): Observable<Date> {
-  return Observable.create { emitter ->
+): Maybe<Date> {
+  return Maybe.create { emitter ->
     if (Looper.myLooper() != Looper.getMainLooper()) {
       emitter.onError(IllegalStateException("Expected to be called on the main thread but was " + Thread.currentThread().name))
       return@create
@@ -33,7 +33,7 @@ fun FragmentActivity.pickDateObservable(
       selection ?: return@OnPositiveButtonClickListener emitter.onComplete()
 
       val date = Date(selection).also { Timber.d("[onDateSet] $it") }
-      emitter.onNext(date)
+      emitter.onSuccess(date)
       emitter.onComplete()
     }
     val onCancelListener = DialogInterface.OnCancelListener {
