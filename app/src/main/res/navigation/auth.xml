@@ -20,5 +20,44 @@
     <fragment
         android:id="@+id/registerFragment"
         android:name="com.doancnpm.edoctor.ui.auth.register.RegisterFragment"
-        android:label="RegisterFragment" />
+        android:label="RegisterFragment">
+
+        <action
+            android:id="@+id/action_registerFragment_to_verifyFragment"
+            app:destination="@id/verifyFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"
+            app:popUpTo="@id/loginFragment"
+            app:popUpToInclusive="false" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/verifyFragment"
+        android:name="com.doancnpm.edoctor.ui.auth.verify.VerifyFragment"
+        android:label="VerifyFragment">
+
+        <argument
+            android:name="phone"
+            app:argType="string"
+            app:nullable="false" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/resendCodeFragment"
+        android:name="com.doancnpm.edoctor.ui.auth.resendcode.ResendCodeFragment"
+        android:label="ResendCodeFragment">
+
+        <action
+            android:id="@+id/action_resendCodeFragment_to_verifyFragment"
+            app:destination="@id/verifyFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+    </fragment>
+
 </navigation>

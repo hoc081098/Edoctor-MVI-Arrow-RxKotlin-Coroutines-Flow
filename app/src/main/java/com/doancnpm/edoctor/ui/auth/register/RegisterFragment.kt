@@ -3,6 +3,7 @@ package com.doancnpm.edoctor.ui.auth.register
 import android.os.Bundle
 import android.text.InputType
 import android.view.View
+import androidx.navigation.fragment.findNavController
 import com.doancnpm.edoctor.R
 import com.doancnpm.edoctor.core.BaseFragment
 import com.doancnpm.edoctor.databinding.FragmentRegisterBinding
@@ -51,7 +52,11 @@ class RegisterFragment : BaseFragment(R.layout.fragment_register) {
         binding.editBirthday
           .editText!!
           .clicks()
-          .exhaustMap { requireActivity().pickDateObservable(1998, Calendar.OCTOBER, 8) }
+          .exhaustMap {
+            requireActivity()
+              .pickDateObservable(1998, Calendar.JANUARY, 1)
+              .toObservable()
+          }
           .map { ViewIntent.BirthdayChanged(it) }
           .startWithItem(ViewIntent.BirthdayChanged(null)),
         binding.radioRole
@@ -74,9 +79,11 @@ class RegisterFragment : BaseFragment(R.layout.fragment_register) {
   private fun handleEvent(event: SingleEvent) {
     when (event) {
       is SingleEvent.Success -> {
-        view?.snack("Register success") {
+        view?.snack("Register success")
 
-        }
+        RegisterFragmentDirections
+          .actionRegisterFragmentToVerifyFragment(event.phone)
+          .let { findNavController().navigate(it) }
       }
       is SingleEvent.Failure -> {
         Timber.d("Register error: ${event.error}")
