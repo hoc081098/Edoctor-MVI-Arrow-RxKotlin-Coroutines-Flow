@@ -3,7 +3,6 @@ package com.doancnpm.edoctor.ui.auth.login
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.doancnpm.edoctor.R
 import com.doancnpm.edoctor.core.BaseFragment
@@ -16,8 +15,6 @@ import com.jakewharton.rxbinding4.view.clicks
 import com.jakewharton.rxbinding4.widget.textChanges
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.kotlin.addTo
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 
@@ -33,9 +30,18 @@ class LoginFragment : BaseFragment(R.layout.fragment_login) {
   }
 
   private fun setupViews() {
-    binding.signUpButton.setOnClickListener {
-      findNavController().navigate(LoginFragmentDirections.actionLoginFragmentToRegisterFragment())
+    val onClickListener = View.OnClickListener {
+      findNavController().navigate(
+        when (it.id) {
+          R.id.sign_up_button -> LoginFragmentDirections.actionLoginFragmentToRegisterFragment()
+          R.id.verify_button -> LoginFragmentDirections.actionLoginFragmentToResendCodeFragment()
+          else -> error("Missing case ${it.id}")
+        }
+      )
     }
+    binding.signUpButton.setOnClickListener(onClickListener)
+    binding.verifyButton.setOnClickListener(onClickListener)
+
     val state = viewModel.stateLiveData.value
     binding.editPhone.editText!!.setText(state?.phone)
     binding.editPassword.editText!!.setText(state?.password)
