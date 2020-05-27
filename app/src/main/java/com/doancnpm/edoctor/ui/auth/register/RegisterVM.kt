@@ -3,7 +3,6 @@ package com.doancnpm.edoctor.ui.auth.register
 import android.util.Patterns
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.distinctUntilChanged
-import arrow.core.getOrElse
 import arrow.core.toOption
 import com.doancnpm.edoctor.core.BaseVM
 import com.doancnpm.edoctor.domain.dispatchers.AppSchedulers
@@ -14,7 +13,7 @@ import com.doancnpm.edoctor.utils.exhaustMap
 import com.jakewharton.rxrelay3.PublishRelay
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.Disposable
-import io.reactivex.rxjava3.kotlin.Observables
+import io.reactivex.rxjava3.kotlin.Observables.combineLatest
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.ofType
 import io.reactivex.rxjava3.kotlin.subscribeBy
@@ -60,7 +59,7 @@ class RegisterVM(
       .distinctUntilChanged()
       .map { getBirthDayErrors(it.orNull()) to it }
 
-    val errorsAndFormData = Observables.combineLatest(
+    val errorsAndFormData = combineLatest(
         phoneObservable,
         passwordObservable,
         roleIdObservable,
