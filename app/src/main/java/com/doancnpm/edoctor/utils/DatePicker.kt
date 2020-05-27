@@ -77,7 +77,7 @@ private fun FragmentActivity.materialDatePicker(
     }
     .timeInMillis
 
-  val datePicker = MaterialDatePicker.Builder
+  return MaterialDatePicker.Builder
     .datePicker()
     .setSelection(initialSelection)
     .setInputMode(INPUT_MODE_CALENDAR)
@@ -89,6 +89,5 @@ private fun FragmentActivity.materialDatePicker(
         .build()
     )
     .build()
-    .apply { show(supportFragmentManager, this.toString()) }
-  return datePicker
+    .apply { show(supportFragmentManager, toString()) }
 }
