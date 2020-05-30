@@ -59,12 +59,14 @@ class ResendCodeFragment : BaseFragment(R.layout.fragment_resend_code) {
     viewModel.singleEvent.observeEvent(owner = viewLifecycleOwner) { event ->
       when (event) {
         is ResendCodeContract.SingleEvent.Success -> {
+          view?.snack("Resend code successfully")
+
           ResendCodeFragmentDirections
             .actionResendCodeFragmentToVerifyFragment(event.phone)
             .let { findNavController().navigate(it) }
         }
         is ResendCodeContract.SingleEvent.Failure -> {
-          requireContext().toast(event.error.getMessage())
+          view?.snack(event.error.getMessage())
         }
       }
     }

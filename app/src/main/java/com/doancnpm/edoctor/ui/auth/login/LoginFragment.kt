@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.doancnpm.edoctor.R
 import com.doancnpm.edoctor.core.BaseFragment
 import com.doancnpm.edoctor.databinding.FragmentLoginBinding
@@ -21,15 +22,16 @@ import timber.log.Timber
 class LoginFragment : BaseFragment(R.layout.fragment_login) {
   private val binding by viewBinding(FragmentLoginBinding::bind)
   private val viewModel by viewModel<LoginVM>()
+  private val navArgs by navArgs<LoginFragmentArgs>()
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 
-    setupViews()
+    setupViews(savedInstanceState == null)
     bindVM()
   }
 
-  private fun setupViews() {
+  private fun setupViews(isFirstConstruction: Boolean) {
     val onClickListener = View.OnClickListener {
       findNavController().navigate(
         when (it.id) {
@@ -41,6 +43,13 @@ class LoginFragment : BaseFragment(R.layout.fragment_login) {
     }
     binding.signUpButton.setOnClickListener(onClickListener)
     binding.verifyButton.setOnClickListener(onClickListener)
+
+    if (isFirstConstruction) {
+      navArgs.phone?.let {
+        binding.editPhone.editText!!.setText(it)
+        return
+      }
+    }
 
     val state = viewModel.stateLiveData.value
     binding.editPhone.editText!!.setText(state?.phone)
@@ -76,7 +85,7 @@ class LoginFragment : BaseFragment(R.layout.fragment_login) {
     viewModel.eventLiveData.observeEvent(owner = viewLifecycleOwner) { event ->
       when (event) {
         SingleEvent.LoginSuccess -> {
-          view?.snack("Login success") {
+          view?.snack("Login successfully") {
             onDismissed {
               startActivity(
                 Intent(
