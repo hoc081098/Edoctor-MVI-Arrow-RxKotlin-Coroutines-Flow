@@ -8,7 +8,9 @@ import com.doancnpm.edoctor.domain.dispatchers.AppDispatchers
 import com.doancnpm.edoctor.domain.entity.Category
 import com.doancnpm.edoctor.domain.entity.DomainResult
 import com.doancnpm.edoctor.domain.repository.CategoryRepository
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 class CategoryRepositoryImpl(
   private val apiService: ApiService,
@@ -24,6 +26,8 @@ class CategoryRepositoryImpl(
           .unwrap()
           .categories
           .map { it.toCategoryDomain(baseUrl) }
+          .also { delay(300) }
+          .also { Timber.d("getCategories { page: $page, perPage: $perPage }") }
       }
     }
   }
