@@ -62,7 +62,7 @@ val dataModule = module {
    * Local
    */
 
-  single<UserLocalSource> { UserLocalSourceImpl(get(), get(), get()) }
+  single<UserLocalSource> { UserLocalSourceImpl(get(), get(), get(), get()) }
 
   single { provideSharedPreferences(androidApplication()) }
 
