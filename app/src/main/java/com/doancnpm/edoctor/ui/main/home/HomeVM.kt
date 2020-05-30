@@ -10,39 +10,42 @@ import com.doancnpm.edoctor.utils.asLiveData
 import com.doancnpm.edoctor.utils.setValue
 import kotlinx.coroutines.launch
 
+@ExperimentalStdlibApi
 class HomeVM(private val categoryRepository: CategoryRepository) : BaseVM() {
+  private val ViewState.shouldLoadNextPage: Boolean
+    get() = when (page) {
+      0 -> !isLoadingFirstPage && firstPageError === null && categories.isEmpty()
+      else -> placeholderState === PlaceholderState.Idle && !loadedAll
+    }
+  private val ViewState.shouldRetryNextPage: Boolean
+    get() = when (page) {
+      0 -> !isLoadingFirstPage && firstPageError !== null
+      else -> placeholderState is PlaceholderState.Error
+    }
+
   private val stateD = MutableLiveData<ViewState>().apply { value = ViewState() }
 
   val stateLiveData = stateD.asLiveData()
 
+  init {
+    loadNextPage()
+  }
+
   fun loadNextPage() {
-    val state = stateD.value!!
-    when {
-      state.page == 0 -> {
-        if (!state.isLoadingFirstPage && state.firstPageError === null) {
-          loadNextPageInternal()
-        }
-      }
-      state.placeholderState is PlaceholderState.Idle -> {
-        loadNextPageInternal()
-      }
+    if (stateD.value!!.shouldLoadNextPage) {
+      loadNextPageInternal()
     }
   }
 
-  fun retry() {
-    val state = stateD.value!!
-    when {
-      state.page == 0 -> {
-        if (!state.isLoadingFirstPage && state.firstPageError !== null) {
-          loadNextPageInternal()
-        }
-      }
-      state.placeholderState is PlaceholderState.Error -> {
-        loadNextPageInternal()
-      }
+  fun retryNextPage() {
+    if (stateD.value!!.shouldRetryNextPage) {
+      loadNextPageInternal()
     }
   }
 
+  /**
+   * Must be guarded
+   */
   private fun loadNextPageInternal() {
     viewModelScope.launch {
       val state = stateD.value!!
@@ -73,7 +76,8 @@ class HomeVM(private val categoryRepository: CategoryRepository) : BaseVM() {
               isLoadingFirstPage = false,
               firstPageError = null,
               placeholderState = PlaceholderState.Idle,
-              page = state.page + 1
+              page = state.page + if (result.isEmpty()) 0 else 1,
+              loadedAll = result.isEmpty(),
             )
           },
           ifLeft = {
@@ -93,6 +97,10 @@ class HomeVM(private val categoryRepository: CategoryRepository) : BaseVM() {
         )
         .let { newState -> stateD.setValue { newState } }
     }
+  }
+
+  fun refresh() {
+    TODO("Not yet implemented")
   }
 
   private companion object {

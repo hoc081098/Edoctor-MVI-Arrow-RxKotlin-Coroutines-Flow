@@ -19,6 +19,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
+@ExperimentalStdlibApi
 @ExperimentalCoroutinesApi
 val viewModelModule = module {
   viewModel { SplashVM(get()) }
