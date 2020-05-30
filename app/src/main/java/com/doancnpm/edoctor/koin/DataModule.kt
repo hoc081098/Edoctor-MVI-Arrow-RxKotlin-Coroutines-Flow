@@ -31,12 +31,15 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 
 val API_URL_QUALIFIER = named("com.doancnpm.edoctor.api_url")
+val BASE_URL_QUALIFIER = named("com.doancnpm.edoctor.base_url")
 private val API_KEY_QUALIFIER = named("com.doancnpm.edoctor.api_key")
 
 val dataModule = module {
   /*
    * Remote
    */
+
+  factory(BASE_URL_QUALIFIER) { BuildConfig.BASE_URL }
 
   factory(API_URL_QUALIFIER) { BuildConfig.API_URL }
 
