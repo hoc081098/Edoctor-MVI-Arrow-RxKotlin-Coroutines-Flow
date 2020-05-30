@@ -18,6 +18,7 @@ import com.doancnpm.edoctor.ui.main.home.HomeContract.PlaceholderState
 import com.doancnpm.edoctor.utils.exhaustive
 import com.doancnpm.edoctor.utils.invisible
 import com.doancnpm.edoctor.utils.visible
+import timber.log.Timber
 
 @ExperimentalStdlibApi
 class HomeAdapter(
@@ -128,6 +129,8 @@ class HomeAdapter(
     }
 
     fun update(state: PlaceholderState) {
+      Timber.d("Update $state")
+
       binding.run {
         when (state) {
           PlaceholderState.Loading -> {
