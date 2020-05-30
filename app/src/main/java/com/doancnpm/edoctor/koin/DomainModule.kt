@@ -33,7 +33,7 @@ val domainModule = module {
       get(API_URL_QUALIFIER),
       get(),
       get(),
-      get(API_URL_QUALIFIER),
+      get(BASE_URL_QUALIFIER),
     )
   }
 }
