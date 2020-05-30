@@ -26,7 +26,7 @@ class UserLocalSourceImpl(
     .replay(1)
     .refCount()!!
 
-  override fun token() = token
+  override suspend fun token() = withContext(dispatchers.io) { token }
 
   override suspend fun saveToken(token: String) =
     withContext(dispatchers.io) { this@UserLocalSourceImpl.token = token }
