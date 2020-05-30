@@ -2,14 +2,12 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/home"
-    app:startDestination="@id/homeFragment"
+    android:id="@+id/profile"
+    app:startDestination="@id/profileFragment"
     tools:ignore="UnusedNavigation">
 
     <fragment
-        android:id="@+id/homeFragment"
-        android:name="com.doancnpm.edoctor.ui.main.home.HomeFragment"
-        android:label="Home"
-        tools:layout="@layout/fragment_home" />
-
+        android:id="@+id/profileFragment"
+        android:name="com.doancnpm.edoctor.ui.main.profile.ProfileFragment"
+        android:label="Profile" />
 </navigation>
