@@ -1,19 +1,52 @@
 package com.doancnpm.edoctor.data.remote
 
-import com.doancnpm.edoctor.data.remote.response.TokenResponse
-import com.doancnpm.edoctor.data.remote.response.UserResponse
+import androidx.annotation.IntRange
+import com.doancnpm.edoctor.data.remote.body.LoginUserBody
+import com.doancnpm.edoctor.data.remote.body.RegisterUserBody
+import com.doancnpm.edoctor.data.remote.response.BaseResponse
+import com.doancnpm.edoctor.data.remote.response.CategoriesResponse
+import com.doancnpm.edoctor.data.remote.response.LoginUserResponse
+import com.doancnpm.edoctor.data.remote.response.RegisterUserResponse
 import retrofit2.Retrofit
 import retrofit2.create
 import retrofit2.http.*
 
 interface ApiService {
 
+  //region User
   @Headers("@: NoAuth")
-  @POST("users/authenticate")
-  suspend fun login(@Header("Authorization") authorization: String): TokenResponse
+  @POST("login")
+  suspend fun loginUser(@Body userBody: LoginUserBody): BaseResponse<LoginUserResponse>
 
-  @GET("users/{email}")
-  suspend fun getUserProfile(@Path("email") email: String): UserResponse
+  @Headers("@: NoAuth")
+  @POST("register")
+  suspend fun registerUser(@Body userBody: RegisterUserBody): BaseResponse<RegisterUserResponse>
+
+  @Headers("@: NoAuth")
+  @POST("resend-code")
+  @FormUrlEncoded
+  suspend fun resendCode(@Field("phone") phone: String): BaseResponse<List<Any>>
+
+  @Headers("@: NoAuth")
+  @POST("verify")
+  @FormUrlEncoded
+  suspend fun verifyUser(
+    @Field("phone") phone: String,
+    @Field("code") code: String,
+  ): BaseResponse<List<Any>>
+  //endregion
+
+  //region Category
+  @GET("categories")
+  suspend fun getCategories(
+    @IntRange(from = 1)
+    @Query("page")
+    page: Int,
+    @Query("per_page")
+    @IntRange(from = 1)
+    perPage: Int,
+  ): BaseResponse<CategoriesResponse>
+  //endregion
 
   companion object Factory {
     operator fun invoke(retrofit: Retrofit) = retrofit.create<ApiService>()

@@ -1,13 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/auth.xml"
-    app:startDestination="@id/loginFragment">
+    app:startDestination="@id/loginFragment"
+    tools:ignore="UnusedNavigation">
 
     <fragment
         android:id="@+id/loginFragment"
         android:name="com.doancnpm.edoctor.ui.auth.login.LoginFragment"
-        android:label="LoginFragment">
+        android:label="Login">
+
+        <argument
+            android:name="phone"
+            android:defaultValue="@null"
+            app:argType="string"
+            app:nullable="true" />
+
         <action
             android:id="@+id/action_loginFragment_to_registerFragment"
             app:destination="@id/registerFragment"
@@ -15,10 +24,69 @@
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/slide_out_right" />
+
+        <action
+            android:id="@+id/action_loginFragment_to_resendCodeFragment"
+            app:destination="@id/resendCodeFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+
     </fragment>
 
     <fragment
         android:id="@+id/registerFragment"
         android:name="com.doancnpm.edoctor.ui.auth.register.RegisterFragment"
-        android:label="RegisterFragment" />
+        android:label="Register">
+
+        <action
+            android:id="@+id/action_registerFragment_to_verifyFragment"
+            app:destination="@id/verifyFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"
+            app:popUpTo="@id/loginFragment"
+            app:popUpToInclusive="false" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/verifyFragment"
+        android:name="com.doancnpm.edoctor.ui.auth.verify.VerifyFragment"
+        android:label="Verify account">
+
+        <argument
+            android:name="phone"
+            app:argType="string"
+            app:nullable="false" />
+
+        <action
+            android:id="@+id/action_verifyFragment_to_loginFragment"
+            app:destination="@id/loginFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:launchSingleTop="true"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/resendCodeFragment"
+        android:name="com.doancnpm.edoctor.ui.auth.resendcode.ResendCodeFragment"
+        android:label="Resend code">
+
+        <action
+            android:id="@+id/action_resendCodeFragment_to_verifyFragment"
+            app:destination="@id/verifyFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"
+            app:popUpTo="@id/loginFragment"
+            app:popUpToInclusive="false" />
+    </fragment>
+
 </navigation>

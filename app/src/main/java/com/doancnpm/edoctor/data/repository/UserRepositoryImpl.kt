@@ -1,6 +1,5 @@
 package com.doancnpm.edoctor.data.repository
 
-import android.util.Base64
 import arrow.core.Either
 import arrow.core.Option
 import arrow.core.extensions.fx
@@ -8,21 +7,24 @@ import com.doancnpm.edoctor.data.ErrorMapper
 import com.doancnpm.edoctor.data.Mappers
 import com.doancnpm.edoctor.data.local.UserLocalSource
 import com.doancnpm.edoctor.data.remote.ApiService
+import com.doancnpm.edoctor.data.remote.body.LoginUserBody
+import com.doancnpm.edoctor.data.remote.body.RegisterUserBody
+import com.doancnpm.edoctor.data.remote.response.unwrap
 import com.doancnpm.edoctor.domain.dispatchers.AppDispatchers
-import com.doancnpm.edoctor.domain.entity.AppError
 import com.doancnpm.edoctor.domain.entity.DomainResult
 import com.doancnpm.edoctor.domain.entity.User
 import com.doancnpm.edoctor.domain.entity.rightResult
 import com.doancnpm.edoctor.domain.repository.UserRepository
 import com.doancnpm.edoctor.utils.catchError
+import com.doancnpm.edoctor.utils.toString_yyyyMMdd
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.kotlin.Observables
-import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import retrofit2.HttpException
 import timber.log.Timber
+import java.net.HttpURLConnection.HTTP_FORBIDDEN
+import java.net.HttpURLConnection.HTTP_UNAUTHORIZED
+import java.util.*
 
 class UserRepositoryImpl(
   private val apiService: ApiService,
@@ -34,7 +36,12 @@ class UserRepositoryImpl(
   private val checkAuthDeferred = CompletableDeferred<Unit>()
 
   init {
-    appCoroutineScope.launch { checkAuthInternal() }
+    appCoroutineScope.launch {
+      while (isActive) {
+        checkAuthInternal()
+        delay(CHECK_AUTH_INTERVAL)
+      }
+    }
   }
 
   /*
@@ -48,19 +55,63 @@ class UserRepositoryImpl(
     }
   }
 
-  override suspend fun login(email: String, password: String): DomainResult<Unit> {
+  override suspend fun resendCode(phone: String): DomainResult<Unit> {
     return Either.catch(errorMapper::map) {
       withContext(dispatchers.io) {
-        val base64 = Base64.encodeToString(
-          "$email:$password".toByteArray(),
-          Base64.NO_WRAP,
-        )
-        val tokenResponse = apiService.login("Basic $base64")
-        val token = tokenResponse.token ?: throw AppError.Remote.ServerError("Login failed", 401)
-        userLocalSource.saveToken(token)
+        apiService.resendCode(phone).unwrap()
+      }
+    }
+  }
 
-        val userResponse = apiService.getUserProfile(email)
-        userLocalSource.saveUser(Mappers.userResponseToUserLocal(userResponse))
+  override suspend fun verify(phone: String, code: String): DomainResult<Unit> {
+    return Either.catch(errorMapper::map) {
+      withContext(dispatchers.io) {
+        apiService.verifyUser(
+          phone = phone,
+          code = code
+        ).unwrap()
+      }
+    }
+  }
+
+  override suspend fun login(phone: String, password: String): DomainResult<Unit> {
+    return Either.catch(errorMapper::map) {
+      withContext(dispatchers.io) {
+        val (token, user) = apiService.loginUser(
+          LoginUserBody(
+            phone = phone,
+            password = password,
+            deviceToken = "1234a" // TODO: Get device token
+          )
+        ).unwrap()
+
+        userLocalSource.saveToken(token)
+        userLocalSource.saveUser(Mappers.loginUserResponseToUserLocal(user))
+      }
+    }
+  }
+
+  override suspend fun register(
+    phone: String,
+    password: String,
+    roleId: User.RoleId,
+    fullName: String,
+    birthday: Date?,
+  ): DomainResult<String> {
+    return Either.catch(errorMapper::map) {
+      withContext(dispatchers.io) {
+        apiService
+          .registerUser(
+            RegisterUserBody(
+              phone = phone,
+              password = password,
+              roleId = Mappers.roleIdToInt(roleId),
+              fullName = fullName,
+              birthday = birthday?.toString_yyyyMMdd(),
+            )
+          )
+          .unwrap()
+          .phone
       }
     }
   }
@@ -71,15 +122,9 @@ class UserRepositoryImpl(
       userLocalSource.userObservable(),
     ) { tokenOptional, userOptional ->
       Option.fx {
-        val token = !tokenOptional
+        !tokenOptional
         val user = !userOptional
-        User(
-          name = user.name,
-          email = user.email,
-          createdAt = user.createdAt,
-          imageUrl = user.imageUrl,
-          token = token,
-        )
+        Mappers.userLocalToUserDomain(user)
       }.rightResult()
     }.catchError(errorMapper)
   }
@@ -90,26 +135,29 @@ class UserRepositoryImpl(
 
   private suspend fun checkAuthInternal() {
     try {
-      Timber.d("[USER_REPO] started")
+      Timber.d("[CHECK AUTH] started")
 
       userLocalSource.token()
         ?: return userLocalSource.removeUserAndToken()
-      val user = userLocalSource.user()
+      userLocalSource.user()
         ?: return userLocalSource.removeUserAndToken()
 
-      val userResponse = apiService.getUserProfile(user.email)
-      userLocalSource.saveUser(Mappers.userResponseToUserLocal(userResponse))
-      Timber.d("[USER_REPO] init success")
+      apiService.getCategories(page = 1, perPage = 1).unwrap()
 
+      Timber.d("[CHECK AUTH] success")
     } catch (e: Exception) {
-      Timber.d(e, "[USER_REPO] init failure: $e")
+      Timber.d(e, "[CHECK AUTH] failure: $e")
 
-      if ((e as? HttpException)?.code() == 401) {
+      if ((e as? HttpException)?.code() in arrayOf(HTTP_UNAUTHORIZED, HTTP_FORBIDDEN)) {
         userLocalSource.removeUserAndToken()
-        Timber.d(e, "[USER_REPO] Login again!")
+        Timber.d(e, "[CHECK AUTH] Login again!")
       }
     } finally {
       checkAuthDeferred.complete(Unit)
     }
+  }
+
+  private companion object {
+    const val CHECK_AUTH_INTERVAL = 60_000L
   }
 }
