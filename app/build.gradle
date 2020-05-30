@@ -19,7 +19,7 @@ android {
 
     buildTypes {
         debug {
-            buildConfigField 'String', "BASE_URL", '"http://54.84.195.155/api/v1/"'
+            buildConfigField 'String', "API_URL", '"http://54.84.195.155/api/v1/"'
             buildConfigField 'String', "API_KEY", '"7767d3e09e826fad677592e5f078f09c"'
         }
 

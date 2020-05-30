@@ -20,7 +20,7 @@ val domainModule = module {
 
   single<UserRepository>(createdAtStart = true) {
     UserRepositoryImpl(
-      get(API_QUALIFIER),
+      get(API_URL_QUALIFIER),
       get(),
       get(),
       get(),
@@ -30,10 +30,10 @@ val domainModule = module {
 
   single<CategoryRepository> {
     CategoryRepositoryImpl(
-      get(API_QUALIFIER),
+      get(API_URL_QUALIFIER),
       get(),
       get(),
-      get(API_QUALIFIER),
+      get(API_URL_QUALIFIER),
     )
   }
 }
