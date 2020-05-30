@@ -74,7 +74,7 @@ fun <T : Any> LiveData<T>.toObservable(fallbackNullValue: (() -> T)? = null): Ob
 inline fun <T : Any> MutableLiveData<T>.asLiveData(): LiveData<T> = this
 
 /**
- * Set value if value after invoking [mutation] is different from current value
+ * Set value if result from [mutation] invoking is different from current value
  */
 inline fun <T : Any> MutableLiveData<T>.setValue(mutation: (T?) -> T) {
   val currentValue = value
