@@ -85,16 +85,15 @@ class LoginFragment : BaseFragment(R.layout.fragment_login) {
     viewModel.eventLiveData.observeEvent(owner = viewLifecycleOwner) { event ->
       when (event) {
         SingleEvent.LoginSuccess -> {
-          view?.snack("Login successfully") {
-            onDismissed {
-              startActivity(
-                Intent(
-                  requireContext(),
-                  MainActivity::class.java
-                )
-              )
-            }
-          }
+          view?.snack("Login successfully")
+
+          startActivity(
+            Intent(
+              requireContext(),
+              MainActivity::class.java
+            )
+          )
+          requireActivity().finish()
         }
         is SingleEvent.LoginFailure -> {
           Timber.d("Login error: ${event.error}")
