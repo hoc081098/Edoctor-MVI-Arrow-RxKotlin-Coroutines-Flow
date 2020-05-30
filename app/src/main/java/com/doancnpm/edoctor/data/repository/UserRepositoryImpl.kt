@@ -11,6 +11,7 @@ import com.doancnpm.edoctor.data.remote.body.LoginUserBody
 import com.doancnpm.edoctor.data.remote.body.RegisterUserBody
 import com.doancnpm.edoctor.data.remote.response.unwrap
 import com.doancnpm.edoctor.domain.dispatchers.AppDispatchers
+import com.doancnpm.edoctor.domain.entity.AppError
 import com.doancnpm.edoctor.domain.entity.DomainResult
 import com.doancnpm.edoctor.domain.entity.User
 import com.doancnpm.edoctor.domain.entity.rightResult
@@ -33,6 +34,23 @@ class UserRepositoryImpl(
   private val userLocalSource: UserLocalSource,
   appCoroutineScope: CoroutineScope,
 ) : UserRepository {
+  private val userObservable: Observable<Either<AppError, Option<User>>> =
+    Observables
+      .combineLatest(
+        userLocalSource.tokenObservable(),
+        userLocalSource.userObservable(),
+      ) { tokenOptional, userOptional ->
+        Option.fx {
+          !tokenOptional
+          val user = !userOptional
+          Mappers.userLocalToUserDomain(user)
+        }.rightResult()
+      }
+      .catchError(errorMapper)
+      .distinctUntilChanged()
+      .replay(1)
+      .refCount()
+
   private val checkAuthDeferred = CompletableDeferred<Unit>()
 
   init {
@@ -116,18 +134,7 @@ class UserRepositoryImpl(
     }
   }
 
-  override fun userObservable(): Observable<DomainResult<Option<User>>> {
-    return Observables.combineLatest(
-      userLocalSource.tokenObservable(),
-      userLocalSource.userObservable(),
-    ) { tokenOptional, userOptional ->
-      Option.fx {
-        !tokenOptional
-        val user = !userOptional
-        Mappers.userLocalToUserDomain(user)
-      }.rightResult()
-    }.catchError(errorMapper)
-  }
+  override fun userObservable() = userObservable
 
   /*
    * Private helpers

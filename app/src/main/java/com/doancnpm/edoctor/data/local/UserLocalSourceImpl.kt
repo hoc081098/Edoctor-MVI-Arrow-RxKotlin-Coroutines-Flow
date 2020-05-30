@@ -4,6 +4,7 @@ import android.content.SharedPreferences
 import com.doancnpm.edoctor.data.local.model.UserLocal
 import com.doancnpm.edoctor.data.local.model.UserLocalJsonAdapter
 import com.doancnpm.edoctor.domain.dispatchers.AppDispatchers
+import com.doancnpm.edoctor.domain.dispatchers.AppSchedulers
 import com.doancnpm.edoctor.utils.delegate
 import com.doancnpm.edoctor.utils.observeString
 import kotlinx.coroutines.withContext
@@ -12,16 +13,19 @@ class UserLocalSourceImpl(
   sharedPreferences: SharedPreferences,
   private val dispatchers: AppDispatchers,
   private val userLocalJsonAdapter: UserLocalJsonAdapter,
+  private val schedulers: AppSchedulers,
 ) : UserLocalSource {
 
   private var token by sharedPreferences.delegate(null as String?, TOKEN_KEY, commit = true)
   private var userLocal by sharedPreferences.delegate(null as String?, USER_KEY, commit = true)
 
   private val tokenObservable = sharedPreferences.observeString(TOKEN_KEY)
+    .subscribeOn(schedulers.io)
     .replay(1)
     .refCount()!!
 
   private val userObservable = sharedPreferences.observeString(USER_KEY)
+    .subscribeOn(schedulers.io)
     .map { json -> json.mapNotNull { it.toUserLocal() } }
     .replay(1)
     .refCount()!!
