@@ -4,8 +4,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.doancnpm.edoctor.core.BaseVM
 import com.doancnpm.edoctor.domain.repository.CategoryRepository
-import com.doancnpm.edoctor.ui.main.home.HomeContract.PlaceholderState
-import com.doancnpm.edoctor.ui.main.home.HomeContract.ViewState
+import com.doancnpm.edoctor.ui.main.home.HomeContract.*
 import com.doancnpm.edoctor.utils.asLiveData
 import com.doancnpm.edoctor.utils.setValue
 import kotlinx.coroutines.launch
@@ -28,7 +27,7 @@ class HomeVM(private val categoryRepository: CategoryRepository) : BaseVM() {
   val stateLiveData = stateD.asLiveData()
 
   init {
-    loadNextPage()
+    loadNextPageInternal()
   }
 
   fun loadNextPage() {
@@ -60,24 +59,35 @@ class HomeVM(private val categoryRepository: CategoryRepository) : BaseVM() {
           state.copy(
             isLoadingFirstPage = false,
             firstPageError = null,
-            placeholderState = PlaceholderState.Loading
+            placeholderState = PlaceholderState.Loading,
+            items = state.categories.map { Item.CategoryItem(it) } + Item.Placeholder(
+              PlaceholderState.Loading)
           )
         }
       }
 
-      categoryRepository.getCategories(
+      categoryRepository
+        .getCategories(
           page = state.page + 1,
           perPage = PER_PAGE
         )
         .fold(
           ifRight = { result ->
+            val categories = (state.categories + result).distinctBy { it.id }
+
             state.copy(
-              categories = (state.categories + result).distinctBy { it.id },
+              categories = categories,
               isLoadingFirstPage = false,
               firstPageError = null,
               placeholderState = PlaceholderState.Idle,
               page = state.page + if (result.isEmpty()) 0 else 1,
               loadedAll = result.isEmpty(),
+              items = buildList(capacity = categories.size) {
+                addAll(categories.map { Item.CategoryItem(it) })
+                if (result.isNotEmpty()) {
+                  add(Item.Placeholder(PlaceholderState.Loading))
+                }
+              }
             )
           },
           ifLeft = {
@@ -90,7 +100,9 @@ class HomeVM(private val categoryRepository: CategoryRepository) : BaseVM() {
               state.copy(
                 isLoadingFirstPage = false,
                 firstPageError = null,
-                placeholderState = PlaceholderState.Error(it)
+                placeholderState = PlaceholderState.Error(it),
+                items = state.categories.map { Item.CategoryItem(it) } + Item.Placeholder(
+                  PlaceholderState.Error(it))
               )
             }
           }
@@ -99,9 +111,7 @@ class HomeVM(private val categoryRepository: CategoryRepository) : BaseVM() {
     }
   }
 
-  fun refresh() {
-    TODO("Not yet implemented")
-  }
+  fun refresh() = Unit
 
   private companion object {
     const val PER_PAGE = 4

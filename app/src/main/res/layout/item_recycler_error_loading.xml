@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/colorBackground"
-    android:padding="12dp">
+    android:padding="4dp">
 
     <ProgressBar
         android:id="@+id/progress_bar"
@@ -24,6 +24,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:fontFamily="@font/google_sans"
+        android:lines="1"
         android:textAlignment="center"
         android:textColor="@android:color/white"
         android:textSize="16sp"

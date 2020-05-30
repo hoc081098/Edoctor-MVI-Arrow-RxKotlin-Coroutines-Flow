@@ -48,7 +48,7 @@ class HomeFragment : BaseFragment(R.layout.fragment_home) {
 
       addOnScrollListener(object : RecyclerView.OnScrollListener() {
         override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-          if (dy > 0 && layoutManager.findLastVisibleItemPosition() + VISIBLE_THRESHOLD >= layoutManager.itemCount) {
+          if (dy > 0 && layoutManager.findLastVisibleItemPosition() + visibleThreshold >= layoutManager.itemCount) {
             viewModel.loadNextPage()
           }
         }
@@ -69,7 +69,7 @@ class HomeFragment : BaseFragment(R.layout.fragment_home) {
       setHasFixedSize(true)
       layoutManager = GridLayoutManager(
         context,
-        if (context.isOrientationPortrait) 2 else 4,
+        spanCount,
         RecyclerView.VERTICAL,
         false
       ).apply {
@@ -77,7 +77,7 @@ class HomeFragment : BaseFragment(R.layout.fragment_home) {
           override fun getSpanSize(position: Int): Int {
             return when (homeAdapter.getItemViewType(position)) {
               HomeAdapter.CATEGORY_VIEW_TYPE -> 1
-              HomeAdapter.PLACEHOLDER_VIEW_TYPE -> 2
+              HomeAdapter.PLACEHOLDER_VIEW_TYPE -> spanCount
               else -> error("Invalid viewType")
             }
           }
@@ -114,7 +114,6 @@ class HomeFragment : BaseFragment(R.layout.fragment_home) {
     }
   }
 
-  private companion object {
-    const val VISIBLE_THRESHOLD = 2
-  }
+  private val spanCount get() = if (requireContext().isOrientationPortrait) 2 else 4
+  private val visibleThreshold get() = 2 * spanCount
 }
