@@ -8,13 +8,8 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import com.doancnpm.edoctor.R
 import com.doancnpm.edoctor.core.BaseActivity
 import com.doancnpm.edoctor.databinding.ActivityMainBinding
-import com.doancnpm.edoctor.domain.repository.UserRepository
 import com.doancnpm.edoctor.utils.setupWithNavController
 import com.doancnpm.edoctor.utils.viewBinding
-import io.reactivex.rxjava3.kotlin.addTo
-import io.reactivex.rxjava3.kotlin.subscribeBy
-import org.koin.android.ext.android.get
-import timber.log.Timber
 
 class MainActivity : BaseActivity() {
 
@@ -28,10 +23,6 @@ class MainActivity : BaseActivity() {
     if (savedInstanceState === null) {
       setupBottomNavigationBar()
     }
-
-    get<UserRepository>().userObservable()
-      .subscribeBy { Timber.d(">>> Current user: $it") }
-      .addTo(compositeDisposable)
   }
 
   override fun onRestoreInstanceState(savedInstanceState: Bundle) {
@@ -48,8 +39,8 @@ class MainActivity : BaseActivity() {
   private fun setupBottomNavigationBar() {
     val navGraphIds = listOf(
       R.navigation.home,
-      R.navigation.dashboard,
-      R.navigation.notifications,
+      R.navigation.history,
+      R.navigation.profile,
     )
 
     // Setup the bottom navigation view with a list of navigation graphs
