@@ -9,6 +9,9 @@ import com.doancnpm.edoctor.ui.auth.register.RegisterVM
 import com.doancnpm.edoctor.ui.auth.resendcode.ResendCodeContract
 import com.doancnpm.edoctor.ui.auth.resendcode.ResendCodeInteractor
 import com.doancnpm.edoctor.ui.auth.resendcode.ResendCodeVM
+import com.doancnpm.edoctor.ui.auth.verify.VerifyContract
+import com.doancnpm.edoctor.ui.auth.verify.VerifyInteractor
+import com.doancnpm.edoctor.ui.auth.verify.VerifyVM
 import com.doancnpm.edoctor.ui.splash.SplashVM
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.koin.androidx.viewmodel.dsl.viewModel
@@ -26,4 +29,7 @@ val viewModelModule = module {
 
   factory<ResendCodeContract.Interactor> { ResendCodeInteractor(get(), get()) }
   viewModel { ResendCodeVM(get(), get()) }
+
+  factory<VerifyContract.Interactor> { VerifyInteractor(get(), get()) }
+  viewModel { (phone: String) -> VerifyVM(phone, get(), get()) }
 }

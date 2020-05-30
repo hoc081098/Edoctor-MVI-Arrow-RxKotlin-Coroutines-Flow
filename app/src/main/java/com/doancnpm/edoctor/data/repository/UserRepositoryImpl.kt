@@ -63,6 +63,17 @@ class UserRepositoryImpl(
     }
   }
 
+  override suspend fun verify(phone: String, code: String): DomainResult<Unit> {
+    return Either.catch(errorMapper::map) {
+      withContext(dispatchers.io) {
+        apiService.verifyUser(
+          phone = phone,
+          code = code
+        ).unwrap()
+      }
+    }
+  }
+
   override suspend fun login(phone: String, password: String): DomainResult<Unit> {
     return Either.catch(errorMapper::map) {
       withContext(dispatchers.io) {

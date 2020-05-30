@@ -26,6 +26,14 @@ interface ApiService {
   @POST("resend-code")
   @FormUrlEncoded
   suspend fun resendCode(@Field("phone") phone: String): BaseResponse<List<Any>>
+
+  @Headers("@: NoAuth")
+  @POST("verify")
+  @FormUrlEncoded
+  suspend fun verifyUser(
+    @Field("phone") phone: String,
+    @Field("code") code: String,
+  ): BaseResponse<List<Any>>
   //endregion
 
   //region Category

@@ -79,7 +79,7 @@ class RegisterFragment : BaseFragment(R.layout.fragment_register) {
   private fun handleEvent(event: SingleEvent) {
     when (event) {
       is SingleEvent.Success -> {
-        view?.snack("Register success")
+        view?.snack("Register successfully")
 
         RegisterFragmentDirections
           .actionRegisterFragmentToVerifyFragment(event.phone)
