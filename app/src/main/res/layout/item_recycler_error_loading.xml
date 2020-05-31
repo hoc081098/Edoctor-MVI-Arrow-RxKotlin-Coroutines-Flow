@@ -26,7 +26,6 @@
         android:fontFamily="@font/google_sans"
         android:lines="1"
         android:textAlignment="center"
-        android:textColor="@android:color/white"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
