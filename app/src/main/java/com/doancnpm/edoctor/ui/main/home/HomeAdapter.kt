@@ -83,8 +83,8 @@ class HomeAdapter(
     }
 
     payloads.forEach { payload ->
-      if (holder is PlaceholderVH && payload is Item.Placeholder) {
-        holder.update(payload.state)
+      if (holder is PlaceholderVH && payload is PlaceholderState) {
+        holder.update(payload)
       }
     }
   }
@@ -129,7 +129,7 @@ class HomeAdapter(
     }
 
     fun update(state: PlaceholderState) {
-      Timber.d("Update $state")
+      Timber.tag("[HOME]").d("Placeholder state: ${state::class.java.simpleName}")
 
       binding.run {
         when (state) {

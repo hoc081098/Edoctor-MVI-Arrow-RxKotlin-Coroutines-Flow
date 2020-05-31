@@ -12,7 +12,8 @@ interface HomeContract {
     val placeholderState: PlaceholderState = PlaceholderState.Idle,
     val page: Int = 0,
     val loadedAll: Boolean = false,
-    val items: List<Item> = emptyList()
+    val items: List<Item> = emptyList(),
+    val isRefreshing: Boolean = false,
   )
 
   sealed class PlaceholderState {
