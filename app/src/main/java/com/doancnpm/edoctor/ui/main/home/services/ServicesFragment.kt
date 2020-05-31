@@ -23,6 +23,7 @@ class ServicesFragment : BaseFragment(R.layout.fragment_services) {
       recyclerView.removeOnScrollListener(onScrollListener)
       recyclerView.adapter = null
       retryButton.setOnClickListener(null)
+      swipeRefreshLayout.setOnRefreshListener(null)
     }
   ) { FragmentServicesBinding.bind(it) }
   private val navArgs by navArgs<ServicesFragmentArgs>()
@@ -66,8 +67,17 @@ class ServicesFragment : BaseFragment(R.layout.fragment_services) {
       owner = viewLifecycleOwner,
       ::renderPlaceholderState,
     )
+    viewModel.refreshingLiveData.observe(owner = viewLifecycleOwner) {
+      if (it) {
+        binding.swipeRefreshLayout.post { binding.swipeRefreshLayout.isRefreshing = true }
+      } else {
+        binding.swipeRefreshLayout.isRefreshing = false
+      }
+    }
+
     binding.recyclerView.addOnScrollListener(onScrollListener)
     binding.retryButton.setOnClickListener { viewModel.retryNextPage() }
+    binding.swipeRefreshLayout.setOnRefreshListener { viewModel.refresh() }
   }
 
   private fun renderPlaceholderState(state: ServicesContract.PlaceholderState) {

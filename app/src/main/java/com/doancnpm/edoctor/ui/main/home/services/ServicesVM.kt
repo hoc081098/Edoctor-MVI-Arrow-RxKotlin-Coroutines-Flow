@@ -23,6 +23,8 @@ class ServicesVM(
 
   private val servicesD = MutableLiveData<List<Service>>().apply { value = emptyList() }
 
+  private val refreshingD = MutableLiveData<Boolean>().apply { value = false }
+
   private val placeholderStateD =
     MutableLiveData<PlaceholderState>().apply { value = PlaceholderState.Idle }
   private val firstPagePlaceholderStateD =
@@ -54,6 +56,8 @@ class ServicesVM(
     }
 
   val firstPagePlaceholderStateLiveData get() = firstPagePlaceholderStateD.asLiveData()
+
+  val refreshingLiveData get() = refreshingD.asLiveData()
   //endregion
 
   init {
@@ -71,6 +75,35 @@ class ServicesVM(
   fun retryNextPage() {
     if (shouldRetry) {
       _loadNextPage()
+    }
+  }
+
+  @MainThread
+  fun refresh() {
+    refreshingD.value = true
+
+    viewModelScope.launch {
+      serviceRepository
+        .getServicesByCategory(
+          category = category,
+          perPage = PER_PAGE,
+          page = 1,
+        )
+        .also { refreshingD.value = false }
+        .fold(
+          ifLeft = {},
+          ifRight = { services ->
+            if (services.isNotEmpty()) {
+              placeholderStateD.value = PlaceholderState.Idle
+              firstPagePlaceholderStateD.value = PlaceholderState.Idle
+
+              loadedAll = false
+              currentPage = 1
+
+              servicesD.value = services
+            }
+          }
+        )
     }
   }
 
