@@ -11,10 +11,7 @@ import com.doancnpm.edoctor.R
 import com.doancnpm.edoctor.core.BaseFragment
 import com.doancnpm.edoctor.databinding.FragmentServicesBinding
 import com.doancnpm.edoctor.domain.entity.getMessage
-import com.doancnpm.edoctor.utils.invisible
-import com.doancnpm.edoctor.utils.observe
-import com.doancnpm.edoctor.utils.viewBinding
-import com.doancnpm.edoctor.utils.visible
+import com.doancnpm.edoctor.utils.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
 import timber.log.Timber
@@ -64,6 +61,8 @@ class ServicesFragment : BaseFragment(R.layout.fragment_services) {
         }
       })
     }
+
+    binding.retryButton.setOnClickListener { viewModel.retryNextPage() }
   }
 
   private fun renderPlaceholderState(state: ServicesContract.PlaceholderState) {
@@ -72,11 +71,11 @@ class ServicesFragment : BaseFragment(R.layout.fragment_services) {
     binding.run {
       when (state) {
         ServicesContract.PlaceholderState.Idle -> {
-          errorGroup.invisible()
+          errorGroup.gone()
           progressBar.invisible()
         }
         ServicesContract.PlaceholderState.Loading -> {
-          errorGroup.invisible()
+          errorGroup.gone()
           progressBar.visible()
         }
         is ServicesContract.PlaceholderState.Error -> {
