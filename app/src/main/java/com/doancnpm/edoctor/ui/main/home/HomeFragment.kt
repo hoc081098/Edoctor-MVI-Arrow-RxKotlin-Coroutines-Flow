@@ -94,7 +94,7 @@ class HomeFragment : BaseFragment(R.layout.fragment_home) {
 
   private fun onClickCategory(category: Category) {
     HomeFragmentDirections
-      .actionHomeFragmentToServicesFragment(category)
+      .actionHomeFragmentToServicesFragment(category, category.name)
       .let { findNavController().navigate(it) }
   }
 
