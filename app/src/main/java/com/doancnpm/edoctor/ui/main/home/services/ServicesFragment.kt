@@ -18,7 +18,13 @@ import timber.log.Timber
 import kotlin.LazyThreadSafetyMode.NONE
 
 class ServicesFragment : BaseFragment(R.layout.fragment_services) {
-  private val binding by viewBinding { FragmentServicesBinding.bind(it) }
+  private val binding: FragmentServicesBinding by viewBinding(
+    {
+      recyclerView.removeOnScrollListener(onScrollListener)
+      recyclerView.adapter = null
+      retryButton.setOnClickListener(null)
+    }
+  ) { FragmentServicesBinding.bind(it) }
   private val navArgs by navArgs<ServicesFragmentArgs>()
   private val viewModel by viewModel<ServicesVM> { parametersOf(navArgs.category) }
 
@@ -28,6 +34,17 @@ class ServicesFragment : BaseFragment(R.layout.fragment_services) {
     )
   }
   private val footerAdapter = FooterAdapter(::onRetry)
+  private val onScrollListener by lazy(NONE) {
+    object : RecyclerView.OnScrollListener() {
+      override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+        val linearLayoutManager = binding.recyclerView.layoutManager as LinearLayoutManager
+
+        if (dy > 0 && linearLayoutManager.findLastVisibleItemPosition() + VISIBLE_THRESHOLD >= linearLayoutManager.itemCount) {
+          viewModel.loadNextPage()
+        }
+      }
+    }
+  }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
@@ -49,19 +66,7 @@ class ServicesFragment : BaseFragment(R.layout.fragment_services) {
       owner = viewLifecycleOwner,
       ::renderPlaceholderState,
     )
-
-    binding.recyclerView.run {
-      val linearLayoutManager = layoutManager as LinearLayoutManager
-
-      addOnScrollListener(object : RecyclerView.OnScrollListener() {
-        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-          if (dy > 0 && linearLayoutManager.findLastVisibleItemPosition() + VISIBLE_THRESHOLD >= linearLayoutManager.itemCount) {
-            viewModel.loadNextPage()
-          }
-        }
-      })
-    }
-
+    binding.recyclerView.addOnScrollListener(onScrollListener)
     binding.retryButton.setOnClickListener { viewModel.retryNextPage() }
   }
 

@@ -74,14 +74,9 @@ class ServicesVM(
     }
   }
 
-  private var running = 0
-
   @Suppress("FunctionName")
   private fun _loadNextPage() {
     viewModelScope.launch {
-      if (++running > 1) {
-        error("Bad")
-      }
 
       if (currentPage == 0) {
         firstPagePlaceholderStateD.value = PlaceholderState.Loading
@@ -118,8 +113,6 @@ class ServicesVM(
             }
           }
         )
-
-      --running
     }
   }
 
