@@ -74,6 +74,12 @@ class UserRepositoryImpl(
     }
   }
 
+  override suspend fun logout(): DomainResult<Unit> {
+    return Either.catch(errorMapper::map) {
+      userLocalSource.removeUserAndToken()
+    }
+  }
+
   override suspend fun resendCode(phone: String): DomainResult<Unit> {
     return Either.catch(errorMapper::map) {
       withContext(dispatchers.io) {

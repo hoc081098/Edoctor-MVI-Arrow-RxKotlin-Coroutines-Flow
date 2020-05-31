@@ -16,6 +16,7 @@ import com.doancnpm.edoctor.ui.auth.verify.VerifyVM
 import com.doancnpm.edoctor.ui.main.MainVM
 import com.doancnpm.edoctor.ui.main.home.HomeVM
 import com.doancnpm.edoctor.ui.main.home.services.ServicesVM
+import com.doancnpm.edoctor.ui.main.profile.ProfileVM
 import com.doancnpm.edoctor.ui.splash.SplashVM
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.koin.androidx.viewmodel.dsl.viewModel
@@ -46,5 +47,9 @@ val viewModelModule = module {
   viewModel { HomeVM(get()) }
 
   viewModel { (category: Category) -> ServicesVM(get(), category) }
+  //endregion
+
+  //region Profile
+  viewModel { ProfileVM(get(), get()) }
   //endregion
 }
