@@ -10,10 +10,14 @@ import com.doancnpm.edoctor.GlideApp
 import com.doancnpm.edoctor.R
 import com.doancnpm.edoctor.core.BaseFragment
 import com.doancnpm.edoctor.databinding.FragmentServicesBinding
+import com.doancnpm.edoctor.domain.entity.getMessage
+import com.doancnpm.edoctor.utils.invisible
 import com.doancnpm.edoctor.utils.observe
 import com.doancnpm.edoctor.utils.viewBinding
+import com.doancnpm.edoctor.utils.visible
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
+import timber.log.Timber
 import kotlin.LazyThreadSafetyMode.NONE
 
 class ServicesFragment : BaseFragment(R.layout.fragment_services) {
@@ -36,13 +40,17 @@ class ServicesFragment : BaseFragment(R.layout.fragment_services) {
   }
 
   private fun bindVM() {
-    viewModel.loadingStateLiveData.observe(
+    viewModel.placeholderStateLiveData.observe(
       owner = viewLifecycleOwner,
-      observer = footerAdapter::submitList
+      { footerAdapter.submitList(it); Timber.d("[LOADING_STATE_2] $it") }
     )
-    viewModel.userLiveData.observe(
+    viewModel.servicesLiveData.observe(
       owner = viewLifecycleOwner,
       serviceAdapter::submitList,
+    )
+    viewModel.firstPagePlaceholderStateLiveData.observe(
+      owner = viewLifecycleOwner,
+      ::renderPlaceholderState,
     )
 
     binding.recyclerView.run {
@@ -58,6 +66,28 @@ class ServicesFragment : BaseFragment(R.layout.fragment_services) {
     }
   }
 
+  private fun renderPlaceholderState(state: ServicesContract.PlaceholderState) {
+    Timber.d("[LOADING_STATE_1] $state")
+
+    binding.run {
+      when (state) {
+        ServicesContract.PlaceholderState.Idle -> {
+          errorGroup.invisible()
+          progressBar.invisible()
+        }
+        ServicesContract.PlaceholderState.Loading -> {
+          errorGroup.invisible()
+          progressBar.visible()
+        }
+        is ServicesContract.PlaceholderState.Error -> {
+          errorGroup.visible()
+          errorMessageTextView.text = state.error.getMessage()
+          progressBar.invisible()
+        }
+      }
+    }
+  }
+
   private fun setupViews() {
     binding.recyclerView.run {
       setHasFixedSize(true)
@@ -69,6 +99,6 @@ class ServicesFragment : BaseFragment(R.layout.fragment_services) {
   private fun onRetry() = viewModel.retryNextPage()
 
   private companion object {
-    const val VISIBLE_THRESHOLD = 2
+    const val VISIBLE_THRESHOLD = 1
   }
 }

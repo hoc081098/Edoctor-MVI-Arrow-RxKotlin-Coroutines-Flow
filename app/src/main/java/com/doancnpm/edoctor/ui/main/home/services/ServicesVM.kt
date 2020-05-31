@@ -1,15 +1,15 @@
 package com.doancnpm.edoctor.ui.main.home.services
 
 import androidx.annotation.MainThread
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import com.doancnpm.edoctor.core.BaseVM
-import com.doancnpm.edoctor.domain.entity.AppError
 import com.doancnpm.edoctor.domain.entity.Category
 import com.doancnpm.edoctor.domain.entity.Service
 import com.doancnpm.edoctor.domain.repository.ServiceRepository
-import com.doancnpm.edoctor.ui.main.home.services.ServicesContract.LoadingState
+import com.doancnpm.edoctor.ui.main.home.services.ServicesContract.PlaceholderState
 import com.doancnpm.edoctor.utils.asLiveData
 import kotlinx.coroutines.launch
 
@@ -17,24 +17,44 @@ class ServicesVM(
   private val serviceRepository: ServiceRepository,
   private val category: Category,
 ) : BaseVM() {
+  //region Private
   private var currentPage = 0
   private var loadedAll = false
 
-  private val usersD = MutableLiveData<List<Service>>().apply { value = emptyList() }
+  private val servicesD = MutableLiveData<List<Service>>().apply { value = emptyList() }
+
   private val placeholderStateD =
     MutableLiveData<PlaceholderState>().apply { value = PlaceholderState.Idle }
+  private val firstPagePlaceholderStateD =
+    MutableLiveData<PlaceholderState>().apply { value = PlaceholderState.Idle }
 
-  val userLiveData get() = usersD.asLiveData()
+  private val shouldLoadNextPage
+    get() = if (currentPage == 0) {
+      firstPagePlaceholderStateD.value == PlaceholderState.Idle
+    } else {
+      placeholderStateD.value == PlaceholderState.Idle
+    } && !loadedAll
 
-  val loadingStateLiveData
-    get() = placeholderStateD.map {
-      when (it) {
-        null -> emptyList()
-        PlaceholderState.Idle -> emptyList()
-        PlaceholderState.Loading -> listOf(LoadingState.Loading)
-        is PlaceholderState.Error -> listOf(LoadingState.Error(it.error))
-      }
+  private val shouldRetry
+    get() = if (currentPage == 0) {
+      firstPagePlaceholderStateD.value!! is PlaceholderState.Error
+    } else {
+      placeholderStateD.value!! is PlaceholderState.Error
     }
+
+  //endregion
+
+  //region Public
+  val servicesLiveData get() = servicesD.asLiveData()
+
+  val placeholderStateLiveData: LiveData<List<PlaceholderState>>
+    get() = placeholderStateD.map {
+      if (it == PlaceholderState.Idle) emptyList()
+      else listOf(it)
+    }
+
+  val firstPagePlaceholderStateLiveData get() = firstPagePlaceholderStateD.asLiveData()
+  //endregion
 
   init {
     loadNextPage()
@@ -42,25 +62,33 @@ class ServicesVM(
 
   @MainThread
   fun loadNextPage() {
-    val state = placeholderStateD.value
-    if (state === null || (state is PlaceholderState.Idle && !loadedAll)) {
+    if (shouldLoadNextPage) {
       _loadNextPage()
     }
   }
 
   @MainThread
   fun retryNextPage() {
-    if (placeholderStateD.value is PlaceholderState.Error) {
+    if (shouldRetry) {
       _loadNextPage()
     }
   }
 
+  private var running = 0
+
   @Suppress("FunctionName")
   private fun _loadNextPage() {
     viewModelScope.launch {
-      placeholderStateD.value = PlaceholderState.Loading
+      if (++running > 1) {
+        error("Bad")
+      }
 
-      val currentList = usersD.value ?: emptyList()
+      if (currentPage == 0) {
+        firstPagePlaceholderStateD.value = PlaceholderState.Loading
+      } else {
+        placeholderStateD.value = PlaceholderState.Loading
+      }
+
       serviceRepository
         .getServicesByCategory(
           category = category,
@@ -69,25 +97,33 @@ class ServicesVM(
         )
         .fold(
           ifLeft = {
-            placeholderStateD.value = PlaceholderState.Error(it)
+            if (currentPage == 0) {
+              firstPagePlaceholderStateD.value = PlaceholderState.Error(it)
+            } else {
+              placeholderStateD.value = PlaceholderState.Error(it)
+            }
           },
-          ifRight = {
-            loadedAll = it.isEmpty()
+          ifRight = { services ->
+            if (currentPage == 0) {
+              firstPagePlaceholderStateD.value = PlaceholderState.Idle
+            } else {
+              placeholderStateD.value = PlaceholderState.Idle
+            }
+
+            loadedAll = services.isEmpty()
             currentPage += 1
-            usersD.value = currentList + it
-            placeholderStateD.value = PlaceholderState.Idle
+
+            if (services.isNotEmpty()) {
+              servicesD.value = (servicesD.value!! + services).distinctBy { it.id }
+            }
           }
         )
+
+      --running
     }
   }
 
-  private sealed class PlaceholderState {
-    object Idle : PlaceholderState()
-    object Loading : PlaceholderState()
-    data class Error(val error: AppError) : PlaceholderState()
-  }
-
   private companion object {
-    const val PER_PAGE = 6
+    const val PER_PAGE = 4
   }
 }
