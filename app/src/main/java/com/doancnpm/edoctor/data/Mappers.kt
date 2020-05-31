@@ -5,6 +5,7 @@ import com.doancnpm.edoctor.data.local.model.UserLocal
 import com.doancnpm.edoctor.data.remote.response.CategoriesResponse
 import com.doancnpm.edoctor.data.remote.response.ErrorResponseJsonAdapter
 import com.doancnpm.edoctor.data.remote.response.LoginUserResponse
+import com.doancnpm.edoctor.data.remote.response.ServicesResponse
 import com.doancnpm.edoctor.domain.entity.*
 import com.doancnpm.edoctor.domain.entity.User.RoleId.CUSTOMER
 import com.doancnpm.edoctor.domain.entity.User.RoleId.DOCTOR
@@ -59,6 +60,16 @@ fun CategoriesResponse.Category.toCategoryDomain(baseUrl: String): Category {
     name = name,
     description = description,
     image = baseUrl + image.url,
+  )
+}
+
+fun ServicesResponse.Service.toServiceDomain(baseUrl: String): Service {
+  return Service(
+    id = id,
+    name = name,
+    description = description,
+    image = baseUrl + image.url,
+    price = price
   )
 }
 

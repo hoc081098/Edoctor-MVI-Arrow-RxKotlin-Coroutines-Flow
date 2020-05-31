@@ -28,3 +28,21 @@ data class BaseResponse<Data : Any>(
     }
   }
 }
+
+data class Pagination(
+  @Json(name = "page")
+  val page: Int, // 2
+  @Json(name = "per_page")
+  val perPage: Int, // 4
+  @Json(name = "total_page")
+  val totalPage: Int, // 2
+)
+
+data class Image(
+  @Json(name = "extension")
+  val extension: String, // jpg
+  @Json(name = "id")
+  val id: Int, // 40
+  @Json(name = "url")
+  val url: String, // system/categories/category.jpg
+)
