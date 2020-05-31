@@ -27,12 +27,12 @@ class ProfileFragment : BaseFragment(R.layout.fragment_profile) {
     viewModel.eventLiveData.observeEvent(owner = viewLifecycleOwner) {
       when (it) {
         ProfileContract.SingleEvent.LogoutSucess -> {
-          view?.snack("Logout success")
+          requireContext().toast("Logout success")
         }
         is ProfileContract.SingleEvent.LogoutFailure -> {
           view?.snack("Logout failure: ${it.error.getMessage()}")
         }
-      }.exhaustive
+      }
     }
 
     viewModel.process(
