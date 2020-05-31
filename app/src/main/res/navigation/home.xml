@@ -25,11 +25,16 @@
     <fragment
         android:id="@+id/servicesFragment"
         android:name="com.doancnpm.edoctor.ui.main.home.services.ServicesFragment"
-        android:label="Services">
+        android:label="{title}">
 
         <argument
             android:name="category"
             app:argType="com.doancnpm.edoctor.domain.entity.Category"
+            app:nullable="false" />
+
+        <argument
+            android:name="title"
+            app:argType="string"
             app:nullable="false" />
 
     </fragment>
