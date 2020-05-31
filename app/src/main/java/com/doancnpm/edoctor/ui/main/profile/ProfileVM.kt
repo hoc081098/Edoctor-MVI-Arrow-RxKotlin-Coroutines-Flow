@@ -16,6 +16,7 @@ import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.ofType
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import kotlinx.coroutines.rx3.rxSingle
+import timber.log.Timber
 
 class ProfileVM(
   private val userRepository: UserRepository,

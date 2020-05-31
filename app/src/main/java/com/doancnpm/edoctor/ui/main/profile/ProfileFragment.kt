@@ -5,6 +5,7 @@ import android.view.View
 import com.doancnpm.edoctor.R
 import com.doancnpm.edoctor.core.BaseFragment
 import com.doancnpm.edoctor.databinding.FragmentProfileBinding
+import com.doancnpm.edoctor.domain.entity.getMessage
 import com.doancnpm.edoctor.ui.main.profile.ProfileContract.ViewIntent
 import com.doancnpm.edoctor.utils.*
 import com.jakewharton.rxbinding4.view.clicks
@@ -25,8 +26,12 @@ class ProfileFragment : BaseFragment(R.layout.fragment_profile) {
   private fun bindVM() {
     viewModel.eventLiveData.observeEvent(owner = viewLifecycleOwner) {
       when (it) {
-        ProfileContract.SingleEvent.LogoutSucess -> TODO()
-        is ProfileContract.SingleEvent.LogoutFailure -> TODO()
+        ProfileContract.SingleEvent.LogoutSucess -> {
+          view?.snack("Logout success")
+        }
+        is ProfileContract.SingleEvent.LogoutFailure -> {
+          view?.snack("Logout failure: ${it.error.getMessage()}")
+        }
       }.exhaustive
     }
 
