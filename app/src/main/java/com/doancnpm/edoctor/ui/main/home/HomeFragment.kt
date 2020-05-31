@@ -111,6 +111,12 @@ class HomeFragment : BaseFragment(R.layout.fragment_home) {
           }
         }
       }
+
+      if (state.isRefreshing) {
+        swipeRefreshLayout.post { swipeRefreshLayout.isRefreshing = true }
+      } else {
+        swipeRefreshLayout.isRefreshing = false
+      }
     }
   }
 

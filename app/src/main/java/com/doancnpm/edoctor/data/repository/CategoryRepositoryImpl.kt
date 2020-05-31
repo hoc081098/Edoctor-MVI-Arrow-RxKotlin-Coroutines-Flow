@@ -26,7 +26,7 @@ class CategoryRepositoryImpl(
           .unwrap()
           .categories
           .map { it.toCategoryDomain(baseUrl) }
-          .also { delay(300) }
+          .also { delay(1_000) }
           .also { Timber.d("getCategories { page: $page, perPage: $perPage }") }
       }
     }

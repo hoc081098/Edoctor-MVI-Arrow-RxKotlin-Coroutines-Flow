@@ -82,3 +82,6 @@ inline fun <T : Any> MutableLiveData<T>.setValue(mutation: (T?) -> T) {
     .takeIf { it != currentValue }
     ?.let { value = it }
 }
+
+inline fun <T : Any> MutableLiveData<T>.setValueNotNull(mutation: (T) -> T) =
+  setValue { mutation(it!!) }
