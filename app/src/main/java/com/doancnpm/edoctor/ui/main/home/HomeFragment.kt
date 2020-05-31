@@ -2,12 +2,14 @@ package com.doancnpm.edoctor.ui.main.home
 
 import android.os.Bundle
 import android.view.View
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.doancnpm.edoctor.GlideApp
 import com.doancnpm.edoctor.R
 import com.doancnpm.edoctor.core.BaseFragment
 import com.doancnpm.edoctor.databinding.FragmentHomeBinding
+import com.doancnpm.edoctor.domain.entity.Category
 import com.doancnpm.edoctor.domain.entity.getMessage
 import com.doancnpm.edoctor.ui.main.home.HomeContract.ViewState
 import com.doancnpm.edoctor.utils.*
@@ -29,7 +31,8 @@ class HomeFragment : BaseFragment(R.layout.fragment_home) {
   private val homeAdapter by lazy(NONE) {
     HomeAdapter(
       GlideApp.with(this),
-      ::onRetryClick,
+      ::onClickRetry,
+      ::onClickCategory,
     )
   }
 
@@ -87,7 +90,13 @@ class HomeFragment : BaseFragment(R.layout.fragment_home) {
     }
   }
 
-  private fun onRetryClick() = viewModel.retryNextPage()
+  private fun onClickRetry() = viewModel.retryNextPage()
+
+  private fun onClickCategory(category: Category) {
+    HomeFragmentDirections
+      .actionHomeFragmentToServicesFragment(category)
+      .let { findNavController().navigate(it) }
+  }
 
   private fun render(state: ViewState) {
     homeAdapter.submitList(state.items)

@@ -5,13 +5,15 @@ import android.view.ViewGroup
 import androidx.annotation.IntDef
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.NO_POSITION
+import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import androidx.viewbinding.ViewBinding
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.doancnpm.edoctor.GlideRequests
 import com.doancnpm.edoctor.R
 import com.doancnpm.edoctor.databinding.ItemRecyclerCategoryBinding
 import com.doancnpm.edoctor.databinding.ItemRecyclerErrorLoadingBinding
+import com.doancnpm.edoctor.domain.entity.Category
 import com.doancnpm.edoctor.domain.entity.getMessage
 import com.doancnpm.edoctor.ui.main.home.HomeContract.Item
 import com.doancnpm.edoctor.ui.main.home.HomeContract.PlaceholderState
@@ -23,7 +25,8 @@ import timber.log.Timber
 @ExperimentalStdlibApi
 class HomeAdapter(
   private val glide: GlideRequests,
-  private val onRetryClick: () -> Unit,
+  private val onClickRetry: () -> Unit,
+  private val onClickCategory: (Category) -> Unit,
 ) :
   ListAdapter<Item, HomeAdapter.VH<ViewBinding>>(object : DiffUtil.ItemCallback<Item>() {
     override fun areItemsTheSame(oldItem: Item, newItem: Item): Boolean {
@@ -92,12 +95,27 @@ class HomeAdapter(
   override fun onBindViewHolder(holder: VH<ViewBinding>, position: Int) =
     holder.bind(getItem(position))
 
-  abstract class VH<out T : ViewBinding>(binding: T) : RecyclerView.ViewHolder(binding.root) {
+  abstract class VH<out T : ViewBinding>(binding: T) : ViewHolder(binding.root) {
     abstract fun bind(item: Item)
   }
 
   inner class CategoryVH(private val binding: ItemRecyclerCategoryBinding) :
     VH<ItemRecyclerCategoryBinding>(binding) {
+    init {
+      itemView.setOnClickListener {
+        val position = bindingAdapterPosition
+
+        if (position == NO_POSITION) {
+          return@setOnClickListener
+        }
+
+        val item = getItem(position)
+        if (item is Item.CategoryItem) {
+          onClickCategory(item.category)
+        }
+      }
+    }
+
     override fun bind(item: Item) {
       val category = (item as? Item.CategoryItem ?: return).category
 
@@ -116,8 +134,8 @@ class HomeAdapter(
     VH<ItemRecyclerErrorLoadingBinding>(binding) {
     init {
       binding.buttonRetry.setOnClickListener {
-        if (bindingAdapterPosition != RecyclerView.NO_POSITION) {
-          onRetryClick()
+        if (bindingAdapterPosition != NO_POSITION) {
+          onClickRetry()
         }
       }
     }
