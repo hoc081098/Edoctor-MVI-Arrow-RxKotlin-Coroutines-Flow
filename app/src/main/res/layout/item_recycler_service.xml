@@ -57,30 +57,37 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Name" />
 
-        <TextView
-            android:id="@+id/text_price"
-            android:layout_width="0dp"
+        <androidx.cardview.widget.CardView
+            android:id="@id/text_price_wrapper"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="4dp"
-            android:layout_marginEnd="8dp"
-            android:ellipsize="end"
-            android:fontFamily="@font/nunito_sans"
-            android:maxLines="1"
-            android:textColor="@color/colorIcon"
-            android:textSize="14sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="@+id/guideline"
-            app:layout_constraintTop_toBottomOf="@+id/text_name"
-            tools:text="10000" />
+            android:layout_marginTop="2dp"
+            app:cardBackgroundColor="#DAA520"
+            app:cardCornerRadius="4dp"
+            app:cardElevation="0dp"
+            app:layout_constraintStart_toStartOf="@+id/text_name"
+            app:layout_constraintTop_toBottomOf="@+id/text_name">
+
+            <TextView
+                android:id="@+id/text_price"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:fontFamily="@font/nunito_sans"
+                android:maxLines="1"
+                android:padding="1dp"
+                android:textColor="@color/colorOnPrimary"
+                android:textSize="14sp"
+
+                tools:text="10000" />
+        </androidx.cardview.widget.CardView>
 
         <TextView
             android:id="@+id/text_description"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="2dp"
             android:layout_marginEnd="8dp"
             android:ellipsize="end"
             android:fontFamily="@font/nunito_sans"
@@ -90,7 +97,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="@+id/guideline"
-            app:layout_constraintTop_toBottomOf="@+id/text_price"
+            app:layout_constraintTop_toBottomOf="@+id/text_price_wrapper"
             tools:text="Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s" />
 
         <com.google.android.material.button.MaterialButton
@@ -100,11 +107,11 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="4dp"
             android:elevation="4dp"
-            app:backgroundTint="@color/colorPrimary"
             android:fontFamily="@font/google_sans"
             android:text="Detail"
             android:textColor="@color/colorOnPrimary"
             android:textSize="13sp"
+            app:backgroundTint="@color/colorPrimary"
             app:cornerRadius="2dp"
             app:layout_constraintStart_toEndOf="@+id/image_view"
             app:layout_constraintTop_toBottomOf="@+id/text_description" />
