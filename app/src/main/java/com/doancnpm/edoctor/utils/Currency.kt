@@ -1,6 +1,7 @@
 package com.doancnpm.edoctor.utils
 
-import java.text.NumberFormat
+import android.icu.text.NumberFormat
+import android.icu.util.Currency
 import java.util.*
 
 private val localeVi = Locale("vi", "VN")
@@ -9,4 +10,4 @@ private val formatter = NumberFormat.getCurrencyInstance(localeVi).apply {
   maximumFractionDigits = 0
 }
 
-val Int.currencyVndFormatted get() = formatter.format(toLong())
+val Int.currencyVndFormatted: String get() = formatter.format(toLong())
