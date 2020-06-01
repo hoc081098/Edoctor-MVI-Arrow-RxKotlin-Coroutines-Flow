@@ -45,7 +45,7 @@ class ServiceAdapter(
       binding.run {
         glide
           .load(item.image)
-          .placeholder(R.drawable.splash_background)
+          .placeholder(R.drawable.logo)
           .thumbnail(0.5f)
           .centerCrop()
           .transition(DrawableTransitionOptions.withCrossFade())

@@ -3,9 +3,12 @@ package com.doancnpm.edoctor.ui.main.home.service_detail
 import android.os.Bundle
 import android.view.View
 import androidx.navigation.fragment.navArgs
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade
+import com.doancnpm.edoctor.GlideApp
 import com.doancnpm.edoctor.R
 import com.doancnpm.edoctor.core.BaseFragment
 import com.doancnpm.edoctor.databinding.FragmentServiceDetailBinding
+import com.doancnpm.edoctor.utils.currencyVndFormatted
 import com.doancnpm.edoctor.utils.viewBinding
 
 class ServiceDetailFragment : BaseFragment(R.layout.fragment_service_detail) {
@@ -14,8 +17,18 @@ class ServiceDetailFragment : BaseFragment(R.layout.fragment_service_detail) {
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
-    binding.root
-    navArgs.title
-    navArgs.service
+
+    val service = navArgs.service
+
+    GlideApp
+      .with(this)
+      .load(service.image)
+      .placeholder(R.drawable.logo)
+      .centerCrop()
+      .transition(withCrossFade())
+      .into(binding.appBarImage)
+
+    binding.textDescription.text = service.description
+    binding.buttonOrder.text = "ORDER - ${service.price.currencyVndFormatted}"
   }
 }
