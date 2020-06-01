@@ -2,59 +2,78 @@ package com.doancnpm.edoctor.data
 
 import android.database.sqlite.SQLiteException
 import com.doancnpm.edoctor.data.local.model.UserLocal
+import com.doancnpm.edoctor.data.remote.response.CategoriesResponse
 import com.doancnpm.edoctor.data.remote.response.ErrorResponseJsonAdapter
 import com.doancnpm.edoctor.data.remote.response.LoginUserResponse
-import com.doancnpm.edoctor.domain.entity.AppError
-import com.doancnpm.edoctor.domain.entity.DomainResult
-import com.doancnpm.edoctor.domain.entity.User
+import com.doancnpm.edoctor.data.remote.response.ServicesResponse
+import com.doancnpm.edoctor.domain.entity.*
 import com.doancnpm.edoctor.domain.entity.User.RoleId.CUSTOMER
 import com.doancnpm.edoctor.domain.entity.User.RoleId.DOCTOR
-import com.doancnpm.edoctor.domain.entity.leftResult
 import retrofit2.HttpException
 import java.io.IOException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 
-object Mappers {
-  fun roleIdToInt(roleId: User.RoleId): Int {
-    return when (roleId) {
-      CUSTOMER -> 2
-      DOCTOR -> 3
-    }
-  }
-
-  fun intToRoleId(int: Int): User.RoleId {
-    return when (int) {
-      2 -> CUSTOMER
-      3 -> DOCTOR
-      else -> error("Cannot convert roleId")
-    }
-  }
-
-  fun loginUserResponseToUserLocal(response: LoginUserResponse.User): UserLocal {
-    return UserLocal(
-      id = response.id,
-      fullName = response.fullName,
-      phone = response.phone,
-      roleId = response.roleId,
-      status = response.status,
-      avatar = response.avatar,
-      birthday = response.birthday,
-    )
-  }
-
-  fun userLocalToUserDomain(local: UserLocal): User {
-    return User(
-      id = local.id,
-      fullName = local.fullName,
-      phone = local.phone,
-      roleId = intToRoleId(local.roleId),
-      status = local.status,
-      avatar = local.avatar,
-      birthday = local.birthday,
-    )
+//region Mappers
+fun User.RoleId.toInt(): Int {
+  return when (this) {
+    CUSTOMER -> 2
+    DOCTOR -> 3
   }
 }
+
+fun Int.toRoleId(): User.RoleId {
+  return when (this) {
+    2 -> CUSTOMER
+    3 -> DOCTOR
+    else -> error("Cannot convert roleId")
+  }
+}
+
+fun LoginUserResponse.User.toUserLocal(): UserLocal {
+  return UserLocal(
+    id = id,
+    fullName = fullName,
+    phone = phone,
+    roleId = roleId,
+    status = status,
+    avatar = avatar,
+    birthday = birthday,
+  )
+}
+
+fun UserLocal.toUserDomain(): User {
+  return User(
+    id = id,
+    fullName = fullName,
+    phone = phone,
+    roleId = roleId.toRoleId(),
+    status = status,
+    avatar = avatar,
+    birthday = birthday,
+  )
+}
+
+fun CategoriesResponse.Category.toCategoryDomain(baseUrl: String): Category {
+  return Category(
+    id = id,
+    name = name,
+    description = description,
+    image = baseUrl + image.url,
+  )
+}
+
+fun ServicesResponse.Service.toServiceDomain(baseUrl: String): Service {
+  return Service(
+    id = id,
+    name = name,
+    description = description,
+    image = baseUrl + image.url,
+    price = price
+  )
+}
+
+//endregion
 
 class ErrorMapper(private val errorResponseJsonAdapter: ErrorResponseJsonAdapter) {
   /**

@@ -10,6 +10,33 @@
         android:id="@+id/homeFragment"
         android:name="com.doancnpm.edoctor.ui.main.home.HomeFragment"
         android:label="Home"
-        tools:layout="@layout/fragment_home" />
+        tools:layout="@layout/fragment_home">
+
+        <action
+            android:id="@+id/action_homeFragment_to_servicesFragment"
+            app:destination="@id/servicesFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/servicesFragment"
+        android:name="com.doancnpm.edoctor.ui.main.home.services.ServicesFragment"
+        android:label="{title}">
+
+        <argument
+            android:name="category"
+            app:argType="com.doancnpm.edoctor.domain.entity.Category"
+            app:nullable="false" />
+
+        <argument
+            android:name="title"
+            app:argType="string"
+            app:nullable="false" />
+
+    </fragment>
 
 </navigation>

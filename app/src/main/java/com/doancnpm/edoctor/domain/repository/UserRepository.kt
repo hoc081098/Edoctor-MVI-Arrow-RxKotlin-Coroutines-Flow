@@ -24,6 +24,8 @@ interface UserRepository {
 
   suspend fun checkAuth(): DomainResult<Boolean>
 
+  suspend fun logout(): DomainResult<Unit>
+
   suspend fun resendCode(phone: String): DomainResult<Unit>
 
   suspend fun verify(phone: String, code: String): DomainResult<Unit>

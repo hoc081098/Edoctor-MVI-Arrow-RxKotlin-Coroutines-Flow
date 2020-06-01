@@ -30,7 +30,8 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-val API_QUALIFIER = named("com.doancnpm.edoctor.api")
+val API_URL_QUALIFIER = named("com.doancnpm.edoctor.api_url")
+val BASE_URL_QUALIFIER = named("com.doancnpm.edoctor.base_url")
 private val API_KEY_QUALIFIER = named("com.doancnpm.edoctor.api_key")
 
 val dataModule = module {
@@ -38,13 +39,15 @@ val dataModule = module {
    * Remote
    */
 
-  factory(API_QUALIFIER) { BuildConfig.BASE_URL }
+  factory(BASE_URL_QUALIFIER) { BuildConfig.BASE_URL }
+
+  factory(API_URL_QUALIFIER) { BuildConfig.API_URL }
 
   factory(API_KEY_QUALIFIER) { BuildConfig.API_KEY }
 
-  single(API_QUALIFIER) { provideRetrofit(get(API_QUALIFIER), get(), get()) }
+  single(API_URL_QUALIFIER) { provideRetrofit(get(API_URL_QUALIFIER), get(), get()) }
 
-  single(API_QUALIFIER) { provideApiService(get(API_QUALIFIER)) }
+  single(API_URL_QUALIFIER) { provideApiService(get(API_URL_QUALIFIER)) }
 
   single { provideMoshi() }
 
