@@ -12,10 +12,11 @@ import com.doancnpm.edoctor.R
 import com.doancnpm.edoctor.databinding.ItemRecyclerServiceBinding
 import com.doancnpm.edoctor.domain.entity.Service
 import com.doancnpm.edoctor.utils.currencyVndFormatted
-import com.doancnpm.edoctor.utils.toast
 
 class ServiceAdapter(
   private val glide: GlideRequests,
+  private val onClickDetail: (Service) -> Unit,
+  private val onClickOrder: (Service) -> Unit,
 ) :
   ListAdapter<Service, ServiceAdapter.VH>(object : DiffUtil.ItemCallback<Service>() {
     override fun areItemsTheSame(oldItem: Service, newItem: Service) = oldItem.id == newItem.id
@@ -37,6 +38,7 @@ class ServiceAdapter(
 
     init {
       binding.detailButton.setOnClickListener(this)
+      binding.orderButton.setOnClickListener(this)
     }
 
     fun bind(item: Service) {
@@ -62,7 +64,8 @@ class ServiceAdapter(
       val item = getItem(position)
 
       when (v) {
-        binding.detailButton -> v.context.toast("Clicked $item")
+        binding.detailButton -> onClickDetail(item)
+        binding.orderButton -> onClickOrder(item)
         else -> TODO()
       }
     }

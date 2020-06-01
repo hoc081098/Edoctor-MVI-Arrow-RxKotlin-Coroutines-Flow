@@ -10,6 +10,7 @@ import com.doancnpm.edoctor.GlideApp
 import com.doancnpm.edoctor.R
 import com.doancnpm.edoctor.core.BaseFragment
 import com.doancnpm.edoctor.databinding.FragmentServicesBinding
+import com.doancnpm.edoctor.domain.entity.Service
 import com.doancnpm.edoctor.domain.entity.getMessage
 import com.doancnpm.edoctor.utils.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -32,8 +33,11 @@ class ServicesFragment : BaseFragment(R.layout.fragment_services) {
   private val serviceAdapter by lazy(NONE) {
     ServiceAdapter(
       GlideApp.with(this),
+      onClickDetail = ::onClickDetail,
+      onClickOrder = ::onClickOrder,
     )
   }
+
   private val footerAdapter = FooterAdapter(::onRetry)
   private val onScrollListener by lazy(NONE) {
     object : RecyclerView.OnScrollListener() {
@@ -100,6 +104,15 @@ class ServicesFragment : BaseFragment(R.layout.fragment_services) {
         }
       }
     }
+  }
+
+
+  private fun onClickOrder(service: Service) {
+    view?.snack("Click order: ${service.name}")
+  }
+
+  private fun onClickDetail(service: Service) {
+    view?.snack("Click detail: ${service.name}")
   }
 
   private fun setupViews() {
