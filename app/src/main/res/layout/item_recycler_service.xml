@@ -75,10 +75,12 @@
                 android:ellipsize="end"
                 android:fontFamily="@font/nunito_sans"
                 android:maxLines="1"
-                android:padding="1dp"
+                android:paddingStart="4dp"
+                android:paddingTop="1dp"
+                android:paddingEnd="4dp"
+                android:paddingBottom="1dp"
                 android:textColor="@color/colorOnPrimary"
                 android:textSize="14sp"
-
                 tools:text="10000" />
         </androidx.cardview.widget.CardView>
 
@@ -108,12 +110,41 @@
             android:layout_marginTop="4dp"
             android:elevation="4dp"
             android:fontFamily="@font/google_sans"
+            android:insetLeft="6dp"
+            android:insetTop="6dp"
+            android:insetRight="6dp"
             android:text="Detail"
-            android:textColor="@color/colorOnPrimary"
-            android:textSize="13sp"
-            app:backgroundTint="@color/colorPrimary"
-            app:cornerRadius="2dp"
+            android:textColor="@color/colorPrimary"
+            android:textSize="12sp"
+            app:backgroundTint="@color/colorOnPrimary"
+            app:cornerRadius="4dp"
+            app:layout_constraintEnd_toStartOf="@+id/order_button"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_chainStyle="packed"
             app:layout_constraintStart_toEndOf="@+id/image_view"
+            app:layout_constraintTop_toBottomOf="@+id/text_description"
+            app:strokeColor="@color/colorPrimary"
+            app:strokeWidth="1dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/order_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="4dp"
+            android:elevation="4dp"
+            android:fontFamily="@font/google_sans"
+            android:insetLeft="6dp"
+            android:insetTop="6dp"
+            android:insetRight="6dp"
+            android:text="Order"
+            android:textColor="@color/colorOnPrimary"
+            android:textSize="12sp"
+            app:backgroundTint="@color/colorPrimary"
+            app:cornerRadius="4dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/detail_button"
             app:layout_constraintTop_toBottomOf="@+id/text_description" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
