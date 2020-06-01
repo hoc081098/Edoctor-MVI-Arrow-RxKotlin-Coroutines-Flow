@@ -11,6 +11,7 @@ import com.doancnpm.edoctor.GlideRequests
 import com.doancnpm.edoctor.R
 import com.doancnpm.edoctor.databinding.ItemRecyclerServiceBinding
 import com.doancnpm.edoctor.domain.entity.Service
+import com.doancnpm.edoctor.utils.currencyVndFormatted
 import com.doancnpm.edoctor.utils.toast
 
 class ServiceAdapter(
@@ -49,7 +50,7 @@ class ServiceAdapter(
           .into(imageView)
 
         textName.text = item.name
-        textPrice.text = item.price.toString()
+        textPrice.text = item.price.currencyVndFormatted
         textDescription.text = item.description
       }
     }
