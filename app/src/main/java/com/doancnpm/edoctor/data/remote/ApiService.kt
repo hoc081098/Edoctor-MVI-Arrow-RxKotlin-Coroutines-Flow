@@ -3,10 +3,7 @@ package com.doancnpm.edoctor.data.remote
 import androidx.annotation.IntRange
 import com.doancnpm.edoctor.data.remote.body.LoginUserBody
 import com.doancnpm.edoctor.data.remote.body.RegisterUserBody
-import com.doancnpm.edoctor.data.remote.response.BaseResponse
-import com.doancnpm.edoctor.data.remote.response.CategoriesResponse
-import com.doancnpm.edoctor.data.remote.response.LoginUserResponse
-import com.doancnpm.edoctor.data.remote.response.RegisterUserResponse
+import com.doancnpm.edoctor.data.remote.response.*
 import retrofit2.Retrofit
 import retrofit2.create
 import retrofit2.http.*
@@ -46,6 +43,15 @@ interface ApiService {
     @IntRange(from = 1)
     perPage: Int,
   ): BaseResponse<CategoriesResponse>
+  //endregion
+
+  //region Service
+  @GET("services")
+  suspend fun getServicesByCategory(
+    @IntRange(from = 1) @Query("category_id") categoryId: Int,
+    @IntRange(from = 1) @Query("page") page: Int,
+    @IntRange(from = 1) @Query("per_page") perPage: Int,
+  ): BaseResponse<ServicesResponse>
   //endregion
 
   companion object Factory {

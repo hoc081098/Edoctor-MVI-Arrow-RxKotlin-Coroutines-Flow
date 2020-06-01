@@ -1,5 +1,6 @@
 package com.doancnpm.edoctor.koin
 
+import com.doancnpm.edoctor.domain.entity.Category
 import com.doancnpm.edoctor.ui.auth.login.LoginContract
 import com.doancnpm.edoctor.ui.auth.login.LoginInteractor
 import com.doancnpm.edoctor.ui.auth.login.LoginVM
@@ -13,11 +14,15 @@ import com.doancnpm.edoctor.ui.auth.verify.VerifyContract
 import com.doancnpm.edoctor.ui.auth.verify.VerifyInteractor
 import com.doancnpm.edoctor.ui.auth.verify.VerifyVM
 import com.doancnpm.edoctor.ui.main.MainVM
+import com.doancnpm.edoctor.ui.main.home.HomeVM
+import com.doancnpm.edoctor.ui.main.home.services.ServicesVM
+import com.doancnpm.edoctor.ui.main.profile.ProfileVM
 import com.doancnpm.edoctor.ui.splash.SplashVM
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
+@ExperimentalStdlibApi
 @ExperimentalCoroutinesApi
 val viewModelModule = module {
   viewModel { SplashVM(get()) }
@@ -38,5 +43,13 @@ val viewModelModule = module {
 
   //region Main
   viewModel { MainVM(get()) }
+
+  viewModel { HomeVM(get()) }
+
+  viewModel { (category: Category) -> ServicesVM(get(), category) }
+  //endregion
+
+  //region Profile
+  viewModel { ProfileVM(get(), get()) }
   //endregion
 }

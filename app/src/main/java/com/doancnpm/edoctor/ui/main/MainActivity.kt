@@ -60,6 +60,7 @@ class MainActivity : BaseActivity() {
     val navGraphIds = listOf(
       R.navigation.home,
       R.navigation.history,
+      R.navigation.notification,
       R.navigation.profile,
     )
 

@@ -16,6 +16,7 @@ import kotlin.reflect.KProperty
 class ViewBindingDelegate<T : ViewBinding>(
   private val fragment: Fragment,
   private val viewBindingFactory: (View) -> T,
+  private var onDestroy: ((T) -> Unit)?,
 ) : ReadOnlyProperty<Fragment, T> {
   private var binding: T? = null
 
@@ -27,6 +28,7 @@ class ViewBindingDelegate<T : ViewBinding>(
 
           viewLifecycleOwner?.lifecycle?.addObserver(object : DefaultLifecycleObserver {
             override fun onDestroy(owner: LifecycleOwner) {
+              onDestroy?.invoke(binding!!)
               binding = null
               viewLifecycleOwner.lifecycle.removeObserver(this)
               Timber.d("$fragment::view::onDestroy")
@@ -53,7 +55,10 @@ class ViewBindingDelegate<T : ViewBinding>(
 }
 
 fun <T : ViewBinding> Fragment.viewBinding(factory: (View) -> T) =
-  ViewBindingDelegate<T>(this, factory)
+  ViewBindingDelegate(this, factory, null)
+
+fun <T : ViewBinding> Fragment.viewBinding(onDestroy: T.() -> Unit, factory: (View) -> T) =
+  ViewBindingDelegate(this, factory, onDestroy)
 
 fun <T : ViewBinding> AppCompatActivity.viewBinding(factory: (LayoutInflater) -> T) =
   lazy(NONE) { factory(layoutInflater) }

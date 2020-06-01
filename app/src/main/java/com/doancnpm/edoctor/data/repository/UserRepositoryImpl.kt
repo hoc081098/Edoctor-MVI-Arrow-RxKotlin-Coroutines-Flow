@@ -4,12 +4,13 @@ import arrow.core.Either
 import arrow.core.Option
 import arrow.core.extensions.fx
 import com.doancnpm.edoctor.data.ErrorMapper
-import com.doancnpm.edoctor.data.Mappers
 import com.doancnpm.edoctor.data.local.UserLocalSource
 import com.doancnpm.edoctor.data.remote.ApiService
 import com.doancnpm.edoctor.data.remote.body.LoginUserBody
 import com.doancnpm.edoctor.data.remote.body.RegisterUserBody
-import com.doancnpm.edoctor.data.remote.response.unwrap
+import com.doancnpm.edoctor.data.toInt
+import com.doancnpm.edoctor.data.toUserDomain
+import com.doancnpm.edoctor.data.toUserLocal
 import com.doancnpm.edoctor.domain.dispatchers.AppDispatchers
 import com.doancnpm.edoctor.domain.entity.AppError
 import com.doancnpm.edoctor.domain.entity.DomainResult
@@ -43,7 +44,7 @@ class UserRepositoryImpl(
         Option.fx {
           !tokenOptional
           val user = !userOptional
-          Mappers.userLocalToUserDomain(user)
+          user.toUserDomain()
         }.rightResult()
       }
       .catchError(errorMapper)
@@ -70,6 +71,12 @@ class UserRepositoryImpl(
     return Either.catch(errorMapper::map) {
       checkAuthDeferred.await()
       userLocalSource.token() !== null && userLocalSource.user() !== null
+    }
+  }
+
+  override suspend fun logout(): DomainResult<Unit> {
+    return Either.catch(errorMapper::map) {
+      userLocalSource.removeUserAndToken()
     }
   }
 
@@ -104,7 +111,7 @@ class UserRepositoryImpl(
         ).unwrap()
 
         userLocalSource.saveToken(token)
-        userLocalSource.saveUser(Mappers.loginUserResponseToUserLocal(user))
+        userLocalSource.saveUser(user.toUserLocal())
       }
     }
   }
@@ -123,7 +130,7 @@ class UserRepositoryImpl(
             RegisterUserBody(
               phone = phone,
               password = password,
-              roleId = Mappers.roleIdToInt(roleId),
+              roleId = roleId.toInt(),
               fullName = fullName,
               birthday = birthday?.toString_yyyyMMdd(),
             )
