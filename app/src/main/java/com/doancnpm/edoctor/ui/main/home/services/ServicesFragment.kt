@@ -2,6 +2,7 @@ package com.doancnpm.edoctor.ui.main.home.services
 
 import android.os.Bundle
 import android.view.View
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.MergeAdapter
@@ -112,7 +113,9 @@ class ServicesFragment : BaseFragment(R.layout.fragment_services) {
   }
 
   private fun onClickDetail(service: Service) {
-    view?.snack("Click detail: ${service.name}")
+    ServicesFragmentDirections
+      .actionServicesFragmentToServiceDetailFragment(service.name, service)
+      .let { findNavController().navigate(it) }
   }
 
   private fun setupViews() {
