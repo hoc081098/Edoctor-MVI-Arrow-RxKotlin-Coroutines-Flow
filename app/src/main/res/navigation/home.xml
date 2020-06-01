@@ -37,6 +37,31 @@
             app:argType="string"
             app:nullable="false" />
 
+        <action
+            android:id="@+id/action_servicesFragment_to_serviceDetailFragment"
+            app:destination="@id/serviceDetailFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/serviceDetailFragment"
+        android:name="com.doancnpm.edoctor.ui.main.home.service_detail.ServiceDetailFragment"
+        android:label="{title}">
+
+        <argument
+            android:name="title"
+            app:argType="string"
+            app:nullable="false" />
+
+        <argument
+            android:name="service"
+            app:argType="com.doancnpm.edoctor.domain.entity.Service"
+            app:nullable="false" />
+
     </fragment>
 
 </navigation>
