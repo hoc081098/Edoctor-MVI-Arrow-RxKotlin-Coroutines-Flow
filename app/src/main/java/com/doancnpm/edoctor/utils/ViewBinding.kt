@@ -10,6 +10,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.viewbinding.ViewBinding
 import timber.log.Timber
+import java.lang.reflect.Method
 import kotlin.LazyThreadSafetyMode.NONE
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
@@ -57,8 +58,18 @@ class ViewBindingDelegate<T : ViewBinding>(
 
 @MainThread
 inline fun <reified T : ViewBinding> Fragment.viewBinding(noinline onDestroy: (T.() -> Unit)? = null): ViewBindingDelegate<T> {
-  val bindMethod = T::class.java.getMethod("bind", View::class.java)
-  return ViewBindingDelegate(this, { bindMethod.invoke(null, it) as T }, onDestroy)
+  var bindMethod: Method? = null
+
+  return ViewBindingDelegate(
+    this,
+    {
+      (bindMethod ?: T::class.java
+        .getMethod("bind", View::class.java)
+        .also { bindMethod = it })
+        .invoke(null, it) as T
+    },
+    onDestroy
+  )
 }
 
 fun <T : ViewBinding> AppCompatActivity.viewBinding(factory: (LayoutInflater) -> T) =
