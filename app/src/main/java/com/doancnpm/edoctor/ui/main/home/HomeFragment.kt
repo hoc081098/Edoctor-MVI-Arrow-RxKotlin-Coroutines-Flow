@@ -19,13 +19,11 @@ import kotlin.LazyThreadSafetyMode.NONE
 
 @ExperimentalStdlibApi
 class HomeFragment : BaseFragment(R.layout.fragment_home) {
-  private val binding by viewBinding(
-    {
-      recyclerView.adapter = null
-      swipeRefreshLayout.setOnRefreshListener(null)
-      retryButton.setOnClickListener(null)
-    }
-  ) { FragmentHomeBinding.bind(it) }
+  private val binding by viewBinding<FragmentHomeBinding> {
+    recyclerView.adapter = null
+    swipeRefreshLayout.setOnRefreshListener(null)
+    retryButton.setOnClickListener(null)
+  }
 
   private val viewModel by viewModel<HomeVM>()
   private val homeAdapter by lazy(NONE) {

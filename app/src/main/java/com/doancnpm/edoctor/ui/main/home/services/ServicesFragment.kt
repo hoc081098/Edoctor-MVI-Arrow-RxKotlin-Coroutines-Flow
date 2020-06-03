@@ -20,14 +20,12 @@ import timber.log.Timber
 import kotlin.LazyThreadSafetyMode.NONE
 
 class ServicesFragment : BaseFragment(R.layout.fragment_services) {
-  private val binding: FragmentServicesBinding by viewBinding(
-    {
-      recyclerView.removeOnScrollListener(onScrollListener)
-      recyclerView.adapter = null
-      retryButton.setOnClickListener(null)
-      swipeRefreshLayout.setOnRefreshListener(null)
-    }
-  ) { FragmentServicesBinding.bind(it) }
+  private val binding: FragmentServicesBinding by viewBinding {
+    recyclerView.removeOnScrollListener(onScrollListener)
+    recyclerView.adapter = null
+    retryButton.setOnClickListener(null)
+    swipeRefreshLayout.setOnRefreshListener(null)
+  }
   private val navArgs by navArgs<ServicesFragmentArgs>()
   private val viewModel by viewModel<ServicesVM> { parametersOf(navArgs.category) }
 

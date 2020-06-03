@@ -62,6 +62,26 @@
             app:argType="com.doancnpm.edoctor.domain.entity.Service"
             app:nullable="false" />
 
+        <action
+            android:id="@+id/action_serviceDetailFragment_to_createOrderFragment"
+            app:destination="@id/createOrderFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/createOrderFragment"
+        android:name="com.doancnpm.edoctor.ui.main.home.create_order.CreateOrderFragment"
+        android:label="Create order">
+
+        <argument
+            android:name="service"
+            app:argType="com.doancnpm.edoctor.domain.entity.Service"
+            app:nullable="false" />
+
     </fragment>
 
 </navigation>

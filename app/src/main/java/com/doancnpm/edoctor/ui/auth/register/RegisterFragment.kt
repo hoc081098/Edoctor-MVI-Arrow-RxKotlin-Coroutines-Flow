@@ -21,7 +21,7 @@ import timber.log.Timber
 import java.util.*
 
 class RegisterFragment : BaseFragment(R.layout.fragment_register) {
-  private val binding by viewBinding(FragmentRegisterBinding::bind)
+  private val binding by viewBinding<FragmentRegisterBinding>()
   private val viewModel by viewModel<RegisterVM>()
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
