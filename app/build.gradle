@@ -108,6 +108,7 @@ dependencies {
     implementation 'com.jakewharton.rxbinding4:rxbinding-material:4.0.0'
     implementation 'com.jakewharton.rxbinding4:rxbinding-swiperefreshlayout:4.0.0'
     implementation 'com.jakewharton.rxbinding4:rxbinding-recyclerview:4.0.0'
+    implementation 'com.jakewharton.rxbinding4:rxbinding-viewpager2:4.0.0'
 
     // Glide
     def glide_version = '4.11.0'
