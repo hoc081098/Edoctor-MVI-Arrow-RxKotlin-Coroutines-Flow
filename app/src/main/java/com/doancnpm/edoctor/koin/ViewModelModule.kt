@@ -15,6 +15,7 @@ import com.doancnpm.edoctor.ui.auth.verify.VerifyInteractor
 import com.doancnpm.edoctor.ui.auth.verify.VerifyVM
 import com.doancnpm.edoctor.ui.main.MainVM
 import com.doancnpm.edoctor.ui.main.home.HomeVM
+import com.doancnpm.edoctor.ui.main.home.create_order.CreateOrderVM
 import com.doancnpm.edoctor.ui.main.home.services.ServicesVM
 import com.doancnpm.edoctor.ui.main.profile.ProfileVM
 import com.doancnpm.edoctor.ui.splash.SplashVM
@@ -47,6 +48,8 @@ val viewModelModule = module {
   viewModel { HomeVM(get()) }
 
   viewModel { (category: Category) -> ServicesVM(get(), category) }
+
+  viewModel { CreateOrderVM() }
   //endregion
 
   //region Profile
