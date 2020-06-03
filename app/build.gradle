@@ -4,7 +4,9 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'androidx.navigation.safeargs'
 apply plugin: 'kotlin-kapt'
 
-androidExtensions { experimental = true }
+androidExtensions {
+    features = ['parcelize']
+}
 
 android {
     compileSdkVersion 29
