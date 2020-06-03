@@ -19,7 +19,7 @@ import org.koin.core.parameter.parametersOf
 
 class VerifyFragment : BaseFragment(R.layout.fragment_verify) {
   private val viewModel by viewModel<VerifyVM> { parametersOf(navArgs.phone) }
-  private val binding by viewBinding { FragmentVerifyBinding.bind(it) }
+  private val binding by viewBinding<FragmentVerifyBinding>()
   private val navArgs by navArgs<VerifyFragmentArgs>()
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

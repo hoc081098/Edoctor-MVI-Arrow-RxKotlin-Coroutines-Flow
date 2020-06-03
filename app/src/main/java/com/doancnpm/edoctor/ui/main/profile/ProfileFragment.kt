@@ -13,7 +13,7 @@ import io.reactivex.rxjava3.kotlin.addTo
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class ProfileFragment : BaseFragment(R.layout.fragment_profile) {
-  private val binding by viewBinding { FragmentProfileBinding.bind(it) }
+  private val binding by viewBinding<FragmentProfileBinding>()
   private val viewModel by viewModel<ProfileVM>()
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
