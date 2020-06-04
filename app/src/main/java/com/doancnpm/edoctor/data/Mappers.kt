@@ -11,6 +11,7 @@ import com.doancnpm.edoctor.domain.entity.User.RoleId.CUSTOMER
 import com.doancnpm.edoctor.domain.entity.User.RoleId.DOCTOR
 import retrofit2.HttpException
 import java.io.IOException
+import java.net.SocketException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 
@@ -89,6 +90,7 @@ class ErrorMapper(private val errorResponseJsonAdapter: ErrorResponseJsonAdapter
         when (throwable) {
           is UnknownHostException -> AppError.Remote.NetworkError(throwable)
           is SocketTimeoutException -> AppError.Remote.NetworkError(throwable)
+          is SocketException -> AppError.Remote.NetworkError(throwable)
           else -> AppError.UnexpectedError(
             cause = throwable,
             errorMessage = "Unknown IOException: $throwable"

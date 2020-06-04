@@ -14,4 +14,5 @@
     <string name="notification_channel_id">com.doancnpm.edoctor</string>
     <string name="notification_channel_name">Edoctor</string>
     <string name="notification_channel_description">Notification channel of edoctor app</string>
+    <string name="title_activity_maps">Map</string>
 </resources>
