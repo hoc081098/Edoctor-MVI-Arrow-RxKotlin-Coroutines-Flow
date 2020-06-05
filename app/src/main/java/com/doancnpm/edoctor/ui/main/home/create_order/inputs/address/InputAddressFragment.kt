@@ -24,6 +24,7 @@ import com.doancnpm.edoctor.ui.main.home.create_order.CreateOrderVM
 import com.doancnpm.edoctor.utils.*
 import com.doancnpm.edoctor.utils.SnackbarDismissEvent.DISMISS_EVENT_ACTION
 import com.google.android.gms.common.api.ResolvableApiException
+import com.google.android.gms.common.api.Status
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.SupportMapFragment
@@ -31,6 +32,10 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.libraries.places.api.model.Place
+import com.google.android.libraries.places.api.model.Place.Field
+import com.google.android.libraries.places.widget.AutocompleteSupportFragment
+import com.google.android.libraries.places.widget.listener.PlaceSelectionListener
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import org.koin.androidx.viewmodel.ext.android.getViewModel
@@ -142,6 +147,36 @@ class InputAddressFragment : BaseFragment(R.layout.fragment_input_address) {
           }
         }
       }
+    }
+
+    (childFragmentManager.findFragmentById(R.id.autocomplete_fragment) as AutocompleteSupportFragment).run {
+      setPlaceFields(
+        listOf(
+          Field.LAT_LNG,
+          Field.NAME,
+          Field.ADDRESS
+        )
+      )
+
+      setOnPlaceSelectedListener(object : PlaceSelectionListener {
+        override fun onPlaceSelected(place: Place) {
+          val latLng = place.latLng
+            ?: return context?.toast("Cannot get latitude and longitude").unit
+
+          viewModel.setLocation(
+            Location(
+              lat = latLng.latitude,
+              lng = latLng.longitude,
+            )
+          )
+        }
+
+        override fun onError(status: Status) {
+          if (status != Status.RESULT_CANCELED) {
+            context?.toast("Error when getting result")
+          }
+        }
+      })
     }
   }
 

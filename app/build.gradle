@@ -28,6 +28,7 @@ android {
             buildConfigField 'String', "BASE_URL", '"http://54.84.195.155/"'
             buildConfigField 'String', "API_URL", '"http://54.84.195.155/api/v1/"'
             buildConfigField 'String', "API_KEY", '"7767d3e09e826fad677592e5f078f09c"'
+            buildConfigField 'String', "PLACE_API_KEY", '"AIzaSyDCrGZXXsyMYRY2Ewmznl0zVMHtpkRWkEc"'
         }
 
         release {
@@ -132,6 +133,7 @@ dependencies {
     // Gms
     implementation 'com.google.android.gms:play-services-maps:17.0.0'
     implementation 'com.google.android.gms:play-services-location:17.0.0'
+    implementation 'com.google.android.libraries.places:places:2.3.0'
 
     // Firebase
     implementation 'com.google.firebase:firebase-messaging:20.2.0'
