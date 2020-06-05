@@ -22,6 +22,11 @@ sealed class AppError(cause: Throwable?) : Throwable(cause) {
     val errorMessage: String,
     override val cause: Throwable,
   ) : AppError(cause)
+
+  sealed class LocationError(cause: Throwable?) : AppError(cause) {
+    object TimeoutGetCurrentLocation : LocationError(null)
+    data class LocationSettingsDisabled(val throwable: Throwable) : LocationError(throwable)
+  }
 }
 
 fun AppError.getMessage(): String {
@@ -30,6 +35,8 @@ fun AppError.getMessage(): String {
     is AppError.Remote.ServerError -> "Server error: $errorMessage"
     is AppError.Local.DatabaseError -> "Database error"
     is AppError.UnexpectedError -> "Unexpected error"
+    AppError.LocationError.TimeoutGetCurrentLocation -> "Timeout to get current location. Please try again!"
+    is AppError.LocationError.LocationSettingsDisabled -> "Location settings disabled. Please enable to continue!"
   }
 }
 

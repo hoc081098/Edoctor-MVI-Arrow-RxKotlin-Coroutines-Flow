@@ -14,6 +14,7 @@ import java.io.IOException
 import java.net.SocketException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
+import android.location.Location as AndroidLocation
 
 //region Mappers
 fun User.RoleId.toInt(): Int {
@@ -71,6 +72,13 @@ fun ServicesResponse.Service.toServiceDomain(baseUrl: String): Service {
     description = description,
     image = baseUrl + image.url,
     price = price
+  )
+}
+
+fun AndroidLocation.toLocationDomain(): Location {
+  return Location(
+    latitude = latitude,
+    longitude = longitude,
   )
 }
 

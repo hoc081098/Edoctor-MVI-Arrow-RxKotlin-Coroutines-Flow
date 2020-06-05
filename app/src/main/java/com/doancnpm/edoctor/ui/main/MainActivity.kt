@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.navigation.NavController
+import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupActionBarWithNavController
 import com.doancnpm.edoctor.R
 import com.doancnpm.edoctor.core.BaseActivity
@@ -81,5 +82,17 @@ class MainActivity : BaseActivity() {
 
   override fun onSupportNavigateUp(): Boolean {
     return currentNavController?.value?.navigateUp() ?: false
+  }
+
+  @Suppress("DEPRECATION")
+  override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    super.onActivityResult(requestCode, resultCode, data)
+
+    Timber.d("[onActivityResult] { requestCode: $requestCode, resultCode: $resultCode, data: $data }")
+
+    (supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as? NavHostFragment ?: return)
+      .childFragmentManager
+      .fragments
+      .forEach { it.onActivityResult(requestCode, resultCode, data) }
   }
 }
