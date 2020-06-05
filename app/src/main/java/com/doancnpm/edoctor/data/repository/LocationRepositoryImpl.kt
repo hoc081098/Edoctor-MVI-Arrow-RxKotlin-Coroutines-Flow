@@ -14,6 +14,7 @@ import com.doancnpm.edoctor.domain.repository.LocationRepository
 import com.doancnpm.edoctor.utils.retrySuspend
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.tasks.await
@@ -25,6 +26,7 @@ import kotlin.time.seconds
 import android.location.Location as AndroidLocation
 
 
+@ExperimentalCoroutinesApi
 @ExperimentalTime
 class LocationRepositoryImpl(
   private val errorMapper: ErrorMapper,
