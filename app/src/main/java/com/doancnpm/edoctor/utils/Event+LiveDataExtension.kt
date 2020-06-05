@@ -67,7 +67,11 @@ fun <T : Any> LiveData<T>.toObservable(fallbackNullValue: (() -> T)? = null): Ob
         removeObserver(observer)
       }
     })
-  }
+  }.startWithIterable(
+    (value ?: fallbackNullValue?.invoke())
+      ?.let { listOf(it) }
+      ?: emptyList()
+  )
 }
 
 @Suppress("NOTHING_TO_INLINE")

@@ -11,22 +11,39 @@ import com.doancnpm.edoctor.ui.main.home.create_order.CreateOrderContract.Locati
 import com.doancnpm.edoctor.ui.main.home.create_order.CreateOrderContract.SingleEvent
 import com.doancnpm.edoctor.utils.Event
 import com.doancnpm.edoctor.utils.asLiveData
+import com.doancnpm.edoctor.utils.toObservable
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.kotlin.addTo
+import io.reactivex.rxjava3.kotlin.subscribeBy
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 class CreateOrderVM(private val locationRepository: LocationRepository) : BaseVM() {
 
   private val singleEventD = MutableLiveData<Event<SingleEvent>>()
   private val locationD = MutableLiveData<Location>()
 
-  val canGoNextLiveDatas = listOf(
-    locationD.map { it !== null },
-    locationD.map { it !== null },
-    locationD.map { it !== null },
-    locationD.map { it !== null },
+  val canGoNextObservables: List<Observable<Boolean>> = listOf(
+    locationD
+      .map { it != null }
+      .toObservable { false }
+      .replay(1)
+      .refCount(),
+    Observable.just(false),
+    Observable.just(false),
+    Observable.just(false),
   )
 
   val locationLiveData get() = locationD.asLiveData()
   val singleEventLiveData get() = singleEventD.asLiveData()
+
+  init {
+    canGoNextObservables.forEachIndexed { index, observable ->
+      observable
+        .subscribeBy { Timber.d("[Can go next] $index -> $it") }
+        .addTo(compositeDisposable)
+    }
+  }
 
   @RequiresPermission(anyOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
   fun getCurrentLocation() {
