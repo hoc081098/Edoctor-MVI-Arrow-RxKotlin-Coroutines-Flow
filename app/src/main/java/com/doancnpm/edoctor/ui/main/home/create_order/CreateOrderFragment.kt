@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.viewpager2.adapter.FragmentStateAdapter
@@ -16,12 +17,14 @@ import com.doancnpm.edoctor.ui.main.home.create_order.inputs.promotion.InputProm
 import com.doancnpm.edoctor.ui.main.home.create_order.inputs.time.InputTimeFragment
 import com.doancnpm.edoctor.utils.showAlertDialog
 import com.doancnpm.edoctor.utils.snack
-import com.doancnpm.edoctor.utils.toObservable
 import com.doancnpm.edoctor.utils.viewBinding
 import com.jakewharton.rxbinding4.viewpager2.pageSelections
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.rx3.awaitFirst
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import timber.log.Timber
 import kotlin.LazyThreadSafetyMode.NONE
 
 class CreateOrderFragment : BaseFragment(R.layout.fragment_create_order) {
@@ -52,16 +55,19 @@ class CreateOrderFragment : BaseFragment(R.layout.fragment_create_order) {
           binding.viewPager.currentItem - 1 in fragments.indices -> {
             binding.viewPager.currentItem--
           }
-          viewModel.canGoNextLiveDatas.first().value == true -> {
-            requireActivity().showAlertDialog {
-              title("Cancel creating new order")
-              message("All information will be not saved")
-              cancelable(false)
-              positiveAction("OK") { _, _ -> findNavController().popBackStack() }
-              negativeAction("Cancel") { _, _ -> }
+          else -> lifecycleScope.launch {
+            if (viewModel.canGoNextObservables.first().awaitFirst() == true) {
+              requireActivity().showAlertDialog {
+                title("Cancel creating new order")
+                message("All information will be not saved")
+                cancelable(false)
+                positiveAction("OK") { _, _ -> findNavController().popBackStack() }
+                negativeAction("Cancel") { _, _ -> }
+              }
+            } else {
+              findNavController().popBackStack()
             }
           }
-          else -> findNavController().popBackStack()
         }
       }
   }
@@ -73,13 +79,17 @@ class CreateOrderFragment : BaseFragment(R.layout.fragment_create_order) {
     viewPager.run {
       adapter = CreateOrderViewPagerAdapter(this@CreateOrderFragment, fragments)
       isUserInputEnabled = false
+
       pageSelections()
+        .doOnNext { Timber.d("setupViews: { index: $it }") }
         .switchMap { index ->
-          viewModel.canGoNextLiveDatas[index]
-            .toObservable()
+          viewModel
+            .canGoNextObservables[index]
             .map { it to index }
         }
         .subscribeBy { (nextEnabled, index) ->
+          Timber.d("setupViews: { nextEnabled: $nextEnabled, index: $index }")
+
           binding.run {
             prevButton.isEnabled = index > 0
             nextButton.isEnabled = nextEnabled
