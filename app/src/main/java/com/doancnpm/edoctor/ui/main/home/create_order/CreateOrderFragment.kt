@@ -1,5 +1,6 @@
 package com.doancnpm.edoctor.ui.main.home.create_order
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.activity.addCallback
@@ -103,6 +104,11 @@ class CreateOrderFragment : BaseFragment(R.layout.fragment_create_order) {
     }
     binding.nextButton.setOnClickListener(onClickListener)
     binding.prevButton.setOnClickListener(onClickListener)
+  }
+
+  @Suppress("DEPRECATION")
+  override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    childFragmentManager.fragments.forEach { it.onActivityResult(requestCode, resultCode, data) }
   }
 }
 

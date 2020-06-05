@@ -2,6 +2,9 @@ package com.doancnpm.edoctor.ui.main.home.create_order.inputs.address
 
 import android.Manifest.permission.ACCESS_COARSE_LOCATION
 import android.Manifest.permission.ACCESS_FINE_LOCATION
+import android.annotation.SuppressLint
+import android.app.Activity
+import android.content.Intent
 import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.os.Bundle
 import android.view.View
@@ -12,9 +15,13 @@ import androidx.lifecycle.lifecycleScope
 import com.doancnpm.edoctor.R
 import com.doancnpm.edoctor.core.BaseFragment
 import com.doancnpm.edoctor.databinding.FragmentInputAddressBinding
+import com.doancnpm.edoctor.domain.entity.AppError
+import com.doancnpm.edoctor.domain.entity.getMessage
+import com.doancnpm.edoctor.ui.main.home.create_order.CreateOrderContract
 import com.doancnpm.edoctor.ui.main.home.create_order.CreateOrderVM
 import com.doancnpm.edoctor.utils.*
 import com.doancnpm.edoctor.utils.SnackbarDismissEvent.DISMISS_EVENT_ACTION
+import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.SupportMapFragment
@@ -23,6 +30,7 @@ import com.google.android.gms.maps.model.MarkerOptions
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import org.koin.androidx.viewmodel.ext.android.getViewModel
+import timber.log.Timber
 import kotlin.LazyThreadSafetyMode.NONE
 import kotlin.coroutines.resume
 
@@ -39,6 +47,7 @@ class InputAddressFragment : BaseFragment(R.layout.fragment_input_address) {
     bindVM()
   }
 
+  @SuppressLint("MissingPermission") // Already ensured permission
   private fun bindVM() {
     viewModel.locationLiveData.observe(owner = viewLifecycleOwner) {
       // Add a marker in Sydney and move the camera
@@ -47,6 +56,24 @@ class InputAddressFragment : BaseFragment(R.layout.fragment_input_address) {
       _googleMap?.run {
         addMarker(MarkerOptions().position(latLng).title("Location"))
         moveCamera(CameraUpdateFactory.newLatLng(latLng))
+      }
+    }
+    viewModel.singleEventLiveData.observeEvent(owner = viewLifecycleOwner) { event ->
+      when (event) {
+        is CreateOrderContract.SingleEvent.Error -> {
+          val error = event.appError
+          view?.snack(error.getMessage())
+
+          if (error is AppError.LocationError.LocationSettingsDisabled
+            && error.throwable is ResolvableApiException
+          ) {
+            error.throwable
+            error.throwable.startResolutionForResult(
+              requireActivity(),
+              REQUEST_CHECK_SETTINGS
+            )
+          }
+        }
       }
     }
 
@@ -69,6 +96,18 @@ class InputAddressFragment : BaseFragment(R.layout.fragment_input_address) {
         }
       }
     }
+  }
+
+  @SuppressLint("MissingPermission")
+  override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    if (requestCode == REQUEST_CHECK_SETTINGS && resultCode == Activity.RESULT_OK) {
+      Timber.d("Check settings success")
+      viewModel.getCurrentLocation()
+    }
+  }
+
+  private companion object {
+    const val REQUEST_CHECK_SETTINGS = 1
   }
 }
 
