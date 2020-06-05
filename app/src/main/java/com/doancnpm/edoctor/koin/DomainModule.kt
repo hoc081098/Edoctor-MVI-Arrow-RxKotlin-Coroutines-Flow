@@ -13,10 +13,12 @@ import com.doancnpm.edoctor.domain.repository.CategoryRepository
 import com.doancnpm.edoctor.domain.repository.LocationRepository
 import com.doancnpm.edoctor.domain.repository.ServiceRepository
 import com.doancnpm.edoctor.domain.repository.UserRepository
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.koin.android.ext.koin.androidApplication
 import org.koin.dsl.module
 import kotlin.time.ExperimentalTime
 
+@ExperimentalCoroutinesApi
 @ExperimentalTime
 val domainModule = module {
   /**
