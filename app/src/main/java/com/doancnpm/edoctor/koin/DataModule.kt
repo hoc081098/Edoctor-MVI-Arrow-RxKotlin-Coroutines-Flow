@@ -14,6 +14,7 @@ import com.doancnpm.edoctor.data.remote.interceptor.ApiKeyInterceptor
 import com.doancnpm.edoctor.data.remote.interceptor.AuthInterceptor
 import com.doancnpm.edoctor.data.remote.response.ErrorResponseJsonAdapter
 import com.doancnpm.edoctor.domain.dispatchers.AppDispatchers
+import com.google.firebase.iid.FirebaseInstanceId
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -75,6 +76,11 @@ val dataModule = module {
    * App
    */
   single { CoroutineScope(get<AppDispatchers>().io + SupervisorJob()) }
+
+  /*
+   * Firebase
+   */
+  factory { FirebaseInstanceId.getInstance() }
 }
 
 private fun provideUserLocalJsonAdapter(moshi: Moshi): UserLocalJsonAdapter {
@@ -87,7 +93,8 @@ private fun provideSharedPreferences(context: Context): SharedPreferences {
 
 private fun provideAuthInterceptor(userLocalSource: UserLocalSource): AuthInterceptor {
   return AuthInterceptor(
-    userLocalSource)
+    userLocalSource
+  )
 }
 
 private fun provideApiKeyInterceptor(apiKey: String): ApiKeyInterceptor {
