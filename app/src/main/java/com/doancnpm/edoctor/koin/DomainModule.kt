@@ -1,6 +1,5 @@
 package com.doancnpm.edoctor.koin
 
-import android.location.Location
 import com.doancnpm.edoctor.data.repository.CategoryRepositoryImpl
 import com.doancnpm.edoctor.data.repository.LocationRepositoryImpl
 import com.doancnpm.edoctor.data.repository.ServiceRepositoryImpl
@@ -34,7 +33,8 @@ val domainModule = module {
       get(),
       get(),
       get(),
-      get()
+      get(),
+      get(),
     )
   }
 
