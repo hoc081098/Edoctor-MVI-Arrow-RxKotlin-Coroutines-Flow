@@ -61,4 +61,8 @@ class CreateOrderVM(private val locationRepository: LocationRepository) : BaseVM
         )
     }
   }
+
+  fun setLocation(location: Location) {
+    locationD.value = location
+  }
 }
