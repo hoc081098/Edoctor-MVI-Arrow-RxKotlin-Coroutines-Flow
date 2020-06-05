@@ -14,6 +14,7 @@ import com.doancnpm.edoctor.core.BaseFragment
 import com.doancnpm.edoctor.databinding.FragmentInputAddressBinding
 import com.doancnpm.edoctor.ui.main.home.create_order.CreateOrderVM
 import com.doancnpm.edoctor.utils.*
+import com.doancnpm.edoctor.utils.SnackbarDismissEvent.DISMISS_EVENT_ACTION
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.SupportMapFragment
@@ -35,6 +36,29 @@ class InputAddressFragment : BaseFragment(R.layout.fragment_input_address) {
     super.onViewCreated(view, savedInstanceState)
 
     setupViews()
+    bindVM()
+  }
+
+  private fun bindVM() {
+    viewModel.locationLiveData.observe(owner = viewLifecycleOwner) {
+      // Add a marker in Sydney and move the camera
+      val latLng = LatLng(it.lat, it.lng)
+
+      _googleMap?.run {
+        addMarker(MarkerOptions().position(latLng).title("Location"))
+        moveCamera(CameraUpdateFactory.newLatLng(latLng))
+      }
+    }
+
+    binding.currentLocationFab.setOnClickListener {
+      lifecycleScope.launch {
+        if (requestLocationPermission()) {
+          viewModel.getCurrentLocation()
+        } else {
+          requireActivity().toast("You need grant location permission to retrieve current location!")
+        }
+      }
+    }
   }
 
   private fun setupViews() {
@@ -42,21 +66,6 @@ class InputAddressFragment : BaseFragment(R.layout.fragment_input_address) {
       if (_googleMap === null) {
         getMapAsync {
           _googleMap = it
-
-          // Add a marker in Sydney and move the camera
-          val sydney = LatLng(-34.0, 151.0)
-          it.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
-          it.moveCamera(CameraUpdateFactory.newLatLng(sydney))
-        }
-      }
-    }
-
-    binding.currentLocationFab.setOnClickListener {
-      lifecycleScope.launch {
-        if (requestLocationPermission()) {
-          requireActivity().toast("Good!")
-        } else {
-          requireActivity().toast("Bad!")
         }
       }
     }
@@ -78,33 +87,29 @@ suspend fun Fragment.requestLocationPermission(): Boolean {
       }
     }
 
-    if (shouldShowRequestPermissionRationale(permission)) {
-      requireView().snack(permission) {
+    when {
+      shouldShowRequestPermissionRationale(permission) -> {
+        requireView().snack("You need grant location permission to retrieve current location!") {
 
-        continuation.invokeOnCancellation {
-          dismiss()
-          requestPermission.unregister()
-        }
+          action("OK") { requestPermission.launch(permission) }
 
-        var clickedOK = false
-        action("OK") {
-          clickedOK = true
-          requestPermission.launch(permission)
-        }
+          val onDismissed = onDismissed {
+            if (it != DISMISS_EVENT_ACTION && continuation.isActive) {
+              continuation.resume(false)
+            }
+          }
 
-        onDismissed {
-          if (!clickedOK && continuation.isActive) {
-            continuation.resume(false)
+          continuation.invokeOnCancellation {
+            removeCallback(onDismissed)
+            dismiss()
+            requestPermission.unregister()
           }
         }
       }
-
-    } else {
-      continuation.invokeOnCancellation {
-        requestPermission.unregister()
+      else -> {
+        continuation.invokeOnCancellation { requestPermission.unregister() }
+        requestPermission.launch(permission)
       }
-
-      requestPermission.launch(permission)
     }
   }
 }

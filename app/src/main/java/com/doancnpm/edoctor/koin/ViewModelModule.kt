@@ -49,7 +49,7 @@ val viewModelModule = module {
 
   viewModel { (category: Category) -> ServicesVM(get(), category) }
 
-  viewModel { CreateOrderVM() }
+  viewModel { CreateOrderVM(get()) }
   //endregion
 
   //region Profile
