@@ -33,20 +33,20 @@ class LocationRepositoryImpl(
   private val application: Application
 ) : LocationRepository {
 
-  private val fusedLocationClient by lazy(LazyThreadSafetyMode.NONE) {
+  private val fusedLocationClient by lazy {
     LocationServices.getFusedLocationProviderClient(application)
   }
-  private val settingsClient by lazy(LazyThreadSafetyMode.NONE) {
+  private val settingsClient by lazy {
     LocationServices.getSettingsClient(application)
   }
-  private val locationRequest by lazy(LazyThreadSafetyMode.NONE) {
+  private val locationRequest by lazy {
     LocationRequest()
       .setInterval(1_000)
       .setFastestInterval(500)
       .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
       .setNumUpdates(1)
   }
-  private val locationSettingsRequest by lazy(LazyThreadSafetyMode.NONE) {
+  private val locationSettingsRequest by lazy {
     LocationSettingsRequest.Builder()
       .addLocationRequest(locationRequest)
       .build()

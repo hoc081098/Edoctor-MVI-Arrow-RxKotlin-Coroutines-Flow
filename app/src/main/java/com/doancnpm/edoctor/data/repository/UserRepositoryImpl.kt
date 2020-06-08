@@ -138,7 +138,7 @@ class UserRepositoryImpl(
               password = password,
               roleId = roleId.toInt(),
               fullName = fullName,
-              birthday = birthday?.toString_yyyyMMdd(),
+              birthday = birthday?.toString_yyyyMMdd(TimeZone.getTimeZone("UTC")),
             )
           )
           .unwrap()
