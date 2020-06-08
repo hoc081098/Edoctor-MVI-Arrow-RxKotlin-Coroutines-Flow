@@ -29,37 +29,37 @@ val domainModule = module {
 
   single<UserRepository>(createdAtStart = true) {
     UserRepositoryImpl(
-      get(API_URL_QUALIFIER),
-      get(),
-      get(),
-      get(),
-      get(),
-      get(),
+      apiService = get(API_URL_QUALIFIER),
+      errorMapper = get(),
+      dispatchers = get(),
+      userLocalSource = get(),
+      firebaseInstanceId = get(),
+      appCoroutineScope = get(),
     )
   }
 
-  single<CategoryRepository> {
+  factory<CategoryRepository> {
     CategoryRepositoryImpl(
-      get(API_URL_QUALIFIER),
-      get(),
-      get(),
-      get(BASE_URL_QUALIFIER),
+      apiService = get(API_URL_QUALIFIER),
+      errorMapper = get(),
+      dispatchers = get(),
+      baseUrl = get(BASE_URL_QUALIFIER),
     )
   }
 
-  single<ServiceRepository> {
+  factory<ServiceRepository> {
     ServiceRepositoryImpl(
-      get(API_URL_QUALIFIER),
-      get(),
-      get(),
-      get(BASE_URL_QUALIFIER),
+      apiService = get(API_URL_QUALIFIER),
+      errorMapper = get(),
+      dispatchers = get(),
+      baseUrl = get(BASE_URL_QUALIFIER),
     )
   }
 
   factory<LocationRepository> {
     LocationRepositoryImpl(
-      get(),
-      androidApplication()
+      errorMapper = get(),
+      application = androidApplication()
     )
   }
 }

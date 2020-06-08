@@ -29,30 +29,81 @@ val viewModelModule = module {
   viewModel { SplashVM(get()) }
 
   //region Auth
-  factory<LoginContract.Interactor> { LoginInteractor(get(), get()) }
-  viewModel { LoginVM(get(), get()) }
+  factory<LoginContract.Interactor> {
+    LoginInteractor(
+      dispatchers = get(),
+      userRepository = get()
+    )
+  }
+  viewModel {
+    LoginVM(
+      interactor = get(),
+      schedulers = get()
+    )
+  }
 
-  factory<RegisterContract.Interactor> { RegisterInteractor(get(), get()) }
-  viewModel { RegisterVM(get(), get()) }
+  factory<RegisterContract.Interactor> {
+    RegisterInteractor(
+      dispatchers = get(),
+      userRepository = get()
+    )
+  }
+  viewModel {
+    RegisterVM(
+      interactor = get(),
+      schedulers = get()
+    )
+  }
 
-  factory<ResendCodeContract.Interactor> { ResendCodeInteractor(get(), get()) }
-  viewModel { ResendCodeVM(get(), get()) }
+  factory<ResendCodeContract.Interactor> {
+    ResendCodeInteractor(
+      dispatchers = get(),
+      userRepository = get()
+    )
+  }
+  viewModel {
+    ResendCodeVM(
+      interactor = get(),
+      schedulers = get()
+    )
+  }
 
-  factory<VerifyContract.Interactor> { VerifyInteractor(get(), get()) }
-  viewModel { (phone: String) -> VerifyVM(phone, get(), get()) }
+  factory<VerifyContract.Interactor> {
+    VerifyInteractor(
+      dispatchers = get(),
+      userRepository = get()
+    )
+  }
+  viewModel { (phone: String) ->
+    VerifyVM(
+      phone = phone,
+      interactor = get(),
+      schedulers = get()
+    )
+  }
   //endregion
 
   //region Main
-  viewModel { MainVM(get()) }
+  viewModel { MainVM(userRepository = get()) }
 
-  viewModel { HomeVM(get()) }
+  viewModel { HomeVM(categoryRepository = get()) }
 
-  viewModel { (category: Category) -> ServicesVM(get(), category) }
+  viewModel { (category: Category) ->
+    ServicesVM(
+      serviceRepository = get(),
+      category = category
+    )
+  }
 
-  viewModel { CreateOrderVM(get()) }
+  viewModel { CreateOrderVM(locationRepository = get()) }
   //endregion
 
   //region Profile
-  viewModel { ProfileVM(get(), get()) }
+  viewModel {
+    ProfileVM(
+      userRepository = get(),
+      dispatchers = get()
+    )
+  }
   //endregion
 }
