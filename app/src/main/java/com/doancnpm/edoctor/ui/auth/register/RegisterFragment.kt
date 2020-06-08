@@ -53,8 +53,9 @@ class RegisterFragment : BaseFragment(R.layout.fragment_register) {
           .editText!!
           .clicks()
           .exhaustMap {
+            val date = viewModel.stateLiveData.value?.formData?.birthday
             requireActivity()
-              .pickDateObservable(1998, Calendar.JANUARY, 1)
+              .pickDateObservable(date)
               .toObservable()
           }
           .map { ViewIntent.BirthdayChanged(it) }
@@ -122,7 +123,7 @@ class RegisterFragment : BaseFragment(R.layout.fragment_register) {
       }.let { if (editBirthday.error != it) editBirthday.error = it }
 
       editBirthday.editText!!.setText(
-        formData.birthday?.toString_yyyyMMdd()
+        formData.birthday?.toString_yyyyMMdd(TimeZone.getDefault())
       )
 
       if (isLoading) {
@@ -154,7 +155,7 @@ class RegisterFragment : BaseFragment(R.layout.fragment_register) {
         }
       )
       editBirthday.editText!!.setText(
-        birthday?.toString_yyyyMMdd()
+        birthday?.toString_yyyyMMdd(TimeZone.getDefault())
       )
     }
   }

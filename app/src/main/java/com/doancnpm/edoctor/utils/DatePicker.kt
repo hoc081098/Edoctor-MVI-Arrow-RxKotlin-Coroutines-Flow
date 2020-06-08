@@ -12,13 +12,10 @@ import io.reactivex.rxjava3.android.MainThreadDisposable
 import io.reactivex.rxjava3.core.Maybe
 import timber.log.Timber
 import java.util.*
-import java.util.Calendar.*
 import com.google.android.material.datepicker.MaterialPickerOnPositiveButtonClickListener as OnPositiveButtonClickListener
 
 fun FragmentActivity.pickDateObservable(
-  year: Int,
-  month: Int,
-  dayOfMonth: Int,
+  initialSelection: Date?,
   validator: DateValidator? = null,
 ): Maybe<Date> {
   return Maybe.create { emitter ->
@@ -27,7 +24,7 @@ fun FragmentActivity.pickDateObservable(
       return@create
     }
 
-    val datePicker = materialDatePicker(year, month, dayOfMonth, validator)
+    val datePicker = materialDatePicker(initialSelection, validator)
 
     val onPositiveButtonClickListener = OnPositiveButtonClickListener<Long> { selection ->
       selection ?: return@OnPositiveButtonClickListener emitter.onComplete()
@@ -64,22 +61,12 @@ fun FragmentActivity.pickDateObservable(
 }
 
 private fun FragmentActivity.materialDatePicker(
-  year: Int,
-  month: Int,
-  dayOfMonth: Int,
+  initialSelection: Date?,
   validator: DateValidator?,
 ): MaterialDatePicker<Long> {
-  val initialSelection = getInstance(Locale.getDefault())
-    .apply {
-      this[YEAR] = year
-      this[MONTH] = month
-      this[DAY_OF_MONTH] = dayOfMonth
-    }
-    .timeInMillis
-
   return MaterialDatePicker.Builder
     .datePicker()
-    .setSelection(initialSelection)
+    .setSelection(initialSelection?.time)
     .setInputMode(INPUT_MODE_CALENDAR)
     .setCalendarConstraints(
       CalendarConstraints.Builder()

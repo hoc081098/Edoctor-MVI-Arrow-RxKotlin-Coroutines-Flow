@@ -7,21 +7,24 @@ import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import com.doancnpm.edoctor.core.BaseVM
 import com.doancnpm.edoctor.domain.repository.LocationRepository
-import com.doancnpm.edoctor.ui.main.home.create_order.CreateOrderContract.Location
-import com.doancnpm.edoctor.ui.main.home.create_order.CreateOrderContract.SingleEvent
+import com.doancnpm.edoctor.ui.main.home.create_order.CreateOrderContract.*
 import com.doancnpm.edoctor.utils.Event
 import com.doancnpm.edoctor.utils.asLiveData
+import com.doancnpm.edoctor.utils.setValueNotNull
 import com.doancnpm.edoctor.utils.toObservable
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.util.*
 
 class CreateOrderVM(private val locationRepository: LocationRepository) : BaseVM() {
 
   private val singleEventD = MutableLiveData<Event<SingleEvent>>()
+
   private val locationD = MutableLiveData<Location>()
+  private val timesD = MutableLiveData<Times>().apply { value = Times() }
 
   val canGoNextObservables: List<Observable<Boolean>> = listOf(
     locationD
@@ -29,12 +32,17 @@ class CreateOrderVM(private val locationRepository: LocationRepository) : BaseVM
       .toObservable { false }
       .replay(1)
       .refCount(),
-    Observable.just(false),
+    timesD
+      .map { it.startTime !== null && it.endTime !== null }
+      .toObservable { false }
+      .replay(1)
+      .refCount(),
     Observable.just(false),
     Observable.just(false),
   )
 
   val locationLiveData get() = locationD.asLiveData()
+  val timesLiveData get() = timesD.asLiveData()
   val singleEventLiveData get() = singleEventD.asLiveData()
 
   init {
@@ -64,5 +72,25 @@ class CreateOrderVM(private val locationRepository: LocationRepository) : BaseVM
 
   fun setLocation(location: Location) {
     locationD.value = location
+  }
+
+  fun setStartDate(date: Date) {
+    timesD.setValueNotNull {
+      if (it.endTime === null || it.endTime > date) {
+        it.copy(startTime = date)
+      } else {
+        it
+      }
+    }
+  }
+
+  fun setEndDate(date: Date) {
+    timesD.setValueNotNull {
+      if (it.startTime === null || it.startTime < date) {
+        it.copy(endTime = date)
+      } else {
+        it
+      }
+    }
   }
 }
