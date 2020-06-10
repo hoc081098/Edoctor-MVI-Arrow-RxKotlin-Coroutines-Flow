@@ -13,5 +13,13 @@ interface CreateOrderContract {
 
   sealed class SingleEvent {
     data class Error(val appError: AppError) : SingleEvent()
+
+    sealed class Times : SingleEvent() {
+      object PastStartTime : Times()
+      object StartTimeIsLaterThanEndTime : Times()
+
+      object PastEndTime : Times()
+      object EndTimeIsEarlierThanStartTime : Times()
+    }
   }
 }

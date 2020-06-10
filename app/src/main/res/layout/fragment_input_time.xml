@@ -24,7 +24,7 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/button_start_time"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
         android:layout_marginEnd="32dp"
@@ -35,7 +35,7 @@
         android:paddingBottom="12dp"
         android:text="2020-12-30 19:59:40"
         android:textAlignment="center"
-        android:textColor="@color/colorAccent"
+        android:textColor="@color/colorAccentDark"
         android:textSize="15sp"
         app:backgroundTint="@color/colorBackground"
         app:cornerRadius="4dp"
@@ -64,15 +64,12 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/button_start_time"
-        app:layout_constraintVertical_bias="0.4"
         app:layout_constraintVertical_chainStyle="packed" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/button_end_time"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginEnd="32dp"
         android:fontFamily="@font/nunito_sans_semibold"
         android:paddingStart="24dp"
         android:paddingTop="16dp"
@@ -80,16 +77,37 @@
         android:paddingBottom="12dp"
         android:text="2020-12-30 19:59:40"
         android:textAlignment="center"
-        android:textColor="@color/colorAccent"
+        android:textColor="@color/colorAccentDark"
         android:textSize="15sp"
         app:backgroundTint="@color/colorBackground"
         app:cornerRadius="4dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/button_clear"
+        app:layout_constraintEnd_toEndOf="@+id/button_start_time"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/button_start_time"
         app:layout_constraintTop_toBottomOf="@+id/textView4"
         app:strokeColor="@color/colorAccent"
         app:strokeWidth="1dp" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/button_clear"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:fontFamily="@font/nunito_sans_semibold"
+        android:paddingStart="24dp"
+        android:paddingTop="16dp"
+        android:paddingEnd="24dp"
+        android:paddingBottom="12dp"
+        android:text="Clear"
+        android:textAlignment="center"
+        android:textSize="15sp"
+        app:cornerRadius="4dp"
+        app:elevation="12dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/button_start_time"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="@+id/button_start_time"
+        app:layout_constraintTop_toBottomOf="@+id/button_end_time" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
