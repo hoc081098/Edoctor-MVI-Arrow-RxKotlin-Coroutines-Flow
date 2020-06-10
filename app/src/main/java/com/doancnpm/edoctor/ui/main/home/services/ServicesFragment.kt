@@ -107,7 +107,9 @@ class ServicesFragment : BaseFragment(R.layout.fragment_services) {
 
 
   private fun onClickOrder(service: Service) {
-    view?.snack("Click order: ${service.name}")
+    ServicesFragmentDirections
+      .actionServicesFragmentToCreateOrderFragment(service)
+      .let { findNavController().navigate(it) }
   }
 
   private fun onClickDetail(service: Service) {

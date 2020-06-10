@@ -17,3 +17,9 @@ fun Date.toString_yyyyMMdd_HHmmss(zone: TimeZone = TimeZone.getDefault()): Strin
   SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
     .apply { timeZone = zone }
     .format(this)
+
+fun parseDate_yyyyMMdd_HHmmss(source: String, zone: TimeZone = UTCTimeZone): Date? {
+  return SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+    .apply { timeZone = zone }
+    .parse(source)
+}
