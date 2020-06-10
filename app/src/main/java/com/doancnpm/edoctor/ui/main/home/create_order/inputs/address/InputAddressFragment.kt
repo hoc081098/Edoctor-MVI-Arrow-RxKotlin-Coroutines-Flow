@@ -36,6 +36,8 @@ import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.api.model.Place.Field
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener
+import io.reactivex.rxjava3.kotlin.addTo
+import io.reactivex.rxjava3.kotlin.subscribeBy
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import org.koin.androidx.viewmodel.ext.android.getViewModel
@@ -68,24 +70,22 @@ class InputAddressFragment : BaseFragment(R.layout.fragment_input_address) {
     viewModel.locationLiveData.observe(owner = viewLifecycleOwner) {
       moveCameraToLocation(it)
     }
-    viewModel.singleEventLiveData.observeEvent(owner = viewLifecycleOwner) { event ->
-      when (event) {
-        is CreateOrderContract.SingleEvent.Error -> {
-          val error = event.appError
-          view?.snack(error.getMessage())
+    viewModel.singleEventObservable.subscribeBy { event ->
+      if (event is CreateOrderContract.SingleEvent.Error) {
+        val error = event.appError
+        view?.snack(error.getMessage())
 
-          if (error is AppError.LocationError.LocationSettingsDisabled
-            && error.throwable is ResolvableApiException
-          ) {
-            error.throwable
-            error.throwable.startResolutionForResult(
-              requireActivity(),
-              REQUEST_CHECK_SETTINGS
-            )
-          }
+        if (error is AppError.LocationError.LocationSettingsDisabled
+          && error.throwable is ResolvableApiException
+        ) {
+          error.throwable
+          error.throwable.startResolutionForResult(
+            requireActivity(),
+            REQUEST_CHECK_SETTINGS
+          )
         }
       }
-    }
+    }.addTo(compositeDisposable)
 
     binding.currentLocationFab.setOnClickListener {
       lifecycleScope.launch {

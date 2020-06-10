@@ -28,7 +28,8 @@
     </style>
 
     <!--    AlertDialog-->
-    <style name="AppTheme.AlertDialog" parent="Theme.MaterialComponents.Dialog.Alert" />
-
+    <style name="AppTheme.AlertDialog" parent="Theme.MaterialComponents.Light.Dialog.Alert">
+        <item name="colorSecondary">@color/colorPrimary</item>
+    </style>
 
 </resources>
