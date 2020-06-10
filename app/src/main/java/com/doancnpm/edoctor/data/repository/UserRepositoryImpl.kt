@@ -17,6 +17,7 @@ import com.doancnpm.edoctor.domain.entity.DomainResult
 import com.doancnpm.edoctor.domain.entity.User
 import com.doancnpm.edoctor.domain.entity.rightResult
 import com.doancnpm.edoctor.domain.repository.UserRepository
+import com.doancnpm.edoctor.utils.UTCTimeZone
 import com.doancnpm.edoctor.utils.catchError
 import com.doancnpm.edoctor.utils.toString_yyyyMMdd
 import com.google.firebase.iid.FirebaseInstanceId
@@ -138,7 +139,7 @@ class UserRepositoryImpl(
               password = password,
               roleId = roleId.toInt(),
               fullName = fullName,
-              birthday = birthday?.toString_yyyyMMdd(TimeZone.getTimeZone("UTC")),
+              birthday = birthday?.toString_yyyyMMdd(UTCTimeZone),
             )
           )
           .unwrap()
