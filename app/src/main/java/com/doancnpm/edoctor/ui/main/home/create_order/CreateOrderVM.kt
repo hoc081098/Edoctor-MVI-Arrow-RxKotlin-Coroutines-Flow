@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import com.doancnpm.edoctor.core.BaseVM
+import com.doancnpm.edoctor.domain.entity.Promotion
 import com.doancnpm.edoctor.domain.repository.LocationRepository
 import com.doancnpm.edoctor.ui.main.home.create_order.CreateOrderContract.*
 import com.doancnpm.edoctor.utils.asLiveData
@@ -26,6 +27,7 @@ class CreateOrderVM(private val locationRepository: LocationRepository) : BaseVM
 
   private val locationD = MutableLiveData<Location>()
   private val timesD = MutableLiveData<Times>().apply { value = Times() }
+  private val promotionD = MutableLiveData<Promotion?>()
 
   val canGoNextObservables: List<Observable<Boolean>> = listOf(
     locationD
@@ -38,7 +40,7 @@ class CreateOrderVM(private val locationRepository: LocationRepository) : BaseVM
       .toObservable { false }
       .replay(1)
       .refCount(),
-    Observable.just(false),
+    Observable.just(true),
     Observable.just(false),
   )
 
@@ -115,5 +117,9 @@ class CreateOrderVM(private val locationRepository: LocationRepository) : BaseVM
 
   fun clearTimes() {
     timesD.setValueNotNull { it.copy(startTime = null, endTime = null) }
+  }
+
+  fun setPromotion(promotion: Promotion?) {
+    promotionD.value = promotion
   }
 }

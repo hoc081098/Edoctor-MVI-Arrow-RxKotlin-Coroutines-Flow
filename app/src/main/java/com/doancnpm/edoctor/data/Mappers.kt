@@ -6,6 +6,7 @@ import com.doancnpm.edoctor.data.remote.response.*
 import com.doancnpm.edoctor.domain.entity.*
 import com.doancnpm.edoctor.domain.entity.User.RoleId.CUSTOMER
 import com.doancnpm.edoctor.domain.entity.User.RoleId.DOCTOR
+import com.doancnpm.edoctor.utils.parseDate_yyyyMMdd_HHmmss
 import retrofit2.HttpException
 import java.io.IOException
 import java.net.SocketException
@@ -84,8 +85,8 @@ fun PromotionsResponse.Promotion.toPromotionDomain(): Promotion {
     id = id,
     name = name,
     discount = discount,
-    startDate = startDate,
-    endDate = endDate,
+    startDate = parseDate_yyyyMMdd_HHmmss(startDate)!!,
+    endDate = parseDate_yyyyMMdd_HHmmss(endDate)!!,
   )
 }
 

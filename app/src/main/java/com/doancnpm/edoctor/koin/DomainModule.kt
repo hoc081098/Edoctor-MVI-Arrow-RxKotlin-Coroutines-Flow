@@ -59,14 +59,14 @@ val domainModule = module {
 
   factory<OrderRepository> {
     OrderRepositoryImpl(
-      apiService = get(),
+      apiService = get(API_URL_QUALIFIER),
       errorMapper = get(),
     )
   }
 
   factory<PromotionRepository> {
     PromotionRepositoryImpl(
-      apiService = get(),
+      apiService = get(API_URL_QUALIFIER),
       errorMapper = get(),
     )
   }
