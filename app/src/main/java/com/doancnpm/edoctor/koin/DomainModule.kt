@@ -1,17 +1,11 @@
 package com.doancnpm.edoctor.koin
 
-import com.doancnpm.edoctor.data.repository.CategoryRepositoryImpl
-import com.doancnpm.edoctor.data.repository.LocationRepositoryImpl
-import com.doancnpm.edoctor.data.repository.ServiceRepositoryImpl
-import com.doancnpm.edoctor.data.repository.UserRepositoryImpl
+import com.doancnpm.edoctor.data.repository.*
 import com.doancnpm.edoctor.domain.dispatchers.AppDispatchers
 import com.doancnpm.edoctor.domain.dispatchers.AppDispatchersImpl
 import com.doancnpm.edoctor.domain.dispatchers.AppSchedulers
 import com.doancnpm.edoctor.domain.dispatchers.AppSchedulersImpl
-import com.doancnpm.edoctor.domain.repository.CategoryRepository
-import com.doancnpm.edoctor.domain.repository.LocationRepository
-import com.doancnpm.edoctor.domain.repository.ServiceRepository
-import com.doancnpm.edoctor.domain.repository.UserRepository
+import com.doancnpm.edoctor.domain.repository.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.koin.android.ext.koin.androidApplication
 import org.koin.dsl.module
@@ -60,6 +54,20 @@ val domainModule = module {
     LocationRepositoryImpl(
       errorMapper = get(),
       application = androidApplication()
+    )
+  }
+
+  factory<OrderRepository> {
+    OrderRepositoryImpl(
+      apiService = get(),
+      errorMapper = get(),
+    )
+  }
+
+  factory<PromotionRepository> {
+    PromotionRepositoryImpl(
+      apiService = get(),
+      errorMapper = get(),
     )
   }
 }

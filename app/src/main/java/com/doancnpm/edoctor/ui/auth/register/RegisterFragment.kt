@@ -123,7 +123,7 @@ class RegisterFragment : BaseFragment(R.layout.fragment_register) {
       }.let { if (editBirthday.error != it) editBirthday.error = it }
 
       editBirthday.editText!!.setText(
-        formData.birthday?.toString_yyyyMMdd(TimeZone.getDefault())
+        formData.birthday?.toString_yyyyMMdd()
       )
 
       if (isLoading) {
@@ -155,7 +155,7 @@ class RegisterFragment : BaseFragment(R.layout.fragment_register) {
         }
       )
       editBirthday.editText!!.setText(
-        birthday?.toString_yyyyMMdd(TimeZone.getDefault())
+        birthday?.toString_yyyyMMdd()
       )
     }
   }

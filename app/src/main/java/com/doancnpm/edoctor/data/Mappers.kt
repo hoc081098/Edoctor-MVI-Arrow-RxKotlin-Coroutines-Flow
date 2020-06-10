@@ -2,10 +2,7 @@ package com.doancnpm.edoctor.data
 
 import android.database.sqlite.SQLiteException
 import com.doancnpm.edoctor.data.local.model.UserLocal
-import com.doancnpm.edoctor.data.remote.response.CategoriesResponse
-import com.doancnpm.edoctor.data.remote.response.ErrorResponseJsonAdapter
-import com.doancnpm.edoctor.data.remote.response.LoginUserResponse
-import com.doancnpm.edoctor.data.remote.response.ServicesResponse
+import com.doancnpm.edoctor.data.remote.response.*
 import com.doancnpm.edoctor.domain.entity.*
 import com.doancnpm.edoctor.domain.entity.User.RoleId.CUSTOMER
 import com.doancnpm.edoctor.domain.entity.User.RoleId.DOCTOR
@@ -79,6 +76,16 @@ fun AndroidLocation.toLocationDomain(): Location {
   return Location(
     latitude = latitude,
     longitude = longitude,
+  )
+}
+
+fun PromotionsResponse.Promotion.toPromotionDomain(): Promotion {
+  return Promotion(
+    id = id,
+    name = name,
+    discount = discount,
+    startDate = startDate,
+    endDate = endDate,
   )
 }
 
