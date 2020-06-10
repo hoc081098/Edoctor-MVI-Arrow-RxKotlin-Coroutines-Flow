@@ -1,6 +1,7 @@
 package com.doancnpm.edoctor.data.remote
 
 import androidx.annotation.IntRange
+import com.doancnpm.edoctor.data.remote.body.CreateOrderBody
 import com.doancnpm.edoctor.data.remote.body.LoginUserBody
 import com.doancnpm.edoctor.data.remote.body.RegisterUserBody
 import com.doancnpm.edoctor.data.remote.response.*
@@ -53,6 +54,17 @@ interface ApiService {
     @IntRange(from = 1) @Query("per_page") perPage: Int,
   ): BaseResponse<ServicesResponse>
   //endregion
+
+  //region Order
+  @POST("orders")
+  suspend fun createOrder(@Body body: CreateOrderBody): BaseResponse<Any>
+  //endregion
+
+  @GET("promotions")
+  suspend fun getPromotions(
+    @IntRange(from = 1) @Query("page") page: Int,
+    @IntRange(from = 1) @Query("per_page") perPage: Int,
+  ): BaseResponse<PromotionsResponse>
 
   companion object Factory {
     operator fun invoke(retrofit: Retrofit) = retrofit.create<ApiService>()
