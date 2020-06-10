@@ -48,7 +48,7 @@ interface ApiService {
   //region Service
   @GET("services")
   suspend fun getServicesByCategory(
-    @IntRange(from = 1) @Query("category_id") categoryId: Int,
+    @IntRange(from = 1) @Query("category_id") categoryId: Long,
     @IntRange(from = 1) @Query("page") page: Int,
     @IntRange(from = 1) @Query("per_page") perPage: Int,
   ): BaseResponse<ServicesResponse>

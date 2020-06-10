@@ -16,7 +16,7 @@ data class LoginUserResponse(
     @Json(name = "full_name")
     val fullName: String, // Son Vo
     @Json(name = "id")
-    val id: Int, // 16
+    val id: Long, // 16
     @Json(name = "phone")
     val phone: String, // +84354658717
     @Json(name = "role_id")
