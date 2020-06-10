@@ -27,4 +27,8 @@
         <item name="android:windowBackground">@drawable/splash_background</item>
     </style>
 
+    <!--    AlertDialog-->
+    <style name="AppTheme.AlertDialog" parent="Theme.MaterialComponents.Dialog.Alert" />
+
+
 </resources>

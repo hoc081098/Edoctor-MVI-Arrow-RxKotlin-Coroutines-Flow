@@ -8,12 +8,15 @@ import com.doancnpm.edoctor.core.BaseFragment
 import com.doancnpm.edoctor.databinding.FragmentInputTimeBinding
 import com.doancnpm.edoctor.ui.main.home.create_order.CreateOrderVM
 import com.doancnpm.edoctor.utils.pickDateObservable
+import com.doancnpm.edoctor.utils.pickTimeObservable
 import com.doancnpm.edoctor.utils.viewBinding
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx3.await
+import kotlinx.coroutines.rx3.rxObservable
 import org.koin.androidx.viewmodel.ext.android.getViewModel
 import java.util.*
 import kotlin.LazyThreadSafetyMode.NONE
+import kotlin.math.min
 
 class InputTimeFragment : BaseFragment(R.layout.fragment_input_time) {
   private val binding by viewBinding<FragmentInputTimeBinding>()
@@ -31,8 +34,18 @@ class InputTimeFragment : BaseFragment(R.layout.fragment_input_time) {
       lifecycleScope.launch {
         val initial = viewModel.timesLiveData.value!!.startTime
         val date = requireActivity().pickDateObservable(initial).await()
+
         if (date != null && date != initial) {
-          viewModel.setStartDate(date)
+          val (hourOfDay, minute) = requireContext().pickTimeObservable(0, 0).await()
+            ?: return@launch
+
+          val time = Calendar.getInstance().apply {
+            time = date
+            this[Calendar.HOUR_OF_DAY] = hourOfDay
+            this[Calendar.MINUTE] = minute
+          }.time
+
+          viewModel.setStartDate(time)
         }
       }
     }
