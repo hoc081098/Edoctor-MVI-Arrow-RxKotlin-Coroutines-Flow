@@ -42,7 +42,7 @@ data class Image(
   @Json(name = "extension")
   val extension: String, // jpg
   @Json(name = "id")
-  val id: Int, // 40
+  val id: Long, // 40
   @Json(name = "url")
   val url: String, // system/categories/category.jpg
 )

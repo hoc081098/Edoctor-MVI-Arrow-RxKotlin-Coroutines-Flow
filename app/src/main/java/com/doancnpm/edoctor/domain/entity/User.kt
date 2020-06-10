@@ -1,7 +1,7 @@
 package com.doancnpm.edoctor.domain.entity
 
 data class User(
-  val id: Int,
+  val id: Long,
   val phone: String,
   val fullName: String,
   val roleId: RoleId,
