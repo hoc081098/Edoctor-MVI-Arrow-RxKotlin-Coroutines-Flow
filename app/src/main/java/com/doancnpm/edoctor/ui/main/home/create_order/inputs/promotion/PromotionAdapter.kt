@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.doancnpm.edoctor.R
 import com.doancnpm.edoctor.databinding.ItemRecyclerPromotionBinding
-import com.doancnpm.edoctor.ui.main.home.create_order.inputs.promotion.InputPromotionContract.PromotionItem
+import com.doancnpm.edoctor.ui.main.home.create_order.CreateOrderContract.InputPromotionContract.PromotionItem
 import com.doancnpm.edoctor.utils.toString_yyyyMMdd_HHmmss
 import kotlin.math.roundToInt
 

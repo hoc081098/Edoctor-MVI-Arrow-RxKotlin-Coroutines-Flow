@@ -16,7 +16,6 @@ import com.doancnpm.edoctor.ui.auth.verify.VerifyVM
 import com.doancnpm.edoctor.ui.main.MainVM
 import com.doancnpm.edoctor.ui.main.home.HomeVM
 import com.doancnpm.edoctor.ui.main.home.create_order.CreateOrderVM
-import com.doancnpm.edoctor.ui.main.home.create_order.inputs.promotion.InputPromotionVM
 import com.doancnpm.edoctor.ui.main.home.services.ServicesVM
 import com.doancnpm.edoctor.ui.main.profile.ProfileVM
 import com.doancnpm.edoctor.ui.splash.SplashVM
@@ -96,9 +95,12 @@ val viewModelModule = module {
     )
   }
 
-  viewModel { CreateOrderVM(locationRepository = get()) }
-
-  viewModel { InputPromotionVM(promotionRepository = get()) }
+  viewModel {
+    CreateOrderVM(
+      locationRepository = get(),
+      promotionRepository = get(),
+    )
+  }
   //endregion
 
   //region Profile

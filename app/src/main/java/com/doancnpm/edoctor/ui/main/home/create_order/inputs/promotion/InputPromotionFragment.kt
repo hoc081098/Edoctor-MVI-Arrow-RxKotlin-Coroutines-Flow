@@ -2,25 +2,22 @@ package com.doancnpm.edoctor.ui.main.home.create_order.inputs.promotion
 
 import android.os.Bundle
 import android.view.View
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
 import com.doancnpm.edoctor.R
 import com.doancnpm.edoctor.core.BaseFragment
 import com.doancnpm.edoctor.databinding.FragmentInputPromotionBinding
 import com.doancnpm.edoctor.domain.entity.getMessage
+import com.doancnpm.edoctor.ui.main.home.create_order.CreateOrderContract.InputPromotionContract.PromotionItem
 import com.doancnpm.edoctor.ui.main.home.create_order.CreateOrderVM
-import com.doancnpm.edoctor.ui.main.home.create_order.inputs.promotion.InputPromotionContract.PromotionItem
 import com.doancnpm.edoctor.utils.*
 import org.koin.androidx.viewmodel.ext.android.getViewModel
-import org.koin.androidx.viewmodel.ext.android.viewModel
 import kotlin.LazyThreadSafetyMode.NONE
 
 class InputPromotionFragment : BaseFragment(R.layout.fragment_input_promotion) {
   private val binding by viewBinding<FragmentInputPromotionBinding>() {
     recyclerView.adapter = null
   }
-  private val parentViewModel by lazy(NONE) { requireParentFragment().getViewModel<CreateOrderVM>() }
-  private val viewModel by viewModel<InputPromotionVM>()
+  private val viewModel by lazy(NONE) { requireParentFragment().getViewModel<CreateOrderVM>() }
 
   private val promotionAdapter by lazy(NONE) { PromotionAdapter(::onSelectItem) }
 
@@ -42,7 +39,7 @@ class InputPromotionFragment : BaseFragment(R.layout.fragment_input_promotion) {
   }
 
   private fun bindVM() {
-    viewModel.viewState.observe(owner = viewLifecycleOwner) { state ->
+    viewModel.promotionViewState.observe(owner = viewLifecycleOwner) { state ->
       promotionAdapter.submitList(state.promotions)
 
       binding.run {
@@ -61,10 +58,6 @@ class InputPromotionFragment : BaseFragment(R.layout.fragment_input_promotion) {
         }
       }
     }
-    viewModel.selectedItem.observe(viewLifecycleOwner, Observer {
-      parentViewModel.setPromotion(it?.promotion)
-    })
-
     binding.retryButton.setOnClickListener { viewModel.retry() }
   }
 
