@@ -42,7 +42,7 @@
         android:paddingStart="24dp"
         android:paddingTop="16dp"
         android:paddingEnd="24dp"
-        android:paddingBottom="12dp"
+        android:paddingBottom="16dp"
         android:text="RETRY"
         android:textAlignment="center"
         android:textColor="@color/colorAccent"
