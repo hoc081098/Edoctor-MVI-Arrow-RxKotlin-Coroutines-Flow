@@ -16,6 +16,7 @@ import com.doancnpm.edoctor.ui.main.home.create_order.inputs.address.InputAddres
 import com.doancnpm.edoctor.ui.main.home.create_order.inputs.note.InputNoteFragment
 import com.doancnpm.edoctor.ui.main.home.create_order.inputs.promotion.InputPromotionFragment
 import com.doancnpm.edoctor.ui.main.home.create_order.inputs.time.InputTimeFragment
+import com.doancnpm.edoctor.utils.hideKeyboard
 import com.doancnpm.edoctor.utils.showAlertDialog
 import com.doancnpm.edoctor.utils.snack
 import com.doancnpm.edoctor.utils.viewBinding
@@ -107,6 +108,7 @@ class CreateOrderFragment : BaseFragment(R.layout.fragment_create_order) {
         binding.nextButton -> if (viewPager.currentItem + 1 in fragments.indices) {
           viewPager.currentItem++
         } else {
+          hideKeyboard()
           view?.snack("Finish")
         }
         binding.prevButton -> if (viewPager.currentItem - 1 in fragments.indices) {
