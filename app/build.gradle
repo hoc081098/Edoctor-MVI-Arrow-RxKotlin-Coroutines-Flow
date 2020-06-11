@@ -29,6 +29,7 @@ android {
             buildConfigField 'String', "API_URL", '"http://54.84.195.155/api/v1/"'
             buildConfigField 'String', "API_KEY", '"7767d3e09e826fad677592e5f078f09c"'
             buildConfigField 'String', "PLACE_API_KEY", '"AIzaSyDCrGZXXsyMYRY2Ewmznl0zVMHtpkRWkEc"'
+            buildConfigField 'String', "MAPBOX_ACCESS_TOKEN",'"pk.eyJ1IjoicGV0cnVzdGhhaWhvYyIsImEiOiJjampycW1uY2s4bTRnM3BwMXo0M2Q3OTduIn0.dRqQsp8tc1SictvFyOP7tQ"'
         }
 
         release {
