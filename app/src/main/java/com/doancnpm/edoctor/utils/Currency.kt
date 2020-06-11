@@ -11,3 +11,5 @@ private val formatter = NumberFormat.getCurrencyInstance(localeVi).apply {
 }
 
 val Int.currencyVndFormatted: String get() = formatter.format(toLong())
+
+val Double.currencyVndFormatted: String get() = formatter.format(this)

@@ -63,6 +63,7 @@ class CreateOrderVM(
   val locationLiveData get() = locationD.asLiveData()
   val timesLiveData get() = timesD.asLiveData()
   val noteLiveData get() = noteD.asLiveData()
+  val promotionItemLiveData get() = inputPromotionVM.selectedItem
   val singleEventObservable get() = singleEventS.asObservable()
 
   init {
