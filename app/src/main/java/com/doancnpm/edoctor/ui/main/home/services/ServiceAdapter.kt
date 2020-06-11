@@ -37,7 +37,7 @@ class ServiceAdapter(
     RecyclerView.ViewHolder(binding.root), View.OnClickListener {
 
     init {
-      binding.detailButton.setOnClickListener(this)
+      binding.root.setOnClickListener(this)
       binding.orderButton.setOnClickListener(this)
     }
 
@@ -64,7 +64,7 @@ class ServiceAdapter(
       val item = getItem(position)
 
       when (v) {
-        binding.detailButton -> onClickDetail(item)
+        binding.root -> onClickDetail(item)
         binding.orderButton -> onClickOrder(item)
         else -> TODO()
       }

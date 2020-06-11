@@ -34,7 +34,7 @@
             android:layout_height="wrap_content"
             android:fontFamily="@font/google_sans"
             android:imeOptions="actionDone"
-            android:inputType="text|textMultiLine"
+            android:inputType="textMultiLine"
             android:lines="3"
             android:singleLine="false"
             android:textSize="18sp" />

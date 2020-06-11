@@ -11,6 +11,7 @@ import com.doancnpm.edoctor.domain.entity.Service
 import com.doancnpm.edoctor.domain.repository.OrderRepository
 import com.doancnpm.edoctor.utils.UTCTimeZone
 import com.doancnpm.edoctor.utils.toString_yyyyMMdd_HHmmss
+import timber.log.Timber
 import java.util.*
 
 class OrderRepositoryImpl(
@@ -21,14 +22,18 @@ class OrderRepositoryImpl(
     service: Service,
     location: Location,
     note: String?,
-    originalPrice: Double,
     promotion: Promotion?,
-    total: Double,
     payCardId: String,
     startTime: Date,
     endTime: Date
   ): DomainResult<Unit> {
     return Either.catch(errorMapper::map) {
+      val originalPrice = service.price.toDouble()
+      val total = promotion?.discount?.let { originalPrice * (1 - it) }
+        ?: originalPrice
+
+      Timber.d("originalPrice=$originalPrice, total=$total")
+
       apiService
         .createOrder(
           CreateOrderBody(
