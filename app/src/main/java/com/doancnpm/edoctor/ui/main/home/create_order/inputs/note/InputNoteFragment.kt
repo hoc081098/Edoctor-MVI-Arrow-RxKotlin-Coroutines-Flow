@@ -1,6 +1,7 @@
 package com.doancnpm.edoctor.ui.main.home.create_order.inputs.note
 
 import android.os.Bundle
+import android.view.KeyEvent
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import com.doancnpm.edoctor.R
@@ -37,15 +38,5 @@ class InputNoteFragment : BaseFragment(R.layout.fragment_input_note) {
         )
       }
       .addTo(compositeDisposable)
-
-    binding.editNote.editText!!.setOnEditorActionListener { v, actionId, event ->
-      if (actionId == EditorInfo.IME_ACTION_NEXT) {
-        hideKeyboard()
-        Timber.d("Hide keyboard")
-        true
-      } else {
-        false
-      }
-    }
   }
 }
