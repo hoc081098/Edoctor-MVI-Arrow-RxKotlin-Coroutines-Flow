@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import com.doancnpm.edoctor.core.BaseVM
+import com.doancnpm.edoctor.domain.entity.Service
 import com.doancnpm.edoctor.domain.repository.LocationRepository
 import com.doancnpm.edoctor.domain.repository.PromotionRepository
 import com.doancnpm.edoctor.ui.main.home.create_order.CreateOrderContract.*
@@ -26,6 +27,7 @@ import java.util.*
 import kotlin.LazyThreadSafetyMode.NONE
 
 class CreateOrderVM(
+  val service: Service,
   private val locationRepository: LocationRepository,
   promotionRepository: PromotionRepository,
 ) : BaseVM() {
@@ -54,7 +56,8 @@ class CreateOrderVM(
       .replay(1)
       .refCount(),
     Observable.just(true), // promotion (optional)
-    Observable.just(true), // note (optional)
+    Observable.just(true), // note (optional),
+    Observable.just(true), // confirmation
   )
 
   val locationLiveData get() = locationD.asLiveData()

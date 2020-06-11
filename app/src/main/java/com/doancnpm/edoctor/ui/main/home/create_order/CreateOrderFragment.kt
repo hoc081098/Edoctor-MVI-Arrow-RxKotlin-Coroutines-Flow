@@ -13,6 +13,7 @@ import com.doancnpm.edoctor.R
 import com.doancnpm.edoctor.core.BaseFragment
 import com.doancnpm.edoctor.databinding.FragmentCreateOrderBinding
 import com.doancnpm.edoctor.ui.main.home.create_order.inputs.address.InputAddressFragment
+import com.doancnpm.edoctor.ui.main.home.create_order.inputs.confirmation.OrderConfirmationFragment
 import com.doancnpm.edoctor.ui.main.home.create_order.inputs.note.InputNoteFragment
 import com.doancnpm.edoctor.ui.main.home.create_order.inputs.promotion.InputPromotionFragment
 import com.doancnpm.edoctor.ui.main.home.create_order.inputs.time.InputTimeFragment
@@ -26,12 +27,13 @@ import io.reactivex.rxjava3.kotlin.subscribeBy
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx3.awaitFirst
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import org.koin.core.parameter.parametersOf
 import timber.log.Timber
 import kotlin.LazyThreadSafetyMode.NONE
 
 class CreateOrderFragment : BaseFragment(R.layout.fragment_create_order) {
   private val binding by viewBinding<FragmentCreateOrderBinding>()
-  private val viewModel by viewModel<CreateOrderVM>()
+  private val viewModel by viewModel<CreateOrderVM>() { parametersOf(navArgs.service) }
   private val navArgs by navArgs<CreateOrderFragmentArgs>()
 
   private val fragments by lazy(NONE) {
@@ -40,6 +42,7 @@ class CreateOrderFragment : BaseFragment(R.layout.fragment_create_order) {
       InputTimeFragment(),
       InputPromotionFragment(),
       InputNoteFragment(),
+      OrderConfirmationFragment(),
     )
   }
 
@@ -104,11 +107,12 @@ class CreateOrderFragment : BaseFragment(R.layout.fragment_create_order) {
 
     // Previous and next button
     val onClickListener = View.OnClickListener {
+      hideKeyboard()
+
       when (it) {
         binding.nextButton -> if (viewPager.currentItem + 1 in fragments.indices) {
           viewPager.currentItem++
         } else {
-          hideKeyboard()
           view?.snack("Finish")
         }
         binding.prevButton -> if (viewPager.currentItem - 1 in fragments.indices) {

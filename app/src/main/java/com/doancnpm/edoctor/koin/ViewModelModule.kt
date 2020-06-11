@@ -1,6 +1,7 @@
 package com.doancnpm.edoctor.koin
 
 import com.doancnpm.edoctor.domain.entity.Category
+import com.doancnpm.edoctor.domain.entity.Service
 import com.doancnpm.edoctor.ui.auth.login.LoginContract
 import com.doancnpm.edoctor.ui.auth.login.LoginInteractor
 import com.doancnpm.edoctor.ui.auth.login.LoginVM
@@ -95,8 +96,9 @@ val viewModelModule = module {
     )
   }
 
-  viewModel {
+  viewModel { (service: Service) ->
     CreateOrderVM(
+      service = service,
       locationRepository = get(),
       promotionRepository = get(),
     )
