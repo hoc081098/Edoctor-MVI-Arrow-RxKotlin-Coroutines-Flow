@@ -79,7 +79,7 @@ fun <T : Any> LiveData<T>.toObservable(fallbackNullValue: (() -> T)? = null): Ob
 }
 
 @Suppress("NOTHING_TO_INLINE")
-inline fun <T : Any> MutableLiveData<T>.asLiveData(): LiveData<T> = this
+inline fun <T> MutableLiveData<T>.asLiveData(): LiveData<T> = this
 
 /**
  * Set value if result from [mutation] invoking is different from current value

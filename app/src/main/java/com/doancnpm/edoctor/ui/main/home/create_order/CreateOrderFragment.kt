@@ -13,6 +13,7 @@ import com.doancnpm.edoctor.R
 import com.doancnpm.edoctor.core.BaseFragment
 import com.doancnpm.edoctor.databinding.FragmentCreateOrderBinding
 import com.doancnpm.edoctor.ui.main.home.create_order.inputs.address.InputAddressFragment
+import com.doancnpm.edoctor.ui.main.home.create_order.inputs.note.InputNoteFragment
 import com.doancnpm.edoctor.ui.main.home.create_order.inputs.promotion.InputPromotionFragment
 import com.doancnpm.edoctor.ui.main.home.create_order.inputs.time.InputTimeFragment
 import com.doancnpm.edoctor.utils.showAlertDialog
@@ -37,6 +38,7 @@ class CreateOrderFragment : BaseFragment(R.layout.fragment_create_order) {
       InputAddressFragment(),
       InputTimeFragment(),
       InputPromotionFragment(),
+      InputNoteFragment(),
     )
   }
 
