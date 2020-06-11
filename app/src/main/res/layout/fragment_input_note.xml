@@ -36,7 +36,6 @@
             android:imeOptions="actionDone"
             android:inputType="textMultiLine"
             android:lines="3"
-            android:singleLine="false"
             android:textSize="18sp" />
 
     </com.google.android.material.textfield.TextInputLayout>
