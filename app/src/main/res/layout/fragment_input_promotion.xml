@@ -20,7 +20,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="invisible" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/retryButton"
@@ -43,7 +44,8 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_chainStyle="packed" />
+        app:layout_constraintVertical_chainStyle="packed"
+        tools:visibility="gone" />
 
     <TextView
         android:id="@+id/errorMessageTextView"
@@ -61,14 +63,29 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/retryButton" />
+        app:layout_constraintTop_toBottomOf="@+id/retryButton"
+        tools:visibility="gone" />
 
     <androidx.constraintlayout.widget.Group
         android:id="@+id/errorGroup"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:visibility="gone"
-        app:constraint_referenced_ids="retryButton,errorMessageTextView"
-        tools:visibility="visible" />
+        app:constraint_referenced_ids="retryButton,errorMessageTextView" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/text_empty"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/google_sans"
+        android:text="Empty promotions"
+        android:textAlignment="center"
+        android:textColor="@color/colorOnBackground"
+        android:textSize="22sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

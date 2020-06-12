@@ -46,14 +46,22 @@ class InputPromotionFragment : BaseFragment(R.layout.fragment_input_promotion) {
         if (state.isLoading) {
           progressBar.visible()
           errorGroup.gone()
+          textEmpty.invisible()
         } else {
           progressBar.invisible()
 
           if (state.error !== null) {
             errorGroup.visible()
             errorMessageTextView.text = state.error.getMessage()
+            textEmpty.invisible()
           } else {
             errorGroup.gone()
+
+            if (state.promotions.isEmpty()) {
+              textEmpty.visible()
+            } else {
+              textEmpty.invisible()
+            }
           }
         }
       }
