@@ -42,7 +42,7 @@ class CreateOrderVM(
 
   private val locationD = MutableLiveData<Location>()
   private val timesD = MutableLiveData<Times>().apply { value = Times() }
-  private val noteD = MutableLiveData<String?>()
+  private val noteD = MutableLiveData<String?>().apply { value = null }
 
   val canGoNextObservables: List<Observable<Boolean>> = listOf(
     locationD
@@ -159,14 +159,12 @@ private class InputPromotionVM(
   private val promotionRepository: PromotionRepository,
   private val viewModelScope: CoroutineScope
 ) {
-  private val selectedItemD = MutableLiveData<PromotionItem>()
+  private val selectedItemD = MutableLiveData<PromotionItem?>().apply { value = null }
 
+  private var isLoading = false
   private val viewStateD by lazy(NONE) {
     MutableLiveData<ViewState>()
-      .apply {
-        value =
-          ViewState()
-      }
+      .apply { value = ViewState() }
       .also { fetchPromotion() }
   }
 
@@ -198,11 +196,15 @@ private class InputPromotionVM(
   }
 
   private fun fetchPromotion() {
+    if (isLoading) return
+    isLoading = true
+
     viewModelScope.launch {
       viewStateD.setValueNotNull { it.copy(isLoading = true, error = null) }
 
       promotionRepository
         .getPromotions()
+        .also { isLoading = false }
         .fold(
           ifLeft = { error ->
             Timber.d(error, "Error: $error")

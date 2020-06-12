@@ -38,11 +38,11 @@ class CreateOrderFragment : BaseFragment(R.layout.fragment_create_order) {
 
   private val fragments by lazy(NONE) {
     listOf(
-      InputAddressFragment(),
-      InputTimeFragment(),
-      InputPromotionFragment(),
-      InputNoteFragment(),
-      OrderConfirmationFragment(),
+      { InputAddressFragment() },
+      { InputTimeFragment() },
+      { InputPromotionFragment() },
+      { InputNoteFragment() },
+      { OrderConfirmationFragment() },
     )
   }
 
@@ -132,8 +132,8 @@ class CreateOrderFragment : BaseFragment(R.layout.fragment_create_order) {
 
 class CreateOrderViewPagerAdapter(
   fragment: Fragment,
-  private val fragments: List<Fragment>
+  private val fragments: List<() -> Fragment>
 ) : FragmentStateAdapter(fragment) {
   override fun getItemCount() = fragments.size
-  override fun createFragment(position: Int) = fragments[position]
+  override fun createFragment(position: Int) = fragments[position]()
 }
