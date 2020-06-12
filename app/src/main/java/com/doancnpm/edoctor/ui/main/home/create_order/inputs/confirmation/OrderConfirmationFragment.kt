@@ -13,7 +13,6 @@ import com.doancnpm.edoctor.databinding.FragmentOrderConfirmationBinding
 import com.doancnpm.edoctor.ui.main.home.create_order.CreateOrderVM
 import com.doancnpm.edoctor.utils.*
 import org.koin.androidx.viewmodel.ext.android.getViewModel
-import timber.log.Timber
 import kotlin.LazyThreadSafetyMode.NONE
 import kotlin.math.roundToInt
 
@@ -61,6 +60,7 @@ class OrderConfirmationFragment : BaseFragment(R.layout.fragment_order_confirmat
           "https://api.mapbox.com/styles/v1/mapbox/light-v10/static/${location.lng},${location.lat},15,0/128x128?access_token=${BuildConfig.MAPBOX_ACCESS_TOKEN}"
         glide
           .load(url)
+          .placeholder(R.drawable.ic_baseline_map_24)
           .transition(DrawableTransitionOptions.withCrossFade())
           .into(imageAddress)
       }
@@ -75,11 +75,10 @@ class OrderConfirmationFragment : BaseFragment(R.layout.fragment_order_confirmat
           ?.promotion
           ?.let { promotion -> "${promotion.name} - ${(promotion.discount * 100).roundToInt()}% OFF" }
 
-        textPrice.text = (item
+        textTotalPrice.text = (item
           ?.promotion
           ?.let { viewModel.service.price * (1 - it.discount) }
           ?: viewModel.service.price.toDouble())
-          .also { Timber.d("Price: $it") }
           .currencyVndFormatted
       })
     }

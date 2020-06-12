@@ -58,12 +58,12 @@
                 android:ellipsize="end"
                 android:fontFamily="@font/google_sans"
                 android:maxLines="2"
-                android:text="None"
                 android:textSize="14sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toEndOf="@+id/textView5"
-                app:layout_constraintTop_toBottomOf="@+id/text_note" />
+                app:layout_constraintTop_toBottomOf="@+id/text_note"
+                tools:text="None" />
 
             <include
                 android:id="@+id/service"
@@ -218,7 +218,7 @@
                 tools:srcCompat="@tools:sample/avatars" />
 
             <androidx.cardview.widget.CardView
-                android:id="@id/text_price_wrapper"
+                android:id="@+id/text_total_price_wrapper"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:cardBackgroundColor="#DAA520"
@@ -229,7 +229,7 @@
                 app:layout_constraintTop_toTopOf="@+id/textView12">
 
                 <TextView
-                    android:id="@+id/text_price"
+                    android:id="@+id/text_total_price"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
@@ -239,9 +239,9 @@
                     android:paddingTop="4dp"
                     android:paddingEnd="8dp"
                     android:paddingBottom="4dp"
+                    android:text="1.000.000đ"
                     android:textColor="@color/colorOnPrimary"
-                    android:textSize="20sp"
-                    tools:text="10000" />
+                    android:textSize="20sp" />
             </androidx.cardview.widget.CardView>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
