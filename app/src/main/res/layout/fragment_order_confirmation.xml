@@ -77,26 +77,24 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:layout_marginTop="16dp"
                 android:fontFamily="@font/nunito_sans_semibold"
                 android:text="Start time: "
                 android:textColor="@color/colorOnBackground"
                 android:textSize="17sp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/service" />
+                app:layout_constraintBaseline_toBaselineOf="@+id/text_start_time"
+                app:layout_constraintStart_toStartOf="parent" />
 
             <TextView
                 android:id="@+id/textView6"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:layout_marginTop="12dp"
                 android:fontFamily="@font/nunito_sans_semibold"
                 android:text="End time: "
                 android:textColor="@color/colorOnBackground"
                 android:textSize="17sp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textView5" />
+                app:layout_constraintBaseline_toBaselineOf="@+id/text_end_time"
+                app:layout_constraintStart_toStartOf="parent" />
 
             <TextView
                 android:id="@+id/textView9"
@@ -107,9 +105,8 @@
                 android:text="Address: "
                 android:textColor="@color/colorOnBackground"
                 android:textSize="17sp"
-                app:layout_constraintBottom_toBottomOf="@+id/text_address"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/text_address" />
+                app:layout_constraintBaseline_toBaselineOf="@+id/text_address"
+                app:layout_constraintStart_toStartOf="parent" />
 
             <TextView
                 android:id="@+id/textView10"
@@ -120,9 +117,8 @@
                 android:text="Note: "
                 android:textColor="@color/colorOnBackground"
                 android:textSize="17sp"
-                app:layout_constraintBottom_toBottomOf="@+id/text_note"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/text_note" />
+                app:layout_constraintBaseline_toBaselineOf="@+id/text_note"
+                app:layout_constraintStart_toStartOf="parent" />
 
             <TextView
                 android:id="@+id/textView11"
@@ -133,22 +129,21 @@
                 android:text="Discount: "
                 android:textColor="@color/colorOnBackground"
                 android:textSize="17sp"
-                app:layout_constraintBottom_toBottomOf="@+id/text_discount"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/text_discount" />
+                app:layout_constraintBaseline_toBaselineOf="@+id/text_discount"
+                app:layout_constraintStart_toStartOf="parent" />
 
             <TextView
                 android:id="@+id/textView12"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:layout_marginTop="12dp"
                 android:fontFamily="@font/nunito_sans_semibold"
                 android:text="Total:"
                 android:textColor="@color/colorOnBackground"
-                android:textSize="20sp"
+                android:textSize="18sp"
+                app:layout_constraintBottom_toBottomOf="@+id/text_total_price_wrapper"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/text_discount" />
+                app:layout_constraintTop_toTopOf="@+id/text_total_price_wrapper" />
 
             <androidx.constraintlayout.widget.Barrier
                 android:id="@+id/barrier"
@@ -162,32 +157,32 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
                 android:layout_marginEnd="8dp"
                 android:fontFamily="@font/google_sans"
                 android:maxLines="2"
                 android:text="start time"
                 android:textSize="14sp"
-                app:layout_constraintBottom_toBottomOf="@+id/textView5"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toEndOf="@+id/textView5"
-                app:layout_constraintTop_toTopOf="@+id/textView5" />
+                app:layout_constraintTop_toBottomOf="@+id/service" />
 
             <TextView
                 android:id="@+id/text_end_time"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
+                android:layout_marginTop="12dp"
                 android:layout_marginEnd="8dp"
                 android:fontFamily="@font/google_sans"
                 android:maxLines="2"
                 android:text="end time"
                 android:textSize="14sp"
-                app:layout_constraintBottom_toBottomOf="@+id/textView6"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toEndOf="@+id/textView5"
-                app:layout_constraintTop_toTopOf="@+id/textView6" />
+                app:layout_constraintTop_toBottomOf="@+id/text_start_time" />
 
             <TextView
                 android:id="@+id/text_address"
@@ -198,7 +193,7 @@
                 android:layout_marginEnd="8dp"
                 android:fontFamily="@font/google_sans"
                 android:maxLines="2"
-                android:text="lat, lng \n jbdsj"
+                android:text="lat, lng \n abc"
                 android:textSize="14sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
@@ -221,12 +216,12 @@
                 android:id="@+id/text_total_price_wrapper"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
                 app:cardBackgroundColor="#DAA520"
                 app:cardCornerRadius="6dp"
                 app:cardElevation="0dp"
-                app:layout_constraintBottom_toBottomOf="@+id/textView12"
                 app:layout_constraintStart_toStartOf="@+id/text_discount"
-                app:layout_constraintTop_toTopOf="@+id/textView12">
+                app:layout_constraintTop_toBottomOf="@+id/text_discount">
 
                 <TextView
                     android:id="@+id/text_total_price"
@@ -241,7 +236,7 @@
                     android:paddingBottom="4dp"
                     android:text="1.000.000đ"
                     android:textColor="@color/colorOnPrimary"
-                    android:textSize="20sp" />
+                    android:textSize="18sp" />
             </androidx.cardview.widget.CardView>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
