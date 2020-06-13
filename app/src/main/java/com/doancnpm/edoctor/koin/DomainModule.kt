@@ -70,4 +70,11 @@ val domainModule = module {
       errorMapper = get(),
     )
   }
+
+  factory<CardRepository> {
+    CardRepositoryImpl(
+      apiService = get(API_URL_QUALIFIER),
+      errorMapper = get(),
+    )
+  }
 }
