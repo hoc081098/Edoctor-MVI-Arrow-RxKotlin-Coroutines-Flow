@@ -113,7 +113,9 @@ class CreateOrderFragment : BaseFragment(R.layout.fragment_create_order) {
         binding.nextButton -> if (viewPager.currentItem + 1 in fragments.indices) {
           viewPager.currentItem++
         } else {
-          view?.snack("Finish")
+          CreateOrderFragmentDirections
+            .actionCreateOrderFragmentToSelectCardFragment()
+            .let { findNavController().navigate(it) }
         }
         binding.prevButton -> if (viewPager.currentItem - 1 in fragments.indices) {
           viewPager.currentItem--
