@@ -17,7 +17,8 @@ import io.reactivex.rxjava3.kotlin.Observables.combineLatest
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.ofType
 import io.reactivex.rxjava3.kotlin.subscribeBy
-import java.util.*
+import io.reactivex.rxjava3.kotlin.withLatestFrom
+import java.util.Date
 
 class RegisterVM(
   private val interactor: Interactor,
@@ -61,22 +62,22 @@ class RegisterVM(
       .map { getBirthDayErrors(it.orNull()) to it }
 
     val errorsAndFormData = combineLatest(
-        phoneObservable,
-        passwordObservable,
-        roleIdObservable,
-        fullNameObservable,
-        birthDayObservable
-      ) { phone, password, roleId, fullName, birthDay ->
-        val errors = phone.first + password.first + roleId.first + fullName.first + birthDay.first
-        val formData = FormData.Data(
-          phone = phone.second,
-          password = password.second,
-          roleId = roleId.second,
-          fullName = fullName.second,
-          birthday = birthDay.second.orNull(),
-        )
-        errors to formData
-      }
+      phoneObservable,
+      passwordObservable,
+      roleIdObservable,
+      fullNameObservable,
+      birthDayObservable
+    ) { phone, password, roleId, fullName, birthDay ->
+      val errors = phone.first + password.first + roleId.first + fullName.first + birthDay.first
+      val formData = FormData.Data(
+        phone = phone.second,
+        password = password.second,
+        roleId = roleId.second,
+        fullName = fullName.second,
+        birthday = birthDay.second.orNull(),
+      )
+      errors to formData
+    }
       .distinctUntilChanged()
       .share()
 
@@ -100,14 +101,14 @@ class RegisterVM(
       }
 
     Observable.mergeArray(
-        errorsAndFormData.map {
-          PartialChange.ErrorsAndFormDataChanged(
-            errors = it.first,
-            formData = it.second,
-          )
-        },
-        registerChange,
-      )
+      errorsAndFormData.map {
+        PartialChange.ErrorsAndFormDataChanged(
+          errors = it.first,
+          formData = it.second,
+        )
+      },
+      registerChange,
+    )
       .observeOn(schedulers.main)
       .scan(initialState) { state, change -> change.reduce(state) }
       .subscribeBy(onNext = { stateD.value = it })
