@@ -46,7 +46,7 @@ class AddCardVM(
       .map { getExpiredDateErrors(it) to it }
 
     val cvcObservable = intentS.ofType<ViewIntent.CvcChanged>()
-      .map { it.cvc }
+      .map { it.cvc.trim() }
       .distinctUntilChanged()
       .map { getCvcErrors(it) to it }
 
@@ -57,16 +57,30 @@ class AddCardVM(
       cvcObservable,
     ) { name, number, date, cvc ->
       val errors = name.first + number.first + date.first + cvc.first
-      val (expiredMonth, expiredYear) = expiredDateRegex.findAll(date.second)
-        .map { it.value.toInt() }.toList()
-      val formData = FormData.Data(
-        holderName = name.second,
-        number = number.second,
-        expiredMonth = expiredMonth,
-        expiredYear = expiredYear,
-        cvc = cvc.second,
-      )
-      errors to formData
+
+      val (expiredMonth, expiredYear) = expiredDateRegex.matchEntire(date.second)
+        ?.destructured
+        ?.let { (month, year) -> month.toIntOrNull() to year.toIntOrNull() }
+        ?: null to null
+      val cvcInt = cvc.second.toIntOrNull()
+
+      errors to if (expiredMonth != null && expiredYear != null && cvcInt != null) {
+        FormData.Data(
+          holderName = name.second,
+          number = number.second,
+          expiredMonth = expiredMonth,
+          expiredYear = expiredYear,
+          cvc = cvcInt,
+        )
+      } else {
+        FormData.Invalid(
+          holderName = name.second,
+          number = number.second,
+          expiredMonth = expiredMonth,
+          expiredYear = expiredYear,
+          cvc = cvcInt,
+        )
+      }
     }
       .distinctUntilChanged()
       .share()
@@ -75,6 +89,7 @@ class AddCardVM(
       .withLatestFrom(errorsAndFormData) { _, pair -> pair }
       .filter { (errors) -> errors.isEmpty() }
       .map { (_, formData) -> formData }
+      .ofType<FormData.Data>()
       .exhaustMap { data ->
         interactor
           .addCard(data)
@@ -108,7 +123,7 @@ class AddCardVM(
   private companion object {
     val emptyHolderName = setOf(ValidationError.EMPTY_HOLDER_NAME)
     val invalidNumber = setOf(ValidationError.INVALID_NUMBER)
-    val expiredDateRegex = "^(1[0-2]|[1-9])/(\\d{2})$".toRegex()
+    val expiredDateRegex = "^([1-9]|0[1-9]|1[0-2])/(\\d{2})$".toRegex()
     val invalidExpiredDate = setOf(ValidationError.INVALID_EXPIRED_DATE)
     val invalidCvc = setOf(ValidationError.INVALID_CVC)
 
@@ -129,15 +144,19 @@ class AddCardVM(
     }
 
     fun getExpiredDateErrors(date: String): Set<ValidationError> {
-      val component = expiredDateRegex.findAll(date).map { it.value.toInt() }.toList()
+      val groups = expiredDateRegex.matchEntire(date)?.groupValues ?: return invalidExpiredDate
+
       return when {
-        component.size != 2 -> invalidExpiredDate
+        groups.size != 3 -> invalidExpiredDate
         else -> {
-          val (month, year) = component
+          val (_, month, year) = groups.map { it.toIntOrNull() }
+          if (month == null || year == null) {
+            return invalidExpiredDate
+          }
 
           val calendar = Calendar.getInstance()
           val currentMonth = calendar[Calendar.MONTH]
-          val currentYear = calendar[Calendar.YEAR]
+          val currentYear = calendar[Calendar.YEAR] % 100
 
           when {
             year < currentYear -> invalidExpiredDate
@@ -148,8 +167,8 @@ class AddCardVM(
       }
     }
 
-    fun getCvcErrors(cvc: Int): Set<ValidationError> {
-      return if (cvc.toString().length != 3) {
+    fun getCvcErrors(cvc: String): Set<ValidationError> {
+      return if (cvc.length != 3 || cvc.toIntOrNull() === null) {
         invalidCvc
       } else {
         emptySet()

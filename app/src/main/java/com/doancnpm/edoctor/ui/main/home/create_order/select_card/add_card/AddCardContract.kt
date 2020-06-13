@@ -35,6 +35,14 @@ interface AddCardContract {
       override val expiredYear: Int,
       override val cvc: Int
     ) : FormData()
+
+    data class Invalid(
+      override val holderName: String,
+      override val number: String,
+      override val expiredMonth: Int?,
+      override val expiredYear: Int?,
+      override val cvc: Int?
+    ): FormData()
   }
 
   enum class ValidationError {
@@ -63,7 +71,7 @@ interface AddCardContract {
     data class HolderNameChanged(val name: String) : ViewIntent()
     data class NumberChanged(val number: String) : ViewIntent()
     data class ExpiredDateChanged(val date: String) : ViewIntent()
-    data class CvcChanged(val cvc: Int) : ViewIntent()
+    data class CvcChanged(val cvc: String) : ViewIntent()
 
     object Submit : ViewIntent()
   }
@@ -88,7 +96,7 @@ interface AddCardContract {
 
     data class ErrorsAndFormDataChanged(
       val errors: Set<ValidationError>,
-      val formData: Data,
+      val formData: FormData,
     ) : PartialChange()
 
     object Loading : PartialChange()
