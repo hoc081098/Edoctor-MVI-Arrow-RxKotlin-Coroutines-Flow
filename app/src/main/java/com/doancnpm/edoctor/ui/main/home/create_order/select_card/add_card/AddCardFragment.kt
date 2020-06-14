@@ -2,6 +2,7 @@ package com.doancnpm.edoctor.ui.main.home.create_order.select_card.add_card
 
 import android.os.Bundle
 import android.view.View
+import androidx.navigation.fragment.findNavController
 import com.doancnpm.edoctor.R
 import com.doancnpm.edoctor.core.BaseFragment
 import com.doancnpm.edoctor.databinding.FragmentAddCardBinding
@@ -47,6 +48,7 @@ class AddCardFragment : BaseFragment(R.layout.fragment_add_card) {
     when (event) {
       SingleEvent.Success -> {
         view?.snack("Add card successfully")
+        findNavController().popBackStack()
       }
       is SingleEvent.Failure -> {
         Timber.d("Add card error: ${event.error}")

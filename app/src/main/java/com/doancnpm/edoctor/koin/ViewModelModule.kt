@@ -17,6 +17,7 @@ import com.doancnpm.edoctor.ui.auth.verify.VerifyVM
 import com.doancnpm.edoctor.ui.main.MainVM
 import com.doancnpm.edoctor.ui.main.home.HomeVM
 import com.doancnpm.edoctor.ui.main.home.create_order.CreateOrderVM
+import com.doancnpm.edoctor.ui.main.home.create_order.select_card.SelectCardVM
 import com.doancnpm.edoctor.ui.main.home.create_order.select_card.add_card.AddCardContract
 import com.doancnpm.edoctor.ui.main.home.create_order.select_card.add_card.AddCardInteractor
 import com.doancnpm.edoctor.ui.main.home.create_order.select_card.add_card.AddCardVM
@@ -120,6 +121,8 @@ val viewModelModule = module {
       schedulers = get(),
     )
   }
+
+  viewModel { SelectCardVM(cardRepository = get()) }
   //endregion
 
   //region Profile

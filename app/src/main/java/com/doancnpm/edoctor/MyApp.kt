@@ -9,6 +9,7 @@ import com.doancnpm.edoctor.koin.domainModule
 import com.doancnpm.edoctor.koin.viewModelModule
 import com.google.android.libraries.places.api.Places
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
@@ -16,6 +17,7 @@ import org.koin.core.logger.Level
 import timber.log.Timber
 import kotlin.time.ExperimentalTime
 
+@FlowPreview
 @ExperimentalTime
 @ExperimentalStdlibApi
 @ExperimentalCoroutinesApi

@@ -71,7 +71,13 @@ interface ApiService {
 
   //region Card
   @POST("cards")
-  suspend fun addCard(@Body body: AddCardBody): BaseResponse<Any>
+  suspend fun addCard(@Body body: AddCardBody): BaseResponse<CardResponse>
+
+  @GET("cards")
+  suspend fun getCards(): BaseResponse<List<CardResponse>>
+
+  @DELETE("cards/{id}")
+  suspend fun removeCard(@Path("id") id: String): BaseResponse<Any>
   //endregion
 
   companion object Factory {

@@ -7,10 +7,12 @@ import com.doancnpm.edoctor.domain.dispatchers.AppSchedulers
 import com.doancnpm.edoctor.domain.dispatchers.AppSchedulersImpl
 import com.doancnpm.edoctor.domain.repository.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import org.koin.android.ext.koin.androidApplication
 import org.koin.dsl.module
 import kotlin.time.ExperimentalTime
 
+@FlowPreview
 @ExperimentalCoroutinesApi
 @ExperimentalTime
 val domainModule = module {
@@ -71,10 +73,11 @@ val domainModule = module {
     )
   }
 
-  factory<CardRepository> {
+  single<CardRepository> {
     CardRepositoryImpl(
       apiService = get(API_URL_QUALIFIER),
       errorMapper = get(),
+      dispatchers = get(),
     )
   }
 }
