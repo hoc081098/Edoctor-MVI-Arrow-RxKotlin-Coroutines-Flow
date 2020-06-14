@@ -2,11 +2,17 @@ package com.doancnpm.edoctor.ui.main.home.create_order
 
 import com.doancnpm.edoctor.domain.entity.AppError
 import com.doancnpm.edoctor.domain.entity.Card
+import com.doancnpm.edoctor.domain.entity.Location
 import com.doancnpm.edoctor.domain.entity.Promotion
 import java.util.Date
 
 interface CreateOrderContract {
-  data class Location(val lat: Double, val lng: Double)
+  data class Location(val lat: Double, val lng: Double) {
+    fun toDomain() = Location(
+      latitude = lat,
+      longitude = lng
+    )
+  }
 
   data class Times(
     val startTime: Date? = null,
@@ -40,7 +46,7 @@ interface CreateOrderContract {
   }
 
   sealed class SingleEvent {
-    data class Error(val appError: AppError) : SingleEvent()
+    data class AddressError(val locationError: AppError.LocationError) : SingleEvent()
 
     sealed class Times : SingleEvent() {
       object PastStartTime : Times()
@@ -49,5 +55,10 @@ interface CreateOrderContract {
       object PastEndTime : Times()
       object EndTimeIsEarlierThanStartTime : Times()
     }
+
+    // Create order
+    object MissingRequiredInput : SingleEvent()
+    object Success : SingleEvent()
+    data class Error(val appError: AppError) : SingleEvent()
   }
 }

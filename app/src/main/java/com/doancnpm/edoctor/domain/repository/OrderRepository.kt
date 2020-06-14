@@ -1,9 +1,6 @@
 package com.doancnpm.edoctor.domain.repository
 
-import com.doancnpm.edoctor.domain.entity.DomainResult
-import com.doancnpm.edoctor.domain.entity.Location
-import com.doancnpm.edoctor.domain.entity.Promotion
-import com.doancnpm.edoctor.domain.entity.Service
+import com.doancnpm.edoctor.domain.entity.*
 import java.util.*
 
 interface OrderRepository {
@@ -12,7 +9,7 @@ interface OrderRepository {
     location: Location,
     note: String?,
     promotion: Promotion?,
-    payCardId: String,
+    card: Card,
     startTime: Date,
     endTime: Date,
   ): DomainResult<Unit>
