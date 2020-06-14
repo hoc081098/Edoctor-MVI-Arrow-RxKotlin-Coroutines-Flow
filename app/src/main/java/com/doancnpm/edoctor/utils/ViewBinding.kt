@@ -2,6 +2,7 @@ package com.doancnpm.edoctor.utils
 
 import android.view.LayoutInflater
 import android.view.View
+import androidx.annotation.MainThread
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.DefaultLifecycleObserver
@@ -9,6 +10,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.viewbinding.ViewBinding
 import timber.log.Timber
+import java.lang.reflect.Method
 import kotlin.LazyThreadSafetyMode.NONE
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
@@ -54,11 +56,21 @@ class ViewBindingDelegate<T : ViewBinding>(
   }
 }
 
-fun <T : ViewBinding> Fragment.viewBinding(factory: (View) -> T) =
-  ViewBindingDelegate(this, factory, null)
+@MainThread
+inline fun <reified T : ViewBinding> Fragment.viewBinding(noinline onDestroy: (T.() -> Unit)? = null): ViewBindingDelegate<T> {
+  var bindMethod: Method? = null
 
-fun <T : ViewBinding> Fragment.viewBinding(onDestroy: T.() -> Unit, factory: (View) -> T) =
-  ViewBindingDelegate(this, factory, onDestroy)
+  return ViewBindingDelegate(
+    this,
+    {
+      (bindMethod ?: T::class.java
+        .getMethod("bind", View::class.java)
+        .also { bindMethod = it })
+        .invoke(null, it) as T
+    },
+    onDestroy
+  )
+}
 
 fun <T : ViewBinding> AppCompatActivity.viewBinding(factory: (LayoutInflater) -> T) =
   lazy(NONE) { factory(layoutInflater) }

@@ -14,6 +14,7 @@ import com.doancnpm.edoctor.data.remote.interceptor.ApiKeyInterceptor
 import com.doancnpm.edoctor.data.remote.interceptor.AuthInterceptor
 import com.doancnpm.edoctor.data.remote.response.ErrorResponseJsonAdapter
 import com.doancnpm.edoctor.domain.dispatchers.AppDispatchers
+import com.google.firebase.iid.FirebaseInstanceId
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -45,36 +46,59 @@ val dataModule = module {
 
   factory(API_KEY_QUALIFIER) { BuildConfig.API_KEY }
 
-  single(API_URL_QUALIFIER) { provideRetrofit(get(API_URL_QUALIFIER), get(), get()) }
+  factory(API_URL_QUALIFIER) {
+    provideRetrofit(
+      baseUrl = get(API_URL_QUALIFIER),
+      moshi = get(),
+      client = get(),
+    )
+  }
 
-  single(API_URL_QUALIFIER) { provideApiService(get(API_URL_QUALIFIER)) }
+  factory {
+    provideOkHttpClient(
+      authInterceptor = get(),
+      apiKeyInterceptor = get(),
+    )
+  }
 
-  single { provideMoshi() }
+  factory { provideErrorResponseJsonAdapter(moshi = get()) }
 
-  single { provideOkHttpClient(get(), get()) }
+  factory { provideAuthInterceptor(userLocalSource = get()) }
 
-  single { provideErrorMapper(get()) }
+  factory { provideApiKeyInterceptor(apiKey = get(API_KEY_QUALIFIER)) }
 
-  factory { provideErrorResponseJsonAdapter(get()) }
+  single(API_URL_QUALIFIER) { provideApiService(retrofit = get(API_URL_QUALIFIER)) }
 
-  factory { provideAuthInterceptor(get()) }
-
-  factory { provideApiKeyInterceptor(get(API_KEY_QUALIFIER)) }
+  single { provideErrorMapper(errorResponseJsonAdapter = get()) }
 
   /*
    * Local
    */
 
-  single<UserLocalSource> { UserLocalSourceImpl(get(), get(), get(), get()) }
+  single<UserLocalSource> {
+    UserLocalSourceImpl(
+      sharedPreferences = get(),
+      dispatchers = get(),
+      userLocalJsonAdapter = get(),
+      schedulers = get(),
+    )
+  }
 
-  single { provideSharedPreferences(androidApplication()) }
+  single { provideSharedPreferences(context = androidApplication()) }
 
-  factory { provideUserLocalJsonAdapter(get()) }
+  factory { provideUserLocalJsonAdapter(moshi = get()) }
 
   /*
    * App
    */
   single { CoroutineScope(get<AppDispatchers>().io + SupervisorJob()) }
+
+  single { provideMoshi() }
+
+  /*
+   * Firebase
+   */
+  factory { FirebaseInstanceId.getInstance() }
 }
 
 private fun provideUserLocalJsonAdapter(moshi: Moshi): UserLocalJsonAdapter {
@@ -87,7 +111,8 @@ private fun provideSharedPreferences(context: Context): SharedPreferences {
 
 private fun provideAuthInterceptor(userLocalSource: UserLocalSource): AuthInterceptor {
   return AuthInterceptor(
-    userLocalSource)
+    userLocalSource
+  )
 }
 
 private fun provideApiKeyInterceptor(apiKey: String): ApiKeyInterceptor {
@@ -98,8 +123,8 @@ private fun provideErrorResponseJsonAdapter(moshi: Moshi): ErrorResponseJsonAdap
   return ErrorResponseJsonAdapter(moshi)
 }
 
-private fun provideErrorMapper(adapter: ErrorResponseJsonAdapter): ErrorMapper {
-  return ErrorMapper(adapter)
+private fun provideErrorMapper(errorResponseJsonAdapter: ErrorResponseJsonAdapter): ErrorMapper {
+  return ErrorMapper(errorResponseJsonAdapter)
 }
 
 private fun provideApiService(retrofit: Retrofit): ApiService = ApiService(retrofit)

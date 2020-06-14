@@ -8,7 +8,7 @@ import com.doancnpm.edoctor.databinding.FragmentHistoryBinding
 import com.doancnpm.edoctor.utils.viewBinding
 
 class HistoryFragment : BaseFragment(R.layout.fragment_history) {
-  private val binding by viewBinding { FragmentHistoryBinding.bind(it) }
+  private val binding by viewBinding<FragmentHistoryBinding>()
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)

@@ -1,6 +1,8 @@
 package com.doancnpm.edoctor.data.remote
 
 import androidx.annotation.IntRange
+import com.doancnpm.edoctor.data.remote.body.AddCardBody
+import com.doancnpm.edoctor.data.remote.body.CreateOrderBody
 import com.doancnpm.edoctor.data.remote.body.LoginUserBody
 import com.doancnpm.edoctor.data.remote.body.RegisterUserBody
 import com.doancnpm.edoctor.data.remote.response.*
@@ -48,10 +50,34 @@ interface ApiService {
   //region Service
   @GET("services")
   suspend fun getServicesByCategory(
-    @IntRange(from = 1) @Query("category_id") categoryId: Int,
+    @IntRange(from = 1) @Query("category_id") categoryId: Long,
     @IntRange(from = 1) @Query("page") page: Int,
     @IntRange(from = 1) @Query("per_page") perPage: Int,
   ): BaseResponse<ServicesResponse>
+  //endregion
+
+  //region Order
+  @POST("orders")
+  suspend fun createOrder(@Body body: CreateOrderBody): BaseResponse<Any>
+  //endregion
+
+  //region Promotion
+  @GET("promotions")
+  suspend fun getPromotions(
+    @IntRange(from = 1) @Query("page") page: Int,
+    @IntRange(from = 1) @Query("per_page") perPage: Int,
+  ): BaseResponse<PromotionsResponse>
+  //endregion
+
+  //region Card
+  @POST("cards")
+  suspend fun addCard(@Body body: AddCardBody): BaseResponse<CardResponse>
+
+  @GET("cards")
+  suspend fun getCards(): BaseResponse<List<CardResponse>>
+
+  @DELETE("cards/{id}")
+  suspend fun removeCard(@Path("id") id: String): BaseResponse<Any>
   //endregion
 
   companion object Factory {

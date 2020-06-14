@@ -15,7 +15,7 @@ import com.doancnpm.edoctor.utils.inflate
 import com.doancnpm.edoctor.utils.viewBinding
 
 class NotificationsFragment : BaseFragment(R.layout.fragment_notifications) {
-  private val binding by viewBinding { FragmentNotificationsBinding.bind(it) }
+  private val binding by viewBinding<FragmentNotificationsBinding>()
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)

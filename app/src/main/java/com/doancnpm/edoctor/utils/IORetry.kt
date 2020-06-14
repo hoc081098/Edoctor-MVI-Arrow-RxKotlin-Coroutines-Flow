@@ -1,25 +1,31 @@
 package com.doancnpm.edoctor.utils
 
 import kotlinx.coroutines.delay
-import java.io.IOException
+import kotlin.time.Duration
+import kotlin.time.ExperimentalTime
 
-suspend fun <T> retryIO(
+@ExperimentalTime
+suspend fun <T> retrySuspend(
   times: Int,
-  initialDelay: Long,
+  initialDelay: Duration,
   factor: Double,
-  maxDelay: Long = Long.MAX_VALUE,
-  block: suspend () -> T,
+  maxDelay: Duration = Duration.INFINITE,
+  shouldRetry: (Throwable) -> Boolean = { true },
+  block: suspend (times: Int) -> T,
 ): T {
   var currentDelay = initialDelay
   repeat(times - 1) {
     try {
-      return block()
-    } catch (e: IOException) {
+      return block(it)
+    } catch (e: Throwable) {
+      if (!shouldRetry(e)) {
+        throw e
+      }
       // you can log an error here and/or make a more finer-grained
       // analysis of the cause to see if retry is needed
     }
     delay(currentDelay)
-    currentDelay = (currentDelay * factor).toLong().coerceAtMost(maxDelay)
+    currentDelay = (currentDelay * factor).coerceAtMost(maxDelay)
   }
-  return block() // last attempt
+  return block(times - 1) // last attempt
 }

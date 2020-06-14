@@ -19,7 +19,7 @@ import io.reactivex.rxjava3.kotlin.addTo
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class ResendCodeFragment : BaseFragment(R.layout.fragment_resend_code) {
-  private val binding by viewBinding { FragmentResendCodeBinding.bind(it) }
+  private val binding by viewBinding<FragmentResendCodeBinding>()
   private val viewModel by viewModel<ResendCodeVM>()
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

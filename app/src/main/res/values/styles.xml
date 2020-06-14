@@ -27,4 +27,18 @@
         <item name="android:windowBackground">@drawable/splash_background</item>
     </style>
 
+    <!--    AlertDialog-->
+    <style name="AppTheme.AlertDialog" parent="Theme.MaterialComponents.Light.Dialog.Alert">
+        <item name="colorSecondary">@color/colorPrimary</item>
+
+        <item name="android:buttonBarPositiveButtonStyle">@style/Alert.ButtonBar</item>
+        <item name="android:buttonBarNegativeButtonStyle">@style/Alert.ButtonBar</item>
+        <item name="android:buttonBarNeutralButtonStyle">@style/Alert.ButtonBar</item>
+    </style>
+
+    <style name="Alert.ButtonBar" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="android:textColor">@color/colorPrimary</item>
+        <item name="android:backgroundTint">@color/colorOnPrimary</item>
+    </style>
+
 </resources>

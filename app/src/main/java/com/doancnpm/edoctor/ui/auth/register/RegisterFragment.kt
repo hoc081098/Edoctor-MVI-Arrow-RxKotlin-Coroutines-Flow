@@ -21,7 +21,7 @@ import timber.log.Timber
 import java.util.*
 
 class RegisterFragment : BaseFragment(R.layout.fragment_register) {
-  private val binding by viewBinding(FragmentRegisterBinding::bind)
+  private val binding by viewBinding<FragmentRegisterBinding>()
   private val viewModel by viewModel<RegisterVM>()
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -53,8 +53,9 @@ class RegisterFragment : BaseFragment(R.layout.fragment_register) {
           .editText!!
           .clicks()
           .exhaustMap {
+            val date = viewModel.stateLiveData.value?.formData?.birthday
             requireActivity()
-              .pickDateObservable(1998, Calendar.JANUARY, 1)
+              .pickDateObservable(date)
               .toObservable()
           }
           .map { ViewIntent.BirthdayChanged(it) }

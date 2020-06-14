@@ -16,6 +16,7 @@ import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.ofType
 import io.reactivex.rxjava3.kotlin.subscribeBy
+import io.reactivex.rxjava3.kotlin.withLatestFrom
 
 class LoginVM(
   private val interactor: Interactor,
@@ -78,12 +79,12 @@ class LoginVM(
       }
 
     Observable.mergeArray(
-        phoneObservable.map { PartialChange.PhoneError(it.second) },
-        passwordObservable.map { PartialChange.PasswordError(it.second) },
-        phoneObservable.map { PartialChange.PhoneChanged(it.first) },
-        passwordObservable.map { PartialChange.PasswordChanged(it.first) },
-        loginChanges,
-      )
+      phoneObservable.map { PartialChange.PhoneError(it.second) },
+      passwordObservable.map { PartialChange.PasswordError(it.second) },
+      phoneObservable.map { PartialChange.PhoneChanged(it.first) },
+      passwordObservable.map { PartialChange.PasswordChanged(it.first) },
+      loginChanges,
+    )
       .observeOn(schedulers.main)
       .scan(initialState) { state, change -> change.reduce(state) }
       .subscribeBy(onNext = { stateD.value = it })

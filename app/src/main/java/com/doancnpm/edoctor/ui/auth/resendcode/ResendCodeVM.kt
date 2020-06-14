@@ -14,6 +14,7 @@ import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.ofType
 import io.reactivex.rxjava3.kotlin.subscribeBy
+import io.reactivex.rxjava3.kotlin.withLatestFrom
 
 class ResendCodeVM(
   private val interactor: Interactor,
@@ -29,6 +30,7 @@ class ResendCodeVM(
 
   val viewState get() = viewStateDistinctD
   val singleEvent get() = singleEventD
+
   @CheckResult
   fun process(intents: Observable<ViewIntent>) = intents.subscribe(intentS)!!
 

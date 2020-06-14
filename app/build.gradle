@@ -3,8 +3,11 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'androidx.navigation.safeargs'
 apply plugin: 'kotlin-kapt'
+apply plugin: 'com.google.gms.google-services'
 
-androidExtensions { experimental = true }
+androidExtensions {
+    features = ['parcelize']
+}
 
 android {
     compileSdkVersion 29
@@ -25,11 +28,19 @@ android {
             buildConfigField 'String', "BASE_URL", '"http://54.84.195.155/"'
             buildConfigField 'String', "API_URL", '"http://54.84.195.155/api/v1/"'
             buildConfigField 'String', "API_KEY", '"7767d3e09e826fad677592e5f078f09c"'
+            buildConfigField 'String', "PLACE_API_KEY", '"AIzaSyDCrGZXXsyMYRY2Ewmznl0zVMHtpkRWkEc"'
+            buildConfigField 'String', "MAPBOX_ACCESS_TOKEN",'"pk.eyJ1IjoicGV0cnVzdGhhaWhvYyIsImEiOiJjampycW1uY2s4bTRnM3BwMXo0M2Q3OTduIn0.dRqQsp8tc1SictvFyOP7tQ"'
         }
 
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+
+            buildConfigField 'String', "BASE_URL", '"http://54.84.195.155/"'
+            buildConfigField 'String', "API_URL", '"http://54.84.195.155/api/v1/"'
+            buildConfigField 'String', "API_KEY", '"7767d3e09e826fad677592e5f078f09c"'
+            buildConfigField 'String', "PLACE_API_KEY", '"AIzaSyDCrGZXXsyMYRY2Ewmznl0zVMHtpkRWkEc"'
+            buildConfigField 'String', "MAPBOX_ACCESS_TOKEN",'"pk.eyJ1IjoicGV0cnVzdGhhaWhvYyIsImEiOiJjampycW1uY2s4bTRnM3BwMXo0M2Q3OTduIn0.dRqQsp8tc1SictvFyOP7tQ"'
         }
     }
 
@@ -55,8 +66,10 @@ dependencies {
     implementation 'androidx.core:core-ktx:1.3.0'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
     implementation 'androidx.recyclerview:recyclerview:1.2.0-alpha03'
+    implementation 'androidx.viewpager2:viewpager2:1.1.0-alpha01'
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0-rc01'
-    implementation 'com.google.android.material:material:1.2.0-beta01'
+    implementation 'androidx.fragment:fragment-ktx:1.3.0-alpha05'
+    implementation 'com.google.android.material:material:1.3.0-alpha01'
 
     // Nav
     implementation 'androidx.navigation:navigation-fragment:2.3.0-beta01'
@@ -97,6 +110,7 @@ dependencies {
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.6'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.6'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-rx3:1.3.6'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.3.6'
 
     // Koin
     implementation 'org.koin:koin-androidx-viewmodel:2.1.5'
@@ -108,6 +122,7 @@ dependencies {
     implementation 'com.jakewharton.rxbinding4:rxbinding-material:4.0.0'
     implementation 'com.jakewharton.rxbinding4:rxbinding-swiperefreshlayout:4.0.0'
     implementation 'com.jakewharton.rxbinding4:rxbinding-recyclerview:4.0.0'
+    implementation 'com.jakewharton.rxbinding4:rxbinding-viewpager2:4.0.0'
 
     // Glide
     def glide_version = '4.11.0'
@@ -120,4 +135,14 @@ dependencies {
     testImplementation 'junit:junit:4.13'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+
+    implementation 'com.ms-square:expandableTextView:0.1.4'
+
+    // Gms
+    implementation 'com.google.android.gms:play-services-maps:17.0.0'
+    implementation 'com.google.android.gms:play-services-location:17.0.0'
+    implementation 'com.google.android.libraries.places:places:2.3.0'
+
+    // Firebase
+    implementation 'com.google.firebase:firebase-messaging:20.2.0'
 }
