@@ -10,10 +10,7 @@ import com.doancnpm.edoctor.utils.flatMapFirst
 import com.doancnpm.edoctor.utils.setValueNotNull
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.consumeAsFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.*
 import timber.log.Timber
 
 @ExperimentalCoroutinesApi
@@ -21,7 +18,7 @@ class SelectCardVM(
   private val cardRepository: CardRepository,
 ) : BaseVM() {
   private val stateD = MutableLiveData<ViewState>().apply { value = ViewState() }
-  private val fetchChannel = Channel<Unit>(Channel.BUFFERED).apply { offer(Unit) }
+  private val fetchChannel = Channel<Unit>(Channel.BUFFERED)
 
   val viewState get() = stateD.asLiveData()
 
@@ -34,7 +31,19 @@ class SelectCardVM(
   init {
     fetchChannel
       .consumeAsFlow()
-      .flatMapFirst { cardRepository.getCards() }
+      .onStart { emit(Unit) }
+      .flatMapFirst {
+        cardRepository
+          .getCards()
+          .onStart {
+            stateD.setValueNotNull {
+              it.copy(
+                isLoading = true,
+                error = null
+              )
+            }
+          }
+      }
       .onEach { result ->
         result.fold(
           ifLeft = { error ->
