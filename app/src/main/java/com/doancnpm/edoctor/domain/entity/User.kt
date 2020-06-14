@@ -5,9 +5,14 @@ data class User(
   val phone: String,
   val fullName: String,
   val roleId: RoleId,
-  val status: Int,
+  val status: Status,
   val avatar: String?,
   val birthday: String?,
 ) {
   enum class RoleId { CUSTOMER, DOCTOR }
+  enum class Status {
+    INACTIVE,
+    ACTIVE,
+    PENDING
+  }
 }

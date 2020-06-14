@@ -37,6 +37,7 @@ class UserRepositoryImpl(
   private val dispatchers: AppDispatchers,
   private val userLocalSource: UserLocalSource,
   private val firebaseInstanceId: FirebaseInstanceId,
+  private val baseUrl: String,
   appCoroutineScope: CoroutineScope,
 ) : UserRepository {
   private val userObservable: Observable<Either<AppError, Option<User>>> =
@@ -118,7 +119,7 @@ class UserRepositoryImpl(
         ).unwrap()
 
         userLocalSource.saveToken(token)
-        userLocalSource.saveUser(user.toUserLocal())
+        userLocalSource.saveUser(user.toUserLocal(baseUrl))
       }
     }
   }

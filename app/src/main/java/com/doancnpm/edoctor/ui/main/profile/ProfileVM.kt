@@ -2,8 +2,11 @@ package com.doancnpm.edoctor.ui.main.profile
 
 import androidx.annotation.CheckResult
 import androidx.lifecycle.MutableLiveData
+import arrow.core.None
+import arrow.core.getOrElse
 import com.doancnpm.edoctor.core.BaseVM
 import com.doancnpm.edoctor.domain.dispatchers.AppDispatchers
+import com.doancnpm.edoctor.domain.dispatchers.AppSchedulers
 import com.doancnpm.edoctor.domain.repository.UserRepository
 import com.doancnpm.edoctor.ui.main.profile.ProfileContract.SingleEvent
 import com.doancnpm.edoctor.ui.main.profile.ProfileContract.ViewIntent
@@ -16,16 +19,22 @@ import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.ofType
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import kotlinx.coroutines.rx3.rxSingle
-import timber.log.Timber
 
 class ProfileVM(
   private val userRepository: UserRepository,
   private val dispatchers: AppDispatchers,
+  schedulers: AppSchedulers,
 ) : BaseVM() {
   private val intentS = PublishRelay.create<ViewIntent>()
   private val eventD = MutableLiveData<Event<SingleEvent>>()
 
   val eventLiveData get() = eventD.asLiveData()
+  val userObservable = userRepository.userObservable()
+    .map { it.getOrElse { None } }
+    .distinctUntilChanged()
+    .observeOn(schedulers.main)
+    .replay(1)
+    .refCount()!!
 
   @CheckResult
   fun process(intents: Observable<ViewIntent>) = intents.subscribe(intentS)!!

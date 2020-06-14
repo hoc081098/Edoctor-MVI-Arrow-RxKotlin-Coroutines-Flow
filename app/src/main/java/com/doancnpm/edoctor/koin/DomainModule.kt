@@ -31,6 +31,7 @@ val domainModule = module {
       userLocalSource = get(),
       firebaseInstanceId = get(),
       appCoroutineScope = get(),
+      baseUrl = get(BASE_URL_QUALIFIER),
     )
   }
 
