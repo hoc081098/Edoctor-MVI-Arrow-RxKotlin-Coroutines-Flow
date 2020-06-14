@@ -12,6 +12,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.doancnpm.edoctor.R
 import com.doancnpm.edoctor.core.BaseFragment
 import com.doancnpm.edoctor.databinding.FragmentCreateOrderBinding
+import com.doancnpm.edoctor.ui.main.MainActivity
 import com.doancnpm.edoctor.ui.main.home.create_order.inputs.address.InputAddressFragment
 import com.doancnpm.edoctor.ui.main.home.create_order.inputs.confirmation.OrderConfirmationFragment
 import com.doancnpm.edoctor.ui.main.home.create_order.inputs.note.InputNoteFragment
@@ -34,7 +35,7 @@ import timber.log.Timber
 import kotlin.LazyThreadSafetyMode.NONE
 
 @ExperimentalCoroutinesApi
-class CreateOrderFragment : BaseFragment(R.layout.fragment_create_order) {
+class CreateOrderFragment : BaseFragment(R.layout.fragment_create_order), () -> Boolean {
   private val binding by viewBinding<FragmentCreateOrderBinding>()
   private val viewModel by viewModel<CreateOrderVM>() { parametersOf(navArgs.service) }
   private val navArgs by navArgs<CreateOrderFragmentArgs>()
@@ -57,6 +58,11 @@ class CreateOrderFragment : BaseFragment(R.layout.fragment_create_order) {
     setupViews()
   }
 
+  override fun onDestroyView() {
+    super.onDestroyView()
+    (requireActivity() as MainActivity).onSupportNavigateUp = null
+  }
+
   private fun setupBackPressed() {
     requireActivity()
       .onBackPressedDispatcher
@@ -65,19 +71,7 @@ class CreateOrderFragment : BaseFragment(R.layout.fragment_create_order) {
           binding.viewPager.currentItem - 1 in fragments.indices -> {
             binding.viewPager.currentItem--
           }
-          else -> lifecycleScope.launch {
-            if (viewModel.canGoNextObservables.first().awaitFirst() == true) {
-              requireActivity().showAlertDialog {
-                title("Cancel creating new order")
-                message("All information will be not saved")
-                cancelable(false)
-                positiveAction("OK") { _, _ -> findNavController().popBackStack() }
-                negativeAction("Cancel") { _, _ -> }
-              }
-            } else {
-              findNavController().popBackStack()
-            }
-          }
+          else -> showExitAlert()
         }
       }
   }
@@ -85,12 +79,14 @@ class CreateOrderFragment : BaseFragment(R.layout.fragment_create_order) {
   private fun setupViews() {
     val viewPager = binding.viewPager
 
+    val mainActivity = requireActivity() as MainActivity
     // Viewpager
     viewPager.run {
       adapter = CreateOrderViewPagerAdapter(this@CreateOrderFragment, fragments)
       isUserInputEnabled = false
 
       pageSelections()
+        .distinctUntilChanged()
         .doOnNext { Timber.d("setupViews: { index: $it }") }
         .switchMap { index ->
           viewModel
@@ -105,6 +101,9 @@ class CreateOrderFragment : BaseFragment(R.layout.fragment_create_order) {
             nextButton.isEnabled = nextEnabled
             nextButton.text = if (index == fragments.lastIndex) "Finish" else "Next"
           }
+
+          mainActivity.supportActionBar!!.setDisplayHomeAsUpEnabled(index == 0)
+          mainActivity.onSupportNavigateUp = if (index == 0) this@CreateOrderFragment else null
         }
         .addTo(compositeDisposable)
     }
@@ -131,6 +130,27 @@ class CreateOrderFragment : BaseFragment(R.layout.fragment_create_order) {
   @Suppress("DEPRECATION")
   override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
     childFragmentManager.fragments.forEach { it.onActivityResult(requestCode, resultCode, data) }
+  }
+
+  override fun invoke(): Boolean {
+    showExitAlert()
+    return false
+  }
+
+  private fun showExitAlert() {
+    lifecycleScope.launch {
+      if (viewModel.canGoNextObservables.first().awaitFirst() == true) {
+        requireActivity().showAlertDialog {
+          title("Cancel creating new order")
+          message("All information will be not saved")
+          cancelable(false)
+          positiveAction("OK") { _, _ -> findNavController().popBackStack() }
+          negativeAction("Cancel") { _, _ -> }
+        }
+      } else {
+        findNavController().popBackStack()
+      }
+    }
   }
 }
 
