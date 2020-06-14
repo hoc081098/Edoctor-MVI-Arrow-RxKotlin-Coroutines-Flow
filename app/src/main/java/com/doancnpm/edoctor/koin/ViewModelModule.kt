@@ -128,7 +128,8 @@ val viewModelModule = module {
   viewModel {
     ProfileVM(
       userRepository = get(),
-      dispatchers = get()
+      dispatchers = get(),
+      schedulers = get(),
     )
   }
   //endregion

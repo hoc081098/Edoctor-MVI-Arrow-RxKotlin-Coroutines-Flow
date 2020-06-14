@@ -23,22 +23,31 @@ fun User.RoleId.toInt(): Int {
   }
 }
 
-fun Int.toRoleId(): User.RoleId {
+private fun Int.toRoleId(): User.RoleId {
   return when (this) {
     2 -> CUSTOMER
     3 -> DOCTOR
-    else -> error("Cannot convert roleId")
+    else -> error("Cannot convert user roleId: $this")
   }
 }
 
-fun LoginUserResponse.User.toUserLocal(): UserLocal {
+private fun Int.toStatus(): User.Status {
+  return when (this) {
+    0 -> User.Status.INACTIVE
+    1 -> User.Status.ACTIVE
+    2 -> User.Status.PENDING
+    else -> error("Cannot convert user status: $this")
+  }
+}
+
+fun LoginUserResponse.User.toUserLocal(baseUrl: String): UserLocal {
   return UserLocal(
     id = id,
     fullName = fullName,
     phone = phone,
     roleId = roleId,
     status = status,
-    avatar = avatar,
+    avatar = avatar?.let { "$baseUrl$it" },
     birthday = birthday,
   )
 }
@@ -49,7 +58,7 @@ fun UserLocal.toUserDomain(): User {
     fullName = fullName,
     phone = phone,
     roleId = roleId.toRoleId(),
-    status = status,
+    status = status.toStatus(),
     avatar = avatar,
     birthday = birthday,
   )
