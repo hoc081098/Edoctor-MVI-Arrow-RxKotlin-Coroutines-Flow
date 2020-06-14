@@ -1,6 +1,7 @@
 package com.doancnpm.edoctor.data
 
 import android.database.sqlite.SQLiteException
+import com.doancnpm.edoctor.R
 import com.doancnpm.edoctor.data.local.model.UserLocal
 import com.doancnpm.edoctor.data.remote.response.*
 import com.doancnpm.edoctor.domain.entity.*
@@ -89,6 +90,24 @@ fun PromotionsResponse.Promotion.toPromotionDomain(): Promotion {
     endDate = parseDate_yyyyMMdd_HHmmss(endDate)!!,
   )
 }
+
+fun CardResponse.toCardDomain(): Card {
+  return Card(
+    id = id,
+    type = type,
+    country = country,
+    last4 = last4,
+    expiredMonth = expMonth,
+    expiredYear = expYear,
+    cardHolderName = cardHolderName,
+    imageDrawableId = when (type) {
+      "visa" -> R.drawable.visacard
+      "mastercard" -> R.drawable.mastercard
+      else -> error("Not support type: $type")
+    }
+  )
+}
+
 
 //endregion
 

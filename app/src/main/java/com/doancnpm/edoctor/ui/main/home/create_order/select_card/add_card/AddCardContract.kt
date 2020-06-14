@@ -2,7 +2,6 @@ package com.doancnpm.edoctor.ui.main.home.create_order.select_card.add_card
 
 import com.doancnpm.edoctor.domain.dispatchers.AppDispatchers
 import com.doancnpm.edoctor.domain.entity.AppError
-import com.doancnpm.edoctor.domain.entity.Card
 import com.doancnpm.edoctor.domain.repository.CardRepository
 import com.doancnpm.edoctor.ui.main.home.create_order.select_card.add_card.AddCardContract.FormData.Data
 import com.doancnpm.edoctor.ui.main.home.create_order.select_card.add_card.AddCardContract.FormData.Initial
@@ -42,7 +41,7 @@ interface AddCardContract {
       override val expiredMonth: Int?,
       override val expiredYear: Int?,
       override val cvc: Int?
-    ): FormData()
+    ) : FormData()
   }
 
   enum class ValidationError {
@@ -120,13 +119,11 @@ class AddCardInteractor(
 
       cardRepository
         .addCard(
-          Card(
-            holderName = formData.holderName,
-            number = formData.number,
-            expiredMonth = formData.expiredMonth,
-            expiredYear = formData.expiredYear,
-            cvc = formData.cvc,
-          )
+          holderName = formData.holderName,
+          number = formData.number,
+          expiredMonth = formData.expiredMonth,
+          expiredYear = formData.expiredYear,
+          cvc = formData.cvc,
         )
         .fold(
           ifLeft = { PartialChange.Failure(it) },
