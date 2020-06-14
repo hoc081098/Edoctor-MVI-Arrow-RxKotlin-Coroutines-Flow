@@ -90,33 +90,19 @@
             app:argType="com.doancnpm.edoctor.domain.entity.Service"
             app:nullable="false" />
 
-        <action
-            android:id="@+id/action_createOrderFragment_to_selectCardFragment"
-            app:destination="@id/selectCardFragment"
-            app:enterAnim="@anim/slide_in_right"
-            app:exitAnim="@anim/slide_out_left"
-            app:popEnterAnim="@anim/slide_in_left"
-            app:popExitAnim="@anim/slide_out_right" />
-    </fragment>
-
-    <fragment
-        android:id="@+id/selectCardFragment"
-        android:name="com.doancnpm.edoctor.ui.main.home.create_order.select_card.SelectCardFragment"
-        android:label="Select card">
-
-        <action
-            android:id="@+id/action_selectCardFragment_to_addCardFragment"
-            app:destination="@id/addCardFragment"
-            app:enterAnim="@anim/slide_in_right"
-            app:exitAnim="@anim/slide_out_left"
-            app:popEnterAnim="@anim/slide_in_left"
-            app:popExitAnim="@anim/slide_out_right" />
-
     </fragment>
 
     <fragment
         android:id="@+id/addCardFragment"
-        android:name="com.doancnpm.edoctor.ui.main.home.create_order.select_card.add_card.AddCardFragment"
+        android:name="com.doancnpm.edoctor.ui.main.home.create_order.inputs.select_card.add_card.AddCardFragment"
         android:label="Add card" />
+
+    <action
+        android:id="@+id/action_global_addCardFragment"
+        app:destination="@id/addCardFragment"
+        app:enterAnim="@anim/slide_in_right"
+        app:exitAnim="@anim/slide_out_left"
+        app:popEnterAnim="@anim/slide_in_left"
+        app:popExitAnim="@anim/slide_out_right" />
 
 </navigation>

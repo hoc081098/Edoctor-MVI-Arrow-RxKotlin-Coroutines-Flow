@@ -16,6 +16,7 @@ import com.doancnpm.edoctor.ui.main.home.create_order.inputs.address.InputAddres
 import com.doancnpm.edoctor.ui.main.home.create_order.inputs.confirmation.OrderConfirmationFragment
 import com.doancnpm.edoctor.ui.main.home.create_order.inputs.note.InputNoteFragment
 import com.doancnpm.edoctor.ui.main.home.create_order.inputs.promotion.InputPromotionFragment
+import com.doancnpm.edoctor.ui.main.home.create_order.inputs.select_card.SelectCardFragment
 import com.doancnpm.edoctor.ui.main.home.create_order.inputs.time.InputTimeFragment
 import com.doancnpm.edoctor.utils.hideKeyboard
 import com.doancnpm.edoctor.utils.showAlertDialog
@@ -24,6 +25,7 @@ import com.doancnpm.edoctor.utils.viewBinding
 import com.jakewharton.rxbinding4.viewpager2.pageSelections
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx3.awaitFirst
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -31,6 +33,7 @@ import org.koin.core.parameter.parametersOf
 import timber.log.Timber
 import kotlin.LazyThreadSafetyMode.NONE
 
+@ExperimentalCoroutinesApi
 class CreateOrderFragment : BaseFragment(R.layout.fragment_create_order) {
   private val binding by viewBinding<FragmentCreateOrderBinding>()
   private val viewModel by viewModel<CreateOrderVM>() { parametersOf(navArgs.service) }
@@ -42,6 +45,7 @@ class CreateOrderFragment : BaseFragment(R.layout.fragment_create_order) {
       { InputTimeFragment() },
       { InputPromotionFragment() },
       { InputNoteFragment() },
+      { SelectCardFragment() },
       { OrderConfirmationFragment() },
     )
   }
@@ -113,9 +117,7 @@ class CreateOrderFragment : BaseFragment(R.layout.fragment_create_order) {
         binding.nextButton -> if (viewPager.currentItem + 1 in fragments.indices) {
           viewPager.currentItem++
         } else {
-          CreateOrderFragmentDirections
-            .actionCreateOrderFragmentToSelectCardFragment()
-            .let { findNavController().navigate(it) }
+          view?.snack("Finish")
         }
         binding.prevButton -> if (viewPager.currentItem - 1 in fragments.indices) {
           viewPager.currentItem--
