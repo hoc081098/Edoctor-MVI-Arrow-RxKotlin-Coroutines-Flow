@@ -24,6 +24,8 @@ class MainActivity : BaseActivity() {
   private val binding by viewBinding(ActivityMainBinding::inflate)
   private val viewModel by viewModel<MainVM>()
 
+  var onSupportNavigateUp: (() -> Boolean)? = null
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(binding.root)
@@ -81,6 +83,7 @@ class MainActivity : BaseActivity() {
   }
 
   override fun onSupportNavigateUp(): Boolean {
+    onSupportNavigateUp?.invoke()?.let { return it }
     return currentNavController?.value?.navigateUp() ?: false
   }
 
