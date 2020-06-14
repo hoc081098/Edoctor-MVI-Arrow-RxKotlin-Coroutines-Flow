@@ -2,7 +2,6 @@ package com.doancnpm.edoctor.utils
 
 import android.view.View
 import androidx.annotation.StringRes
-import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 
 inline fun View.snack(
@@ -15,7 +14,7 @@ inline fun View.snack(
   message: String,
   length: SnackbarLength = SnackbarLength.SHORT,
   crossinline f: Snackbar.() -> Unit = {},
-) = Snackbar.make(this, message, length.length).apply {
+) = Snackbar.make(this, message, length.rawValue).apply {
   f()
   show()
 }
@@ -35,26 +34,41 @@ fun Snackbar.action(
   color?.let { setActionTextColor(color) }
 }
 
-fun Snackbar.onDismissed(f: () -> Unit) {
-  addCallback(object : BaseTransientBottomBar.BaseCallback<Snackbar?>() {
+fun Snackbar.onDismissed(onDismissed: (SnackbarDismissEvent) -> Unit): Snackbar.Callback {
+  return object : Snackbar.Callback() {
     override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
-      super.onDismissed(transientBottomBar, event)
-      f()
+      onDismissed(SnackbarDismissEvent(event))
       removeCallback(this)
     }
-  })
+  }.also { addCallback(it) }
 }
 
-enum class SnackbarLength {
-  SHORT {
-    override val length = Snackbar.LENGTH_SHORT
-  },
-  LONG {
-    override val length = Snackbar.LENGTH_LONG
-  },
-  INDEFINITE {
-    override val length = Snackbar.LENGTH_INDEFINITE
-  };
+enum class SnackbarDismissEvent(val rawValue: Int) {
+  /** Indicates that the Snackbar was dismissed via a swipe.  */
+  DISMISS_EVENT_SWIPE(Snackbar.Callback.DISMISS_EVENT_SWIPE),
 
-  abstract val length: Int
+  /** Indicates that the Snackbar was dismissed via an action click.  */
+  DISMISS_EVENT_ACTION(Snackbar.Callback.DISMISS_EVENT_ACTION),
+
+  /** Indicates that the Snackbar was dismissed via a timeout.  */
+  DISMISS_EVENT_TIMEOUT(Snackbar.Callback.DISMISS_EVENT_TIMEOUT),
+
+  /** Indicates that the Snackbar was dismissed via a call to [.dismiss].  */
+  DISMISS_EVENT_MANUAL(Snackbar.Callback.DISMISS_EVENT_MANUAL),
+
+  /** Indicates that the Snackbar was dismissed from a new Snackbar being shown.  */
+  DISMISS_EVENT_CONSECUTIVE(Snackbar.Callback.DISMISS_EVENT_CONSECUTIVE);
+
+  companion object Factory {
+    operator fun invoke(rawValue: Int): SnackbarDismissEvent =
+      values().first { it.rawValue == rawValue }
+  }
+}
+
+enum class SnackbarLength(val rawValue: Int) {
+  SHORT(Snackbar.LENGTH_SHORT),
+
+  LONG(Snackbar.LENGTH_LONG),
+
+  INDEFINITE(Snackbar.LENGTH_INDEFINITE);
 }

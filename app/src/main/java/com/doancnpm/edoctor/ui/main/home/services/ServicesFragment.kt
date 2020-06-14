@@ -2,6 +2,7 @@ package com.doancnpm.edoctor.ui.main.home.services
 
 import android.os.Bundle
 import android.view.View
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.MergeAdapter
@@ -19,14 +20,12 @@ import timber.log.Timber
 import kotlin.LazyThreadSafetyMode.NONE
 
 class ServicesFragment : BaseFragment(R.layout.fragment_services) {
-  private val binding: FragmentServicesBinding by viewBinding(
-    {
-      recyclerView.removeOnScrollListener(onScrollListener)
-      recyclerView.adapter = null
-      retryButton.setOnClickListener(null)
-      swipeRefreshLayout.setOnRefreshListener(null)
-    }
-  ) { FragmentServicesBinding.bind(it) }
+  private val binding: FragmentServicesBinding by viewBinding {
+    recyclerView.removeOnScrollListener(onScrollListener)
+    recyclerView.adapter = null
+    retryButton.setOnClickListener(null)
+    swipeRefreshLayout.setOnRefreshListener(null)
+  }
   private val navArgs by navArgs<ServicesFragmentArgs>()
   private val viewModel by viewModel<ServicesVM> { parametersOf(navArgs.category) }
 
@@ -108,11 +107,15 @@ class ServicesFragment : BaseFragment(R.layout.fragment_services) {
 
 
   private fun onClickOrder(service: Service) {
-    view?.snack("Click order: ${service.name}")
+    ServicesFragmentDirections
+      .actionServicesFragmentToCreateOrderFragment(service)
+      .let { findNavController().navigate(it) }
   }
 
   private fun onClickDetail(service: Service) {
-    view?.snack("Click detail: ${service.name}")
+    ServicesFragmentDirections
+      .actionServicesFragmentToServiceDetailFragment(service.name, service)
+      .let { findNavController().navigate(it) }
   }
 
   private fun setupViews() {

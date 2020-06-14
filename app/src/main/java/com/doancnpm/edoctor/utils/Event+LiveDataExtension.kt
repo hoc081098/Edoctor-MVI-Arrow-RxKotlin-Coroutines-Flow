@@ -51,27 +51,35 @@ inline fun <T : Any> LiveData<Event<T>>.observeEvent(
 }.also { observe(owner, it) }
 
 fun <T : Any> LiveData<T>.toObservable(fallbackNullValue: (() -> T)? = null): Observable<T> {
-  return Observable.create { emitter: ObservableEmitter<T> ->
-    verifyMainThread()
+  return Observable
+    .create { emitter: ObservableEmitter<T> ->
+      verifyMainThread()
 
-    val observer = Observer<T> { value: T? ->
-      if (!emitter.isDisposed) {
-        val notnullValue = value ?: fallbackNullValue?.invoke() ?: return@Observer
-        emitter.onNext(notnullValue)
+      val observer = Observer<T> { value: T? ->
+        if (!emitter.isDisposed) {
+          val notnullValue = value ?: fallbackNullValue?.invoke() ?: return@Observer
+          emitter.onNext(notnullValue)
+        }
       }
+      observeForever(observer)
+
+      emitter.setDisposable(object : MainThreadDisposable() {
+        override fun onDispose() {
+          removeObserver(observer)
+        }
+      })
     }
-    observeForever(observer)
-
-    emitter.setDisposable(object : MainThreadDisposable() {
-      override fun onDispose() {
-        removeObserver(observer)
+    .startWith(
+      Observable.defer {
+        (value ?: fallbackNullValue?.invoke())
+          ?.let { Observable.just(it) }
+          ?: Observable.empty()
       }
-    })
-  }
+    )
 }
 
 @Suppress("NOTHING_TO_INLINE")
-inline fun <T : Any> MutableLiveData<T>.asLiveData(): LiveData<T> = this
+inline fun <T> MutableLiveData<T>.asLiveData(): LiveData<T> = this
 
 /**
  * Set value if result from [mutation] invoking is different from current value

@@ -5,7 +5,7 @@ import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 data class UserLocal(
-  @Json(name = "id") val id: Int,
+  @Json(name = "id") val id: Long,
   @Json(name = "full_name") val fullName: String,
   @Json(name = "phone") val phone: String,
   @Json(name = "role_id") val roleId: Int,

@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardCornerRadius="4dp"
+    app:cardElevation="4dp"
+    app:cardPreventCornerOverlap="true"
+    app:cardUseCompatPadding="true"
+    app:contentPadding="0dp"
+    tools:layout_width="200dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/background_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/gradient1">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintDimensionRatio="w,1.1:1"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/text_name"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:ellipsize="end"
+                android:fontFamily="@font/google_sans"
+                android:maxLines="2"
+                android:textAlignment="viewStart"
+                android:textColor="@color/colorOnPrimary"
+                android:textSize="15sp"
+                app:layout_constraintEnd_toStartOf="@+id/image_checked"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="TextView" />
+
+
+            <TextView
+                android:id="@+id/text_start_date"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:fontFamily="@font/google_sans"
+                android:maxLines="1"
+                android:textAlignment="center"
+                android:textColor="@color/colorOnPrimary"
+                android:textSize="10sp"
+                app:layout_constraintBottom_toTopOf="@+id/text_end_date"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                tools:text="TextView" />
+
+            <TextView
+                android:id="@+id/text_end_date"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:fontFamily="@font/google_sans"
+                android:maxLines="1"
+                android:textAlignment="center"
+                android:textColor="@color/colorOnPrimary"
+                android:textSize="10sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                tools:text="TextView" />
+
+            <TextView
+                android:id="@+id/text_discount"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginStart="0dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="0dp"
+                android:fontFamily="@font/nunito_sans_semibold"
+                android:gravity="center"
+                android:maxLines="1"
+                android:textColor="@color/colorOnPrimary"
+                android:textSize="32sp"
+                app:layout_constraintBottom_toTopOf="@+id/text_start_date"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/text_name"
+                tools:text="20% OFF" />
+
+            <ImageView
+                android:id="@+id/image_checked"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/ic_baseline_check_circle_24" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>

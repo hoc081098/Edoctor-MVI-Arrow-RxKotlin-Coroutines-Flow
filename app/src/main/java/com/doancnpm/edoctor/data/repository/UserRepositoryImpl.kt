@@ -17,11 +17,14 @@ import com.doancnpm.edoctor.domain.entity.DomainResult
 import com.doancnpm.edoctor.domain.entity.User
 import com.doancnpm.edoctor.domain.entity.rightResult
 import com.doancnpm.edoctor.domain.repository.UserRepository
+import com.doancnpm.edoctor.utils.UTCTimeZone
 import com.doancnpm.edoctor.utils.catchError
 import com.doancnpm.edoctor.utils.toString_yyyyMMdd
+import com.google.firebase.iid.FirebaseInstanceId
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.kotlin.Observables
 import kotlinx.coroutines.*
+import kotlinx.coroutines.tasks.await
 import retrofit2.HttpException
 import timber.log.Timber
 import java.net.HttpURLConnection.HTTP_FORBIDDEN
@@ -33,6 +36,7 @@ class UserRepositoryImpl(
   private val errorMapper: ErrorMapper,
   private val dispatchers: AppDispatchers,
   private val userLocalSource: UserLocalSource,
+  private val firebaseInstanceId: FirebaseInstanceId,
   appCoroutineScope: CoroutineScope,
 ) : UserRepository {
   private val userObservable: Observable<Either<AppError, Option<User>>> =
@@ -102,11 +106,14 @@ class UserRepositoryImpl(
   override suspend fun login(phone: String, password: String): DomainResult<Unit> {
     return Either.catch(errorMapper::map) {
       withContext(dispatchers.io) {
+        val deviceToken = firebaseInstanceId.instanceId.await().token
+        Timber.d("Device token: $deviceToken")
+
         val (token, user) = apiService.loginUser(
           LoginUserBody(
             phone = phone,
             password = password,
-            deviceToken = "1234a" // TODO: Get device token
+            deviceToken = deviceToken,
           )
         ).unwrap()
 
@@ -132,7 +139,7 @@ class UserRepositoryImpl(
               password = password,
               roleId = roleId.toInt(),
               fullName = fullName,
-              birthday = birthday?.toString_yyyyMMdd(),
+              birthday = birthday?.toString_yyyyMMdd(UTCTimeZone),
             )
           )
           .unwrap()

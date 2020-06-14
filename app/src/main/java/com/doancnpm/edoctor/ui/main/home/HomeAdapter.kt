@@ -122,7 +122,7 @@ class HomeAdapter(
       binding.textName.text = category.name
       glide
         .load(category.image)
-        .placeholder(R.drawable.splash_background)
+        .placeholder(R.drawable.logo)
         .thumbnail(0.5f)
         .centerCrop()
         .transition(DrawableTransitionOptions.withCrossFade())

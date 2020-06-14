@@ -1,18 +1,19 @@
 package com.doancnpm.edoctor.data
 
 import android.database.sqlite.SQLiteException
+import com.doancnpm.edoctor.R
 import com.doancnpm.edoctor.data.local.model.UserLocal
-import com.doancnpm.edoctor.data.remote.response.CategoriesResponse
-import com.doancnpm.edoctor.data.remote.response.ErrorResponseJsonAdapter
-import com.doancnpm.edoctor.data.remote.response.LoginUserResponse
-import com.doancnpm.edoctor.data.remote.response.ServicesResponse
+import com.doancnpm.edoctor.data.remote.response.*
 import com.doancnpm.edoctor.domain.entity.*
 import com.doancnpm.edoctor.domain.entity.User.RoleId.CUSTOMER
 import com.doancnpm.edoctor.domain.entity.User.RoleId.DOCTOR
+import com.doancnpm.edoctor.utils.parseDate_yyyyMMdd_HHmmss
 import retrofit2.HttpException
 import java.io.IOException
+import java.net.SocketException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
+import android.location.Location as AndroidLocation
 
 //region Mappers
 fun User.RoleId.toInt(): Int {
@@ -73,6 +74,41 @@ fun ServicesResponse.Service.toServiceDomain(baseUrl: String): Service {
   )
 }
 
+fun AndroidLocation.toLocationDomain(): Location {
+  return Location(
+    latitude = latitude,
+    longitude = longitude,
+  )
+}
+
+fun PromotionsResponse.Promotion.toPromotionDomain(): Promotion {
+  return Promotion(
+    id = id,
+    name = name,
+    discount = discount,
+    startDate = parseDate_yyyyMMdd_HHmmss(startDate)!!,
+    endDate = parseDate_yyyyMMdd_HHmmss(endDate)!!,
+  )
+}
+
+fun CardResponse.toCardDomain(): Card {
+  return Card(
+    id = id,
+    type = type,
+    country = country,
+    last4 = last4,
+    expiredMonth = expMonth,
+    expiredYear = expYear,
+    cardHolderName = cardHolderName,
+    imageDrawableId = when (type) {
+      "visa" -> R.drawable.visacard
+      "mastercard" -> R.drawable.mastercard
+      else -> error("Not support type: $type")
+    }
+  )
+}
+
+
 //endregion
 
 class ErrorMapper(private val errorResponseJsonAdapter: ErrorResponseJsonAdapter) {
@@ -89,6 +125,7 @@ class ErrorMapper(private val errorResponseJsonAdapter: ErrorResponseJsonAdapter
         when (throwable) {
           is UnknownHostException -> AppError.Remote.NetworkError(throwable)
           is SocketTimeoutException -> AppError.Remote.NetworkError(throwable)
+          is SocketException -> AppError.Remote.NetworkError(throwable)
           else -> AppError.UnexpectedError(
             cause = throwable,
             errorMessage = "Unknown IOException: $throwable"

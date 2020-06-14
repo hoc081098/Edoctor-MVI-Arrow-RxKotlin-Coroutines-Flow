@@ -1,6 +1,7 @@
 package com.doancnpm.edoctor.koin
 
 import com.doancnpm.edoctor.domain.entity.Category
+import com.doancnpm.edoctor.domain.entity.Service
 import com.doancnpm.edoctor.ui.auth.login.LoginContract
 import com.doancnpm.edoctor.ui.auth.login.LoginInteractor
 import com.doancnpm.edoctor.ui.auth.login.LoginVM
@@ -15,6 +16,10 @@ import com.doancnpm.edoctor.ui.auth.verify.VerifyInteractor
 import com.doancnpm.edoctor.ui.auth.verify.VerifyVM
 import com.doancnpm.edoctor.ui.main.MainVM
 import com.doancnpm.edoctor.ui.main.home.HomeVM
+import com.doancnpm.edoctor.ui.main.home.create_order.CreateOrderVM
+import com.doancnpm.edoctor.ui.main.home.create_order.inputs.select_card.add_card.AddCardContract
+import com.doancnpm.edoctor.ui.main.home.create_order.inputs.select_card.add_card.AddCardInteractor
+import com.doancnpm.edoctor.ui.main.home.create_order.inputs.select_card.add_card.AddCardVM
 import com.doancnpm.edoctor.ui.main.home.services.ServicesVM
 import com.doancnpm.edoctor.ui.main.profile.ProfileVM
 import com.doancnpm.edoctor.ui.splash.SplashVM
@@ -28,28 +33,103 @@ val viewModelModule = module {
   viewModel { SplashVM(get()) }
 
   //region Auth
-  factory<LoginContract.Interactor> { LoginInteractor(get(), get()) }
-  viewModel { LoginVM(get(), get()) }
+  factory<LoginContract.Interactor> {
+    LoginInteractor(
+      dispatchers = get(),
+      userRepository = get()
+    )
+  }
+  viewModel {
+    LoginVM(
+      interactor = get(),
+      schedulers = get()
+    )
+  }
 
-  factory<RegisterContract.Interactor> { RegisterInteractor(get(), get()) }
-  viewModel { RegisterVM(get(), get()) }
+  factory<RegisterContract.Interactor> {
+    RegisterInteractor(
+      dispatchers = get(),
+      userRepository = get()
+    )
+  }
+  viewModel {
+    RegisterVM(
+      interactor = get(),
+      schedulers = get()
+    )
+  }
 
-  factory<ResendCodeContract.Interactor> { ResendCodeInteractor(get(), get()) }
-  viewModel { ResendCodeVM(get(), get()) }
+  factory<ResendCodeContract.Interactor> {
+    ResendCodeInteractor(
+      dispatchers = get(),
+      userRepository = get()
+    )
+  }
+  viewModel {
+    ResendCodeVM(
+      interactor = get(),
+      schedulers = get()
+    )
+  }
 
-  factory<VerifyContract.Interactor> { VerifyInteractor(get(), get()) }
-  viewModel { (phone: String) -> VerifyVM(phone, get(), get()) }
+  factory<VerifyContract.Interactor> {
+    VerifyInteractor(
+      dispatchers = get(),
+      userRepository = get()
+    )
+  }
+  viewModel { (phone: String) ->
+    VerifyVM(
+      phone = phone,
+      interactor = get(),
+      schedulers = get()
+    )
+  }
   //endregion
 
   //region Main
-  viewModel { MainVM(get()) }
+  viewModel { MainVM(userRepository = get()) }
 
-  viewModel { HomeVM(get()) }
+  viewModel { HomeVM(categoryRepository = get()) }
 
-  viewModel { (category: Category) -> ServicesVM(get(), category) }
+  viewModel { (category: Category) ->
+    ServicesVM(
+      serviceRepository = get(),
+      category = category
+    )
+  }
+
+  viewModel { (service: Service) ->
+    CreateOrderVM(
+      service = service,
+      locationRepository = get(),
+      promotionRepository = get(),
+      cardRepository = get(),
+      orderRepository = get(),
+    )
+  }
+
+  factory<AddCardContract.Interactor> {
+    AddCardInteractor(
+      cardRepository = get(),
+      dispatchers = get(),
+    )
+  }
+
+  viewModel {
+    AddCardVM(
+      interactor = get(),
+      schedulers = get(),
+    )
+  }
   //endregion
 
   //region Profile
-  viewModel { ProfileVM(get(), get()) }
+  viewModel {
+    ProfileVM(
+      userRepository = get(),
+      dispatchers = get()
+    )
+  }
   //endregion
 }
