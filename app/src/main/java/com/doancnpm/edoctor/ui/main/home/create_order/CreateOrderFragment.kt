@@ -12,6 +12,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.doancnpm.edoctor.R
 import com.doancnpm.edoctor.core.BaseFragment
 import com.doancnpm.edoctor.databinding.FragmentCreateOrderBinding
+import com.doancnpm.edoctor.domain.entity.getMessage
 import com.doancnpm.edoctor.ui.main.MainActivity
 import com.doancnpm.edoctor.ui.main.home.create_order.inputs.address.InputAddressFragment
 import com.doancnpm.edoctor.ui.main.home.create_order.inputs.confirmation.OrderConfirmationFragment
@@ -19,10 +20,7 @@ import com.doancnpm.edoctor.ui.main.home.create_order.inputs.note.InputNoteFragm
 import com.doancnpm.edoctor.ui.main.home.create_order.inputs.promotion.InputPromotionFragment
 import com.doancnpm.edoctor.ui.main.home.create_order.inputs.select_card.SelectCardFragment
 import com.doancnpm.edoctor.ui.main.home.create_order.inputs.time.InputTimeFragment
-import com.doancnpm.edoctor.utils.hideKeyboard
-import com.doancnpm.edoctor.utils.showAlertDialog
-import com.doancnpm.edoctor.utils.snack
-import com.doancnpm.edoctor.utils.viewBinding
+import com.doancnpm.edoctor.utils.*
 import com.jakewharton.rxbinding4.viewpager2.pageSelections
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
@@ -56,6 +54,33 @@ class CreateOrderFragment : BaseFragment(R.layout.fragment_create_order), () -> 
 
     setupBackPressed()
     setupViews()
+    bindVM()
+  }
+
+  private fun bindVM() {
+    viewModel.singleEventObservable
+      .subscribeBy { event ->
+        when (event) {
+          is CreateOrderContract.SingleEvent.Error -> {
+            context?.toast("Submit failure: ${event.appError.getMessage()}")
+          }
+          CreateOrderContract.SingleEvent.MissingRequiredInput -> {
+            context?.toast("Missing required input. Please fill before submitting!")
+          }
+          CreateOrderContract.SingleEvent.Success -> {
+            context?.toast("Submit successfully")
+            findNavController().popBackStack(R.id.servicesFragment, false)
+          }
+        }
+      }
+      .addTo(compositeDisposable)
+    viewModel.isSubmittingLiveData.observe(owner = viewLifecycleOwner) {
+      if (it) {
+        binding.progressBar.show()
+      } else {
+        binding.progressBar.hide()
+      }
+    }
   }
 
   override fun onDestroyView() {
@@ -116,7 +141,13 @@ class CreateOrderFragment : BaseFragment(R.layout.fragment_create_order), () -> 
         binding.nextButton -> if (viewPager.currentItem + 1 in fragments.indices) {
           viewPager.currentItem++
         } else {
-          view?.snack("Finish")
+          requireActivity().showAlertDialog {
+            title("Submit order")
+            message("Are you sure you want to submit this order?")
+            cancelable(true)
+            positiveAction("OK") { _, _ -> viewModel.submit() }
+            negativeAction("Cancel") { _, _ -> }
+          }
         }
         binding.prevButton -> if (viewPager.currentItem - 1 in fragments.indices) {
           viewPager.currentItem--

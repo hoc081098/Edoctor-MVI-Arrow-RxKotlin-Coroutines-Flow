@@ -105,6 +105,7 @@ val viewModelModule = module {
       locationRepository = get(),
       promotionRepository = get(),
       cardRepository = get(),
+      orderRepository = get(),
     )
   }
 

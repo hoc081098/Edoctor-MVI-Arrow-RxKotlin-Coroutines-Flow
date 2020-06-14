@@ -6,10 +6,13 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import com.doancnpm.edoctor.core.BaseVM
+import com.doancnpm.edoctor.domain.entity.AppError
 import com.doancnpm.edoctor.domain.entity.Card
+import com.doancnpm.edoctor.domain.entity.Promotion
 import com.doancnpm.edoctor.domain.entity.Service
 import com.doancnpm.edoctor.domain.repository.CardRepository
 import com.doancnpm.edoctor.domain.repository.LocationRepository
+import com.doancnpm.edoctor.domain.repository.OrderRepository
 import com.doancnpm.edoctor.domain.repository.PromotionRepository
 import com.doancnpm.edoctor.ui.main.home.create_order.CreateOrderContract.*
 import com.doancnpm.edoctor.utils.*
@@ -31,6 +34,7 @@ class CreateOrderVM(
   val service: Service,
   private val locationRepository: LocationRepository,
   private val cardRepository: CardRepository,
+  private val orderRepository: OrderRepository,
   promotionRepository: PromotionRepository,
 ) : BaseVM() {
   private val inputPromotionVM by lazy(NONE) {
@@ -48,6 +52,7 @@ class CreateOrderVM(
   }
 
   private val singleEventS = PublishRelay.create<SingleEvent>()
+  private val isSubmittingD = MutableLiveData<Boolean>().apply { value = false }
 
   private val locationD = MutableLiveData<Location>()
   private val timesD = MutableLiveData<Times>().apply { value = Times() }
@@ -82,8 +87,10 @@ class CreateOrderVM(
   val timesLiveData get() = timesD.asLiveData()
   val noteLiveData get() = noteD.asLiveData()
   val promotionItemLiveData get() = inputPromotionVM.selectedItem
-  val cardLiveData get() = selectCardVM.selected
+  private val cardLiveData get() = selectCardVM.selected
+
   val singleEventObservable get() = singleEventS.asObservable()
+  val isSubmittingLiveData get() = isSubmittingD.asLiveData()
 
   init {
     canGoNextObservables.forEachIndexed { index, observable ->
@@ -100,7 +107,15 @@ class CreateOrderVM(
       locationRepository
         .getCurrentLocation()
         .fold(
-          ifLeft = { singleEventS.accept(SingleEvent.Error(it)) },
+          ifLeft = {
+            singleEventS.accept(
+              if (it is AppError.LocationError) {
+                SingleEvent.AddressError(it)
+              } else {
+                SingleEvent.Error(it)
+              }
+            )
+          },
           ifRight = {
             locationD.value = Location(
               lat = it.latitude,
@@ -181,6 +196,50 @@ class CreateOrderVM(
 
   fun select(item: SelectCardContract.CardItem) = selectCardVM.select(item)
   //endregion
+
+  fun submit() {
+    if (isSubmittingD.value!!) return
+    isSubmittingD.value = true
+
+    viewModelScope.launch {
+      val location: com.doancnpm.edoctor.domain.entity.Location
+      val note: String?
+      val promotion: Promotion?
+      val card: Card
+      val startTime: Date
+      val endTime: Date
+
+      try {
+        location = locationLiveData.value!!.toDomain()
+        note = noteLiveData.value
+        promotion = promotionItemLiveData.value?.promotion
+        card = cardLiveData.value!!
+        startTime = timesLiveData.value!!.startTime!!
+        endTime = timesLiveData.value!!.endTime!!
+      } catch (e: KotlinNullPointerException) {
+        singleEventS.accept(SingleEvent.MissingRequiredInput)
+        isSubmittingD.value = false
+        return@launch
+      }
+
+      orderRepository
+        .createOrder(
+          service = service,
+          location = location,
+          note = note,
+          promotion = promotion,
+          card = card,
+          startTime = startTime,
+          endTime = endTime,
+        )
+        .also { isSubmittingD.value = false }
+        .fold(
+          ifLeft = { SingleEvent.Error(it) },
+          ifRight = { SingleEvent.Success }
+        )
+        .let { singleEventS.accept(it) }
+    }
+  }
 }
 
 private class InputPromotionVM(

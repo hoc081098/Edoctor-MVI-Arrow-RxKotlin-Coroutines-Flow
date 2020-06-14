@@ -16,7 +16,7 @@ import androidx.lifecycle.lifecycleScope
 import com.doancnpm.edoctor.R
 import com.doancnpm.edoctor.core.BaseFragment
 import com.doancnpm.edoctor.databinding.FragmentInputAddressBinding
-import com.doancnpm.edoctor.domain.entity.AppError
+import com.doancnpm.edoctor.domain.entity.AppError.LocationError.LocationSettingsDisabled
 import com.doancnpm.edoctor.domain.entity.getMessage
 import com.doancnpm.edoctor.ui.main.home.create_order.CreateOrderContract
 import com.doancnpm.edoctor.ui.main.home.create_order.CreateOrderContract.Location
@@ -38,6 +38,7 @@ import com.google.android.libraries.places.widget.AutocompleteSupportFragment
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import org.koin.androidx.viewmodel.ext.android.getViewModel
@@ -45,6 +46,7 @@ import timber.log.Timber
 import kotlin.LazyThreadSafetyMode.NONE
 import kotlin.coroutines.resume
 
+@ExperimentalCoroutinesApi
 class InputAddressFragment : BaseFragment(R.layout.fragment_input_address) {
   private val binding by viewBinding<FragmentInputAddressBinding>()
   private val viewModel by lazy(NONE) { requireParentFragment().getViewModel<CreateOrderVM>() }
@@ -71,14 +73,11 @@ class InputAddressFragment : BaseFragment(R.layout.fragment_input_address) {
       moveCameraToLocation(it)
     }
     viewModel.singleEventObservable.subscribeBy { event ->
-      if (event is CreateOrderContract.SingleEvent.Error) {
-        val error = event.appError
+      if (event is CreateOrderContract.SingleEvent.AddressError) {
+        val error = event.locationError
         view?.snack(error.getMessage())
 
-        if (error is AppError.LocationError.LocationSettingsDisabled
-          && error.throwable is ResolvableApiException
-        ) {
-          error.throwable
+        if (error is LocationSettingsDisabled && error.throwable is ResolvableApiException) {
           error.throwable.startResolutionForResult(
             requireActivity(),
             REQUEST_CHECK_SETTINGS

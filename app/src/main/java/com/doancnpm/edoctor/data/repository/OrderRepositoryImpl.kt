@@ -4,15 +4,12 @@ import arrow.core.Either
 import com.doancnpm.edoctor.data.ErrorMapper
 import com.doancnpm.edoctor.data.remote.ApiService
 import com.doancnpm.edoctor.data.remote.body.CreateOrderBody
-import com.doancnpm.edoctor.domain.entity.DomainResult
-import com.doancnpm.edoctor.domain.entity.Location
-import com.doancnpm.edoctor.domain.entity.Promotion
-import com.doancnpm.edoctor.domain.entity.Service
+import com.doancnpm.edoctor.domain.entity.*
 import com.doancnpm.edoctor.domain.repository.OrderRepository
 import com.doancnpm.edoctor.utils.UTCTimeZone
 import com.doancnpm.edoctor.utils.toString_yyyyMMdd_HHmmss
 import timber.log.Timber
-import java.util.*
+import java.util.Date
 
 class OrderRepositoryImpl(
   private val apiService: ApiService,
@@ -23,7 +20,7 @@ class OrderRepositoryImpl(
     location: Location,
     note: String?,
     promotion: Promotion?,
-    payCardId: String,
+    card: Card,
     startTime: Date,
     endTime: Date
   ): DomainResult<Unit> {
@@ -42,7 +39,7 @@ class OrderRepositoryImpl(
             lng = location.longitude,
             note = note,
             originalPrice = originalPrice,
-            payCardId = payCardId,
+            payCardId = card.id,
             promotionId = promotion?.id,
             serviceId = service.id,
             startTime = startTime.toString_yyyyMMdd_HHmmss(UTCTimeZone),
