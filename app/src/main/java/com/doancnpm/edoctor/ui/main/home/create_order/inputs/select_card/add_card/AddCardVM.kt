@@ -1,10 +1,10 @@
-package com.doancnpm.edoctor.ui.main.home.create_order.select_card.add_card
+package com.doancnpm.edoctor.ui.main.home.create_order.inputs.select_card.add_card
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.distinctUntilChanged
 import com.doancnpm.edoctor.core.BaseVM
 import com.doancnpm.edoctor.domain.dispatchers.AppSchedulers
-import com.doancnpm.edoctor.ui.main.home.create_order.select_card.add_card.AddCardContract.*
+import com.doancnpm.edoctor.ui.main.home.create_order.inputs.select_card.add_card.AddCardContract.*
 import com.doancnpm.edoctor.utils.Event
 import com.doancnpm.edoctor.utils.asLiveData
 import com.doancnpm.edoctor.utils.exhaustMap

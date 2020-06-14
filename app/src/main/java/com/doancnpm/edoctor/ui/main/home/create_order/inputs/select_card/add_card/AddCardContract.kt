@@ -1,12 +1,12 @@
-package com.doancnpm.edoctor.ui.main.home.create_order.select_card.add_card
+package com.doancnpm.edoctor.ui.main.home.create_order.inputs.select_card.add_card
 
 import com.doancnpm.edoctor.domain.dispatchers.AppDispatchers
 import com.doancnpm.edoctor.domain.entity.AppError
 import com.doancnpm.edoctor.domain.repository.CardRepository
-import com.doancnpm.edoctor.ui.main.home.create_order.select_card.add_card.AddCardContract.FormData.Data
-import com.doancnpm.edoctor.ui.main.home.create_order.select_card.add_card.AddCardContract.FormData.Initial
-import com.doancnpm.edoctor.ui.main.home.create_order.select_card.add_card.AddCardContract.Interactor
-import com.doancnpm.edoctor.ui.main.home.create_order.select_card.add_card.AddCardContract.PartialChange
+import com.doancnpm.edoctor.ui.main.home.create_order.inputs.select_card.add_card.AddCardContract.FormData.Data
+import com.doancnpm.edoctor.ui.main.home.create_order.inputs.select_card.add_card.AddCardContract.FormData.Initial
+import com.doancnpm.edoctor.ui.main.home.create_order.inputs.select_card.add_card.AddCardContract.Interactor
+import com.doancnpm.edoctor.ui.main.home.create_order.inputs.select_card.add_card.AddCardContract.PartialChange
 import io.reactivex.rxjava3.core.Observable
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.rx3.rxObservable

@@ -66,7 +66,7 @@ class InputPromotionFragment : BaseFragment(R.layout.fragment_input_promotion) {
         }
       }
     }
-    binding.retryButton.setOnClickListener { viewModel.retry() }
+    binding.retryButton.setOnClickListener { viewModel.retryGetPromotion() }
   }
 
   private fun onSelectItem(item: PromotionItem) = viewModel.select(item)

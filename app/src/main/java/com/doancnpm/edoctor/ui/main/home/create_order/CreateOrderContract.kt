@@ -1,8 +1,9 @@
 package com.doancnpm.edoctor.ui.main.home.create_order
 
 import com.doancnpm.edoctor.domain.entity.AppError
+import com.doancnpm.edoctor.domain.entity.Card
 import com.doancnpm.edoctor.domain.entity.Promotion
-import java.util.*
+import java.util.Date
 
 interface CreateOrderContract {
   data class Location(val lat: Double, val lng: Double)
@@ -22,6 +23,19 @@ interface CreateOrderContract {
     data class PromotionItem(
       val promotion: Promotion,
       val isSelected: Boolean
+    )
+  }
+
+  interface SelectCardContract {
+    data class ViewState(
+      val items: List<CardItem> = emptyList(),
+      val isLoading: Boolean = true,
+      val error: AppError? = null,
+    )
+
+    data class CardItem(
+      val card: Card,
+      val isSelected: Boolean,
     )
   }
 

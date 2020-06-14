@@ -1,4 +1,4 @@
-package com.doancnpm.edoctor.ui.main.home.create_order.select_card.add_card
+package com.doancnpm.edoctor.ui.main.home.create_order.inputs.select_card.add_card
 
 import android.os.Bundle
 import android.view.View
@@ -7,7 +7,7 @@ import com.doancnpm.edoctor.R
 import com.doancnpm.edoctor.core.BaseFragment
 import com.doancnpm.edoctor.databinding.FragmentAddCardBinding
 import com.doancnpm.edoctor.domain.entity.getMessage
-import com.doancnpm.edoctor.ui.main.home.create_order.select_card.add_card.AddCardContract.*
+import com.doancnpm.edoctor.ui.main.home.create_order.inputs.select_card.add_card.AddCardContract.*
 import com.doancnpm.edoctor.utils.*
 import com.jakewharton.rxbinding4.view.clicks
 import com.jakewharton.rxbinding4.widget.textChanges

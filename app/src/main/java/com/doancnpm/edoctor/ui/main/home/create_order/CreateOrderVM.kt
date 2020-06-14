@@ -6,35 +6,44 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import com.doancnpm.edoctor.core.BaseVM
+import com.doancnpm.edoctor.domain.entity.Card
 import com.doancnpm.edoctor.domain.entity.Service
+import com.doancnpm.edoctor.domain.repository.CardRepository
 import com.doancnpm.edoctor.domain.repository.LocationRepository
 import com.doancnpm.edoctor.domain.repository.PromotionRepository
 import com.doancnpm.edoctor.ui.main.home.create_order.CreateOrderContract.*
-import com.doancnpm.edoctor.ui.main.home.create_order.CreateOrderContract.InputPromotionContract.PromotionItem
-import com.doancnpm.edoctor.ui.main.home.create_order.CreateOrderContract.InputPromotionContract.ViewState
-import com.doancnpm.edoctor.utils.asLiveData
-import com.doancnpm.edoctor.utils.asObservable
-import com.doancnpm.edoctor.utils.setValueNotNull
-import com.doancnpm.edoctor.utils.toObservable
+import com.doancnpm.edoctor.utils.*
 import com.jakewharton.rxrelay3.PublishRelay
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.util.*
+import java.util.Date
 import kotlin.LazyThreadSafetyMode.NONE
 
+@ExperimentalCoroutinesApi
 class CreateOrderVM(
   val service: Service,
   private val locationRepository: LocationRepository,
+  private val cardRepository: CardRepository,
   promotionRepository: PromotionRepository,
 ) : BaseVM() {
   private val inputPromotionVM by lazy(NONE) {
     InputPromotionVM(
       promotionRepository = promotionRepository,
       viewModelScope = viewModelScope
+    )
+  }
+
+  private val selectCardVM by lazy(NONE) {
+    SelectCardVM(
+      cardRepository = cardRepository,
+      viewModelScope = viewModelScope,
     )
   }
 
@@ -57,6 +66,15 @@ class CreateOrderVM(
       .refCount(),
     Observable.just(true), // promotion (optional)
     Observable.just(true), // note (optional),
+    Observable
+      .defer {
+        selectCardVM
+          .selected
+          .map { it !== null }
+          .toObservable { false }
+      }
+      .replay(1)
+      .refCount(), // card (required),
     Observable.just(true), // confirmation
   )
 
@@ -64,6 +82,7 @@ class CreateOrderVM(
   val timesLiveData get() = timesD.asLiveData()
   val noteLiveData get() = noteD.asLiveData()
   val promotionItemLiveData get() = inputPromotionVM.selectedItem
+  val cardLiveData get() = selectCardVM.selected
   val singleEventObservable get() = singleEventS.asObservable()
 
   init {
@@ -144,27 +163,36 @@ class CreateOrderVM(
   //region Promotion
   val promotionViewState get() = inputPromotionVM.viewState
 
-  fun retry() = inputPromotionVM.retry()
+  fun retryGetPromotion() = inputPromotionVM.retry()
 
-  fun select(item: PromotionItem) = inputPromotionVM.select(item)
+  fun select(item: InputPromotionContract.PromotionItem) = inputPromotionVM.select(item)
   //endregion
 
   fun setNote(note: String?) {
     Timber.d("Set note=$note")
     noteD.value = note
   }
+
+  //region Cards
+  val selectCardViewState
+    get() = selectCardVM.viewState
+
+  fun retryGetCards() = selectCardVM.retry()
+
+  fun select(item: SelectCardContract.CardItem) = selectCardVM.select(item)
+  //endregion
 }
 
 private class InputPromotionVM(
   private val promotionRepository: PromotionRepository,
   private val viewModelScope: CoroutineScope
 ) {
-  private val selectedItemD = MutableLiveData<PromotionItem?>().apply { value = null }
+  private val selectedItemD = MutableLiveData<InputPromotionContract.PromotionItem?>().apply { value = null }
 
   private var isLoading = false
   private val viewStateD by lazy(NONE) {
-    MutableLiveData<ViewState>()
-      .apply { value = ViewState() }
+    MutableLiveData<InputPromotionContract.ViewState>()
+      .apply { value = InputPromotionContract.ViewState() }
       .also { fetchPromotion() }
   }
 
@@ -178,7 +206,7 @@ private class InputPromotionVM(
     }
   }
 
-  fun select(item: PromotionItem) {
+  fun select(item: InputPromotionContract.PromotionItem) {
     val old = selectedItemD.value
     selectedItemD.value = if (old === null || old.promotion.id != item.promotion.id) item else null
 
@@ -216,7 +244,7 @@ private class InputPromotionVM(
                 isLoading = false,
                 error = null,
                 promotions = promotions.map {
-                  PromotionItem(
+                  InputPromotionContract.PromotionItem(
                     promotion = it,
                     isSelected = selectedItemD.value?.promotion?.id == it.id,
                   )
@@ -226,5 +254,82 @@ private class InputPromotionVM(
           }
         )
     }
+  }
+}
+
+@ExperimentalCoroutinesApi
+private class SelectCardVM(
+  private val cardRepository: CardRepository,
+  private val viewModelScope: CoroutineScope,
+) {
+  private var selectedD = MutableLiveData<Card?>().apply { value = null }
+  private val stateD = MutableLiveData<SelectCardContract.ViewState>().apply { value = SelectCardContract.ViewState() }
+  private val fetchChannel = Channel<Unit>(Channel.BUFFERED)
+
+  val viewState get() = stateD.asLiveData()
+  val selected get() = selectedD.asLiveData()
+
+  fun retry() {
+    if (stateD.value!!.error !== null) {
+      fetchChannel.offer(Unit)
+    }
+  }
+
+  fun select(item: SelectCardContract.CardItem) {
+    selectedD.value = item.card
+
+    stateD.setValueNotNull { state ->
+      state.copy(
+        isLoading = false,
+        items = state.items.map {
+          it.copy(isSelected = it.card.id == selectedD.value?.id)
+        }
+      )
+    }
+  }
+
+  init {
+    fetchChannel
+      .consumeAsFlow()
+      .onStart { emit(Unit) }
+      .flatMapFirst {
+        cardRepository
+          .getCards()
+          .onStart {
+            stateD.setValueNotNull {
+              it.copy(
+                isLoading = true,
+                error = null
+              )
+            }
+          }
+      }
+      .onEach { result ->
+        result.fold(
+          ifLeft = { error ->
+            stateD.setValueNotNull {
+              it.copy(
+                isLoading = false,
+                error = error
+              )
+            }
+          },
+          ifRight = { cards ->
+            stateD.setValueNotNull { state ->
+              state.copy(
+                isLoading = false,
+                items = cards.map {
+                  SelectCardContract.CardItem(
+                    card = it,
+                    isSelected = it.id == selectedD.value?.id,
+                  )
+                }
+              )
+            }
+          }
+        )
+      }
+      .catch { Timber.d(it, "Unhandled exception: $it") }
+      .launchIn(viewModelScope)
   }
 }

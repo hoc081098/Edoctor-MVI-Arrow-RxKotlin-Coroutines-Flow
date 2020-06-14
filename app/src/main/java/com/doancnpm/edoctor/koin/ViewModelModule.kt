@@ -17,10 +17,9 @@ import com.doancnpm.edoctor.ui.auth.verify.VerifyVM
 import com.doancnpm.edoctor.ui.main.MainVM
 import com.doancnpm.edoctor.ui.main.home.HomeVM
 import com.doancnpm.edoctor.ui.main.home.create_order.CreateOrderVM
-import com.doancnpm.edoctor.ui.main.home.create_order.select_card.SelectCardVM
-import com.doancnpm.edoctor.ui.main.home.create_order.select_card.add_card.AddCardContract
-import com.doancnpm.edoctor.ui.main.home.create_order.select_card.add_card.AddCardInteractor
-import com.doancnpm.edoctor.ui.main.home.create_order.select_card.add_card.AddCardVM
+import com.doancnpm.edoctor.ui.main.home.create_order.inputs.select_card.add_card.AddCardContract
+import com.doancnpm.edoctor.ui.main.home.create_order.inputs.select_card.add_card.AddCardInteractor
+import com.doancnpm.edoctor.ui.main.home.create_order.inputs.select_card.add_card.AddCardVM
 import com.doancnpm.edoctor.ui.main.home.services.ServicesVM
 import com.doancnpm.edoctor.ui.main.profile.ProfileVM
 import com.doancnpm.edoctor.ui.splash.SplashVM
@@ -105,6 +104,7 @@ val viewModelModule = module {
       service = service,
       locationRepository = get(),
       promotionRepository = get(),
+      cardRepository = get(),
     )
   }
 
@@ -121,8 +121,6 @@ val viewModelModule = module {
       schedulers = get(),
     )
   }
-
-  viewModel { SelectCardVM(cardRepository = get()) }
   //endregion
 
   //region Profile
