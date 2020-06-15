@@ -81,14 +81,13 @@ class NotificationsFragment : BaseFragment(R.layout.fragment_notifications) {
   private fun renderPlaceholderState(state: PlaceholderState) {
     binding.run {
       when (state) {
-        is PlaceholderState.Idle -> {
+        PlaceholderState.Idle, is PlaceholderState.Success -> {
           errorGroup.gone()
           progressBar.invisible()
 
-          if (!state.isInitial && viewModel.notificationsLiveData.value!!.isEmpty()) {
-            textEmpty.visible()
-          } else {
-            textEmpty.invisible()
+          if (state is PlaceholderState.Success) {
+            if (state.isEmpty) textEmpty.visible()
+            else textEmpty.invisible()
           }
         }
         PlaceholderState.Loading -> {

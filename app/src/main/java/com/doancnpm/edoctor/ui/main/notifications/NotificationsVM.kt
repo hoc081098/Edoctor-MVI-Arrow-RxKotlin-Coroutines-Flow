@@ -24,9 +24,9 @@ class NotificationsVM(
   private val refreshingD = MutableLiveData<Boolean>().apply { value = false }
 
   private val placeholderStateD =
-    MutableLiveData<PlaceholderState>().apply { value = PlaceholderState.Idle() }
+    MutableLiveData<PlaceholderState>().apply { value = PlaceholderState.Idle }
   private val firstPagePlaceholderStateD =
-    MutableLiveData<PlaceholderState>().apply { value = PlaceholderState.Idle() }
+    MutableLiveData<PlaceholderState>().apply { value = PlaceholderState.Idle }
 
   private val shouldLoadNextPage
     get() = if (currentPage == 0) {
@@ -91,8 +91,8 @@ class NotificationsVM(
           ifLeft = {},
           ifRight = { services ->
             if (services.isNotEmpty()) {
-              placeholderStateD.value = PlaceholderState.Idle(false)
-              firstPagePlaceholderStateD.value = PlaceholderState.Idle(false)
+              placeholderStateD.value = PlaceholderState.Idle
+              firstPagePlaceholderStateD.value = PlaceholderState.Success(false)
 
               loadedAll = false
               currentPage = 1
@@ -129,9 +129,9 @@ class NotificationsVM(
           },
           ifRight = { notifications ->
             if (currentPage == 0) {
-              firstPagePlaceholderStateD.value = PlaceholderState.Idle(false)
+              firstPagePlaceholderStateD.value = PlaceholderState.Success(notifications.isEmpty())
             } else {
-              placeholderStateD.value = PlaceholderState.Idle(false)
+              placeholderStateD.value = PlaceholderState.Idle
             }
 
             loadedAll = notifications.isEmpty()

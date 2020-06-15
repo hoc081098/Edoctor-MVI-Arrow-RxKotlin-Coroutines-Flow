@@ -39,7 +39,7 @@ class FooterAdapter(private val onRetry: () -> Unit) :
 
     fun bind(item: PlaceholderState) {
       when (item) {
-        PlaceholderState.Loading -> {
+        PlaceholderState.Loading, is PlaceholderState.Success -> {
           binding.run {
             buttonRetry.invisible()
             textError.invisible()
