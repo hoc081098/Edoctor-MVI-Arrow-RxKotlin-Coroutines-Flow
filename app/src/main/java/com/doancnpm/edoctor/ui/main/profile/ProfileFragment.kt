@@ -40,7 +40,7 @@ class ProfileFragment : BaseFragment(R.layout.fragment_profile) {
         binding.run {
           it.fold(
             ifEmpty = {
-              imageAvatar.setImageResource(R.drawable.ic_person_black_24dp)
+              imageAvatar.setImageResource(R.drawable.icons8_person_96)
 
               textFullName.text = NOT_LOGGED_IN
               textPhone.text = NOT_LOGGED_IN
@@ -52,8 +52,8 @@ class ProfileFragment : BaseFragment(R.layout.fragment_profile) {
                 ?.let {
                   glide
                     .load(it)
-                    .placeholder(R.drawable.ic_person_black_24dp)
-                    .error(R.drawable.ic_person_black_24dp)
+                    .placeholder(R.drawable.icons8_person_96)
+                    .error(R.drawable.icons8_person_96)
                     .transition(withCrossFade())
                     .into(imageAvatar)
                 }
