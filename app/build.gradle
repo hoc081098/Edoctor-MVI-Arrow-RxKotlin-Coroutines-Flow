@@ -44,8 +44,8 @@ android {
         }
     }
 
-    viewBinding {
-        enabled = true
+    buildFeatures {
+        viewBinding = true
     }
 
     compileOptions {
@@ -148,4 +148,5 @@ dependencies {
 
     implementation 'de.hdodenhof:circleimageview:3.1.0'
     implementation 'com.github.florent37:shapeofview:1.4.7'
+    implementation 'com.amulyakhare:com.amulyakhare.textdrawable:1.0.1'
 }
