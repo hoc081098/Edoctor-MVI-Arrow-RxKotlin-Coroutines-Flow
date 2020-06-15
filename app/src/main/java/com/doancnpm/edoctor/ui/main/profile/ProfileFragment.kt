@@ -1,7 +1,11 @@
 package com.doancnpm.edoctor.ui.main.profile
 
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.View
+import com.amulyakhare.textdrawable.TextDrawable
+import com.amulyakhare.textdrawable.util.ColorGenerator
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade
 import com.doancnpm.edoctor.GlideApp
 import com.doancnpm.edoctor.R
@@ -15,6 +19,7 @@ import com.jakewharton.rxbinding4.view.clicks
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import timber.log.Timber
 
 class ProfileFragment : BaseFragment(R.layout.fragment_profile) {
   private val binding by viewBinding<FragmentProfileBinding>()
@@ -52,7 +57,24 @@ class ProfileFragment : BaseFragment(R.layout.fragment_profile) {
                     .transition(withCrossFade())
                     .into(imageAvatar)
                 }
-                ?: imageAvatar.setImageResource(R.drawable.ic_person_black_24dp)
+                ?: when (val firstLetter = user.fullName.firstOrNull()) {
+                  null -> ColorDrawable(Color.parseColor("#fafafa"))
+                  else -> {
+                    val size = requireContext()
+                      .dpToPx(96)
+                      .also { Timber.d("96dp = ${it}px") }
+                    TextDrawable
+                      .builder()
+                      .beginConfig()
+                      .width(size)
+                      .height(size)
+                      .endConfig()
+                      .buildRect(
+                        firstLetter.toUpperCase().toString(),
+                        ColorGenerator.MATERIAL.getColor(user.phone),
+                      )
+                  }
+                }.let(imageAvatar::setImageDrawable)
 
               textFullName.text = user.fullName
               textPhone.text = user.phone

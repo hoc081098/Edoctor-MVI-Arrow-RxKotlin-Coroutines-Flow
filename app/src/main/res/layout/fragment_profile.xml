@@ -8,7 +8,8 @@
     <com.github.florent37.shapeofview.shapes.ArcView
         android:id="@+id/arc_view"
         android:layout_width="match_parent"
-        android:layout_height="186dp"
+        android:layout_height="160dp"
+        android:elevation="10dp"
         app:layout_constraintTop_toTopOf="parent"
         app:shape_arc_height="25dp"
         app:shape_arc_position="bottom">
@@ -22,6 +23,7 @@
                 android:id="@+id/image_avatar"
                 android:layout_width="96dp"
                 android:layout_height="96dp"
+                android:elevation="20dp"
                 android:src="@drawable/ic_person_black_24dp"
                 app:civ_border_width="0dp"
                 app:civ_circle_background_color="#fafafa"
@@ -39,9 +41,8 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="160dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@+id/arc_view">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -95,7 +96,6 @@
                 android:id="@+id/phone_row"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
                 android:background="?attr/selectableItemBackground"
                 android:minHeight="64dp"
                 app:layout_constraintTop_toBottomOf="@+id/full_name_row">
@@ -139,7 +139,6 @@
                 android:id="@+id/birthday_row"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
                 android:background="?attr/selectableItemBackground"
                 android:minHeight="64dp"
                 app:layout_constraintTop_toBottomOf="@+id/phone_row">
@@ -183,7 +182,6 @@
                 android:id="@+id/status_row"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
                 android:background="?attr/selectableItemBackground"
                 android:minHeight="64dp"
                 app:layout_constraintTop_toBottomOf="@+id/birthday_row">
@@ -227,7 +225,7 @@
                 android:id="@+id/logoutButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="8dp"
                 android:backgroundTint="@color/colorPrimary"
                 android:elevation="12dp"
                 android:fontFamily="@font/google_sans"
