@@ -35,7 +35,7 @@ class ServiceRepositoryImpl(
           .unwrap()
           .services
           .map { it.toServiceDomain(baseUrl) }
-          .also { delay(400) }
+          .also { delay(200) }
           .also { Timber.d("getServicesByCategory { page: $page, perPage: $perPage, categoryId: ${category.id} }") }
       }
     }
