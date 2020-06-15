@@ -21,6 +21,7 @@ import com.doancnpm.edoctor.ui.main.home.create_order.inputs.select_card.add_car
 import com.doancnpm.edoctor.ui.main.home.create_order.inputs.select_card.add_card.AddCardInteractor
 import com.doancnpm.edoctor.ui.main.home.create_order.inputs.select_card.add_card.AddCardVM
 import com.doancnpm.edoctor.ui.main.home.services.ServicesVM
+import com.doancnpm.edoctor.ui.main.notifications.NotificationsVM
 import com.doancnpm.edoctor.ui.main.profile.ProfileVM
 import com.doancnpm.edoctor.ui.splash.SplashVM
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -121,6 +122,12 @@ val viewModelModule = module {
       interactor = get(),
       schedulers = get(),
     )
+  }
+  //endregion
+
+  //region Notification
+  viewModel {
+    NotificationsVM(notificationRepository = get())
   }
   //endregion
 

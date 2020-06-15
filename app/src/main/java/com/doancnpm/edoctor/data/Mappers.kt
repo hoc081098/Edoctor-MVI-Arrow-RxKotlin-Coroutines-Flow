@@ -117,6 +117,17 @@ fun CardResponse.toCardDomain(): Card {
   )
 }
 
+fun NotificationsResponse.Notification.toNotificationDomain(baseUrl: String): Notification {
+  return Notification(
+    id = id,
+    type = type,
+    title = title,
+    body = body,
+    image = baseUrl + image,
+    orderId = orderId,
+    createdAt = parseDate_yyyyMMdd_HHmmss(createdAt)!!,
+  )
+}
 
 //endregion
 
