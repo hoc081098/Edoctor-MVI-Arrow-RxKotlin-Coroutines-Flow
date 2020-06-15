@@ -81,4 +81,13 @@ val domainModule = module {
       dispatchers = get(),
     )
   }
+
+  factory<NotificationRepository> {
+    NotificationRepositoryImpl(
+      apiService = get(API_URL_QUALIFIER),
+      errorMapper = get(),
+      dispatchers = get(),
+      baseUrl = get(BASE_URL_QUALIFIER),
+    )
+  }
 }
