@@ -80,6 +80,14 @@ interface ApiService {
   suspend fun removeCard(@Path("id") id: String): BaseResponse<Any>
   //endregion
 
+  //region Notifications
+  @GET("notifications")
+  suspend fun getNotifications(
+    @IntRange(from = 1) @Query("page") page: Int,
+    @IntRange(from = 1) @Query("per_page") perPage: Int,
+  ): BaseResponse<NotificationsResponse>
+  //endregion
+
   companion object Factory {
     operator fun invoke(retrofit: Retrofit) = retrofit.create<ApiService>()
   }
