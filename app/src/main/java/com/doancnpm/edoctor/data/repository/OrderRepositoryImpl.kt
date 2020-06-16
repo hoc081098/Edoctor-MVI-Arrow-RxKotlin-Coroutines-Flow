@@ -4,9 +4,12 @@ import arrow.core.Either
 import com.doancnpm.edoctor.data.ErrorMapper
 import com.doancnpm.edoctor.data.remote.ApiService
 import com.doancnpm.edoctor.data.remote.body.CreateOrderBody
+import com.doancnpm.edoctor.data.toInt
+import com.doancnpm.edoctor.data.toOrderDomain
 import com.doancnpm.edoctor.domain.entity.*
 import com.doancnpm.edoctor.domain.repository.OrderRepository
 import com.doancnpm.edoctor.utils.UTCTimeZone
+import com.doancnpm.edoctor.utils.toString_yyyyMMdd
 import com.doancnpm.edoctor.utils.toString_yyyyMMdd_HHmmss
 import timber.log.Timber
 import java.util.Date
@@ -14,6 +17,7 @@ import java.util.Date
 class OrderRepositoryImpl(
   private val apiService: ApiService,
   private val errorMapper: ErrorMapper,
+  private val baseUrl: String,
 ) : OrderRepository {
   override suspend fun createOrder(
     service: Service,
@@ -47,6 +51,44 @@ class OrderRepositoryImpl(
           )
         )
         .unwrap()
+    }
+  }
+
+  override suspend fun getOrders(
+    page: Int,
+    perPage: Int,
+    serviceName: String?,
+    date: Date?,
+    orderId: Long?,
+    statuses: List<Order.Status>?
+  ): DomainResult<List<Order>> {
+    return Either.catch(errorMapper::map) {
+      val statusesMap = statuses
+        ?.withIndex()
+        ?.associate { (index, value) -> "statuses[$index]" to value.toInt().toString() }
+        ?: emptyMap()
+
+      apiService
+        .getOrders(
+          page = page,
+          perPage = perPage,
+          serviceName = serviceName,
+          date = date?.toString_yyyyMMdd(),
+          orderId = orderId,
+          statuses = statusesMap,
+        )
+        .unwrap()
+        .orders
+        .map { it.toOrderDomain(baseUrl) }
+        .also {
+          Timber.d("""{ size: ${it.size} } getOrders {
+              |page: $page, 
+              |perPage: $perPage, 
+              |serviceName: $serviceName, 
+              |date: $date,
+              |orderId: $orderId, 
+              |statuses: $statuses }""".trimMargin())
+        }
     }
   }
 }

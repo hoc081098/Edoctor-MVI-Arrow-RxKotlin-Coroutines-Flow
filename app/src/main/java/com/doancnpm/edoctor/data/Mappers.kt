@@ -31,7 +31,7 @@ private fun Int.toRoleId(): User.RoleId {
   }
 }
 
-private fun Int.toStatus(): User.Status {
+private fun Int.toUserStatus(): User.Status {
   return when (this) {
     0 -> User.Status.INACTIVE
     1 -> User.Status.ACTIVE
@@ -58,7 +58,7 @@ fun UserLocal.toUserDomain(): User {
     fullName = fullName,
     phone = phone,
     roleId = roleId.toRoleId(),
-    status = status.toStatus(),
+    status = status.toUserStatus(),
     avatar = avatar,
     birthday = birthday,
   )
@@ -126,6 +126,55 @@ fun NotificationsResponse.Notification.toNotificationDomain(baseUrl: String): No
     image = baseUrl + image,
     orderId = orderId,
     createdAt = parseDate_yyyyMMdd_HHmmss(createdAt)!!,
+  )
+}
+
+fun Order.Status.toInt(): Int {
+  return when (this) {
+    Order.Status.PENDING_STATUS -> 1
+    Order.Status.ACCEPTED_STATUS -> 2
+    Order.Status.CUSTOMER_CANCELED_STATUS -> 3
+    Order.Status.DOCTOR_CANCELED_STATUS -> 4
+    Order.Status.PROCESSING_STATUS -> 5
+    Order.Status.DONE_STATUS -> 6
+  }
+}
+
+private fun Int.toOrderStatus(): Order.Status {
+  return when (this) {
+    1 -> Order.Status.PENDING_STATUS
+    2 -> Order.Status.ACCEPTED_STATUS
+    3 -> Order.Status.CUSTOMER_CANCELED_STATUS
+    4 -> Order.Status.DOCTOR_CANCELED_STATUS
+    5 -> Order.Status.PROCESSING_STATUS
+    6 -> Order.Status.DONE_STATUS
+    else -> error("Cannot convert order status: $this")
+  }
+}
+
+fun OrdersResponse.Order.toOrderDomain(baseUrl: String): Order {
+  return Order(
+    id = id,
+    customerId = customerId,
+    doctorId = doctorId,
+    serviceId = serviceId,
+    startTime = parseDate_yyyyMMdd_HHmmss(startTime)!!,
+    endTime = parseDate_yyyyMMdd_HHmmss(endTime)!!,
+    note = note,
+    originalPrice = originalPrice,
+    promotionId = promotionId,
+    total = total,
+    payCardId = payCardId,
+    status = status.toOrderStatus(),
+    location = Location(
+      latitude = lat,
+      longitude = lng,
+    ),
+    address = address,
+    createdAt = parseDate_yyyyMMdd_HHmmss(createdAt)!!,
+    service = service.toServiceDomain(baseUrl),
+    doctor = doctor.toUserLocal(baseUrl).toUserDomain(),
+    customer = customer.toUserLocal(baseUrl).toUserDomain(),
   )
 }
 
