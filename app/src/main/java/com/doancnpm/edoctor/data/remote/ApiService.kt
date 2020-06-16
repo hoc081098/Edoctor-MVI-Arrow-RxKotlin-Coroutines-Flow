@@ -59,6 +59,16 @@ interface ApiService {
   //region Order
   @POST("orders")
   suspend fun createOrder(@Body body: CreateOrderBody): BaseResponse<Any>
+
+  @GET("orders")
+  suspend fun getOrders(
+    @IntRange(from = 1) @Query("page") page: Int,
+    @IntRange(from = 1) @Query("per_page") perPage: Int,
+    @Query("service_name") serviceName: String?,
+    @Query("date") date: String?,
+    @Query("order_id") orderId: Long?,
+    @QueryMap(encoded = true) statuses: Map<String, String>,
+  ): BaseResponse<OrdersResponse>
   //endregion
 
   //region Promotion

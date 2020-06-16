@@ -64,6 +64,7 @@ val domainModule = module {
     OrderRepositoryImpl(
       apiService = get(API_URL_QUALIFIER),
       errorMapper = get(),
+      baseUrl = get(BASE_URL_QUALIFIER),
     )
   }
 
