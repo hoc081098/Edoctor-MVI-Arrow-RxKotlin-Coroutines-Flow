@@ -17,7 +17,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:cardCornerRadius="4dp"
-        app:cardElevation="4dp"
+        app:cardElevation="8dp"
         app:cardPreventCornerOverlap="true"
         app:cardUseCompatPadding="true"
         app:layout_constraintEnd_toEndOf="parent"
@@ -37,11 +37,13 @@
         android:id="@+id/current_location_fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
+        android:layout_marginEnd="54dp"
         android:layout_marginBottom="16dp"
         android:clickable="true"
+        android:elevation="12dp"
         android:focusable="true"
         android:src="@drawable/ic_baseline_location_on_24"
+        app:backgroundTint="@color/colorAccent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
