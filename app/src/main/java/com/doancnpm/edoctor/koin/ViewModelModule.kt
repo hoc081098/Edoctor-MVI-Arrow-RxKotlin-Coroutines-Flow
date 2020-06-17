@@ -15,6 +15,9 @@ import com.doancnpm.edoctor.ui.auth.verify.VerifyContract
 import com.doancnpm.edoctor.ui.auth.verify.VerifyInteractor
 import com.doancnpm.edoctor.ui.auth.verify.VerifyVM
 import com.doancnpm.edoctor.ui.main.MainVM
+import com.doancnpm.edoctor.ui.main.history.HistoryContract
+import com.doancnpm.edoctor.ui.main.history.HistoryInteractor
+import com.doancnpm.edoctor.ui.main.history.HistoryVM
 import com.doancnpm.edoctor.ui.main.home.HomeVM
 import com.doancnpm.edoctor.ui.main.home.create_order.CreateOrderVM
 import com.doancnpm.edoctor.ui.main.home.create_order.inputs.select_card.add_card.AddCardContract
@@ -137,6 +140,17 @@ val viewModelModule = module {
       userRepository = get(),
       dispatchers = get(),
       schedulers = get(),
+    )
+  }
+  //endregion
+
+  //region History
+  factory<HistoryContract.Interactor> { HistoryInteractor(orderRepository = get()) }
+
+  viewModel {
+    HistoryVM(
+      interactor = get(),
+      schedulers = get()
     )
   }
   //endregion

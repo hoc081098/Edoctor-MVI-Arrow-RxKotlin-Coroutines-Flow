@@ -21,6 +21,6 @@ interface OrderRepository {
     serviceName: String?,
     date: Date?,
     orderId: Long?,
-    statuses: List<Order.Status>?,
+    statuses: Set<Order.Status>?,
   ): DomainResult<List<Order>>
 }

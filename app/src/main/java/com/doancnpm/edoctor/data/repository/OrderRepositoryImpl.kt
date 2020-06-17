@@ -60,7 +60,7 @@ class OrderRepositoryImpl(
     serviceName: String?,
     date: Date?,
     orderId: Long?,
-    statuses: List<Order.Status>?
+    statuses: Set<Order.Status>?
   ): DomainResult<List<Order>> {
     return Either.catch(errorMapper::map) {
       val statusesMap = statuses
