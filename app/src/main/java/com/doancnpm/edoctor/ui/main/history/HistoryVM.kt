@@ -82,7 +82,7 @@ class HistoryVM(
       .subscribe(stateS)
       .addTo(compositeDisposable)
 
-    stateS.subscribeBy { state -> stateD.setValue { state } }
+    stateS.subscribeBy { state -> stateD.setValue { state } }.addTo(compositeDisposable)
   }
 
   private companion object {
