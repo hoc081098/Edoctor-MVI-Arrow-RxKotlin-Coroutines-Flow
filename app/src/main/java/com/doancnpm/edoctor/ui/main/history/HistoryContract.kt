@@ -70,13 +70,20 @@ interface HistoryContract {
   sealed class ViewIntent {
     data class ChangeType(val historyType: HistoryType) : ViewIntent()
     object LoadNextPage : ViewIntent()
+
     data class Cancel(val order: Order) : ViewIntent()
+    data class FindDoctor(val order: Order) : ViewIntent()
   }
 
   sealed class SingleEvent {
     sealed class Cancel : SingleEvent() {
       data class Success(val order: Order) : Cancel()
       data class Failure(val order: Order, val error: AppError) : Cancel()
+    }
+
+    sealed class FindDoctor : SingleEvent() {
+      data class Success(val order: Order) : FindDoctor()
+      data class Failure(val order: Order, val error: AppError) : FindDoctor()
     }
   }
 
@@ -145,6 +152,13 @@ interface HistoryContract {
       data class Success(val order: Order) : Cancel()
       data class Failure(val order: Order, val error: AppError) : Cancel()
     }
+
+    sealed class FindDoctor : PartialChange() {
+      override fun reduce(vs: ViewState): ViewState = vs
+
+      data class Success(val order: Order) : FindDoctor()
+      data class Failure(val order: Order, val error: AppError) : FindDoctor()
+    }
   }
 
   interface Interactor {
@@ -157,7 +171,9 @@ interface HistoryContract {
       type: HistoryType
     ): Observable<PartialChange>
 
-    fun cancel(order: Order): Observable<PartialChange>
+    fun cancel(order: Order): Observable<PartialChange.Cancel>
+
+    fun findDoctor(order: Order): Observable<PartialChange.FindDoctor>
   }
 }
 
@@ -206,13 +222,25 @@ class HistoryInteractor(
     }
   }
 
-  override fun cancel(order: Order): Observable<PartialChange> {
+  override fun cancel(order: Order): Observable<PartialChange.Cancel> {
     return rxObservable(dispatchers.main) {
       orderRepository
         .cancel(order)
         .fold(
           ifLeft = { PartialChange.Cancel.Failure(order, it) },
           ifRight = { PartialChange.Cancel.Success(order) },
+        )
+        .let { send(it) }
+    }
+  }
+
+  override fun findDoctor(order: Order): Observable<PartialChange.FindDoctor> {
+    return rxObservable(dispatchers.main) {
+      orderRepository
+        .findDoctor(order)
+        .fold(
+          ifLeft = { PartialChange.FindDoctor.Failure(order, it) },
+          ifRight = { PartialChange.FindDoctor.Success(order) },
         )
         .let { send(it) }
     }

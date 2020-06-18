@@ -25,4 +25,6 @@ interface OrderRepository {
   ): DomainResult<List<Order>>
 
   suspend fun cancel(order: Order): DomainResult<Unit>
+
+  suspend fun findDoctor(order: Order): DomainResult<Unit>
 }

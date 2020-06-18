@@ -11,6 +11,7 @@ import com.doancnpm.edoctor.R
 import com.doancnpm.edoctor.core.BaseActivity
 import com.doancnpm.edoctor.databinding.ActivityMainBinding
 import com.doancnpm.edoctor.ui.auth.AuthActivity
+import com.doancnpm.edoctor.utils.dismissAlertDialog
 import com.doancnpm.edoctor.utils.setupWithNavController
 import com.doancnpm.edoctor.utils.viewBinding
 import io.reactivex.rxjava3.kotlin.addTo
@@ -32,6 +33,8 @@ class MainActivity : BaseActivity() {
 
     if (savedInstanceState === null) {
       setupBottomNavigationBar()
+    } else {
+      dismissAlertDialog()
     }
 
     bindVM()
