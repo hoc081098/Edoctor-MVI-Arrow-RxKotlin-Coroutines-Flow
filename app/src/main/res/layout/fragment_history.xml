@@ -26,6 +26,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@android:color/transparent"
+                app:checkedChip="@id/chip_waiting"
                 app:chipSpacingHorizontal="4dp"
                 app:selectionRequired="true"
                 app:singleLine="true"
@@ -33,6 +34,7 @@
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/chip_waiting"
+                    style="@style/Widget.MaterialComponents.Chip.Choice"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/google_sans"
@@ -41,6 +43,7 @@
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/chip_up_coming"
+                    style="@style/Widget.MaterialComponents.Chip.Choice"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/google_sans"
@@ -49,6 +52,7 @@
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/chip_processing"
+                    style="@style/Widget.MaterialComponents.Chip.Choice"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/google_sans"
@@ -57,6 +61,7 @@
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/chip_done"
+                    style="@style/Widget.MaterialComponents.Chip.Choice"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/google_sans"
