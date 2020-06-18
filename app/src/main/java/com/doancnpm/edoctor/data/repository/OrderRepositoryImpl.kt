@@ -11,6 +11,7 @@ import com.doancnpm.edoctor.domain.repository.OrderRepository
 import com.doancnpm.edoctor.utils.UTCTimeZone
 import com.doancnpm.edoctor.utils.toString_yyyyMMdd
 import com.doancnpm.edoctor.utils.toString_yyyyMMdd_HHmmss
+import kotlinx.coroutines.delay
 import timber.log.Timber
 import java.util.Date
 
@@ -80,6 +81,7 @@ class OrderRepositoryImpl(
         .unwrap()
         .orders
         .map { it.toOrderDomain(baseUrl) }
+        .also { delay(200) }
         .also {
           Timber.d("""{ size: ${it.size} } getOrders {
               |page: $page, 
