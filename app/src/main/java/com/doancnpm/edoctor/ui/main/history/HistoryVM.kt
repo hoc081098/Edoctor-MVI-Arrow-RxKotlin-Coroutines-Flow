@@ -72,10 +72,21 @@ class HistoryVM(
           .takeUntil(changeTypeIntent)
       }
 
+    val cancelOrderChange = intentS.ofType<ViewIntent.Cancel>()
+      .flatMap { interactor.cancel(it.order) }
+      .doOnNext {
+        when(it) {
+          is HistoryContract.PartialChange.Cancel.Success -> SingleEvent.Cancel.Success(it.order)
+          is HistoryContract.PartialChange.Cancel.Failure -> SingleEvent.Cancel.Failure(it.order, it.error)
+          else -> return@doOnNext
+        }.let { singleEventD.value = Event(it) }
+      }
+
     Observable
       .mergeArray(
         changeTypeChange,
         nextPageChange,
+        cancelOrderChange,
       )
       .observeOn(schedulers.main)
       .scan(initialState) { vs, change -> change.reduce(vs) }

@@ -18,15 +18,26 @@ import com.doancnpm.edoctor.databinding.ItemRecyclerOrderUpcomingBinding
 import com.doancnpm.edoctor.databinding.ItemRecyclerOrderWaitingBinding
 import com.doancnpm.edoctor.domain.entity.Order
 import com.doancnpm.edoctor.ui.main.history.HistoryContract.HistoryType.Helper.layoutIdFor
+import com.doancnpm.edoctor.ui.main.history.HistoryContract.ViewIntent
+import com.doancnpm.edoctor.utils.asObservable
 import com.doancnpm.edoctor.utils.currencyVndFormatted
+import com.doancnpm.edoctor.utils.mapNotNull
 import com.doancnpm.edoctor.utils.toString_yyyyMMdd_HHmmss
+import com.jakewharton.rxbinding4.view.clicks
+import com.jakewharton.rxbinding4.view.detaches
+import com.jakewharton.rxrelay3.PublishRelay
+import io.reactivex.rxjava3.disposables.CompositeDisposable
+import io.reactivex.rxjava3.kotlin.addTo
 
 class OrderAdapter(
   private val glide: GlideRequests,
+  private val compositeDisposable: CompositeDisposable,
 ) : ListAdapter<Order, OrderAdapter.VH>(object : DiffUtil.ItemCallback<Order>() {
   override fun areItemsTheSame(oldItem: Order, newItem: Order) = oldItem.id == newItem.id
   override fun areContentsTheSame(oldItem: Order, newItem: Order) = oldItem == newItem
 }) {
+  private val cancelOrderS = PublishRelay.create<ViewIntent.Cancel>()
+  val cancelOrder get() = cancelOrderS.asObservable()
 
   @LayoutRes
   override fun getItemViewType(position: Int) = layoutIdFor(getItem(position).status)
@@ -34,7 +45,10 @@ class OrderAdapter(
   override fun onCreateViewHolder(parent: ViewGroup, @LayoutRes viewType: Int): VH {
     val inflater = LayoutInflater.from(parent.context)
     return when (viewType) {
-      R.layout.item_recycler_order_waiting -> WaitingVH(ItemRecyclerOrderWaitingBinding.inflate(inflater, parent, false))
+      R.layout.item_recycler_order_waiting -> WaitingVH(
+        ItemRecyclerOrderWaitingBinding.inflate(inflater, parent, false),
+        parent
+      )
       R.layout.item_recycler_order_upcoming -> UpComingVH(ItemRecyclerOrderUpcomingBinding.inflate(inflater, parent, false))
       R.layout.item_recycler_order_processing -> ProcessingVH(ItemRecyclerOrderProcessingBinding.inflate(inflater, parent, false))
       R.layout.item_recycler_order_done -> DoneVH(ItemRecyclerOrderDoneBinding.inflate(inflater, parent, false))
@@ -49,7 +63,26 @@ class OrderAdapter(
     abstract fun bind(item: Order)
   }
 
-  inner class WaitingVH(private val binding: ItemRecyclerOrderWaitingBinding) : VH(binding.root) {
+  inner class WaitingVH(
+    private val binding: ItemRecyclerOrderWaitingBinding,
+    parent: ViewGroup
+  ) : VH(binding.root) {
+    init {
+      binding.cancelButton
+        .clicks()
+        .takeUntil(parent.detaches())
+        .mapNotNull {
+          val position = bindingAdapterPosition
+          if (position == RecyclerView.NO_POSITION) {
+            null
+          } else {
+            ViewIntent.Cancel(getItem(position))
+          }
+        }
+        .subscribe(cancelOrderS)
+        .addTo(compositeDisposable)
+    }
+
     override fun bind(item: Order) {
       binding.run {
         glide

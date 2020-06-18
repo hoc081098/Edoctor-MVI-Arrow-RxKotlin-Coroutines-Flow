@@ -3,6 +3,7 @@ package com.doancnpm.edoctor.ui.main.history
 import androidx.annotation.IntRange
 import androidx.annotation.LayoutRes
 import com.doancnpm.edoctor.R
+import com.doancnpm.edoctor.domain.dispatchers.AppDispatchers
 import com.doancnpm.edoctor.domain.entity.AppError
 import com.doancnpm.edoctor.domain.entity.Order
 import com.doancnpm.edoctor.domain.repository.OrderRepository
@@ -10,8 +11,7 @@ import com.doancnpm.edoctor.ui.main.history.HistoryContract.HistoryType
 import com.doancnpm.edoctor.ui.main.history.HistoryContract.PartialChange
 import io.reactivex.rxjava3.core.Observable
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.rx3.asObservable
+import kotlinx.coroutines.rx3.rxObservable
 import java.util.Date
 
 interface HistoryContract {
@@ -70,9 +70,15 @@ interface HistoryContract {
   sealed class ViewIntent {
     data class ChangeType(val historyType: HistoryType) : ViewIntent()
     object LoadNextPage : ViewIntent()
+    data class Cancel(val order: Order) : ViewIntent()
   }
 
-  sealed class SingleEvent
+  sealed class SingleEvent {
+    sealed class Cancel : SingleEvent() {
+      data class Success(val order: Order) : Cancel()
+      data class Failure(val order: Order, val error: AppError) : Cancel()
+    }
+  }
 
   sealed class PartialChange {
     abstract fun reduce(vs: ViewState): ViewState
@@ -125,6 +131,20 @@ interface HistoryContract {
         }
       }
     }
+
+    sealed class Cancel : PartialChange() {
+      override fun reduce(vs: ViewState): ViewState {
+        return when (this) {
+          is Success -> vs.copy(
+            orders = vs.orders.filter { it.id != order.id }
+          )
+          is Failure -> vs
+        }
+      }
+
+      data class Success(val order: Order) : Cancel()
+      data class Failure(val order: Order, val error: AppError) : Cancel()
+    }
   }
 
   interface Interactor {
@@ -136,16 +156,26 @@ interface HistoryContract {
       orderId: Long?,
       type: HistoryType
     ): Observable<PartialChange>
+
+    fun cancel(order: Order): Observable<PartialChange>
   }
 }
 
 @ExperimentalCoroutinesApi
 class HistoryInteractor(
   private val orderRepository: OrderRepository,
+  private val dispatchers: AppDispatchers,
 ) : HistoryContract.Interactor {
-  override fun load(page: Int, perPage: Int, serviceName: String?, date: Date?, orderId: Long?, type: HistoryType): Observable<PartialChange> {
-    return flow {
-      emit(if (page == 1) PartialChange.FirstPage.Loading else PartialChange.NextPage.Loading)
+  override fun load(
+    page: Int,
+    perPage: Int,
+    serviceName: String?,
+    date: Date?,
+    orderId: Long?,
+    type: HistoryType
+  ): Observable<PartialChange> {
+    return rxObservable(dispatchers.main) {
+      send(if (page == 1) PartialChange.FirstPage.Loading else PartialChange.NextPage.Loading)
 
       orderRepository
         .getOrders(
@@ -172,7 +202,19 @@ class HistoryInteractor(
             }
           }
         )
-        .let { emit(it) }
-    }.asObservable()
+        .let { send(it) }
+    }
+  }
+
+  override fun cancel(order: Order): Observable<PartialChange> {
+    return rxObservable(dispatchers.main) {
+      orderRepository
+        .cancel(order)
+        .fold(
+          ifLeft = { PartialChange.Cancel.Failure(order, it) },
+          ifRight = { PartialChange.Cancel.Success(order) },
+        )
+        .let { send(it) }
+    }
   }
 }

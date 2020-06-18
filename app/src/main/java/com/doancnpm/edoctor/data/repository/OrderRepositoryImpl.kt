@@ -93,4 +93,7 @@ class OrderRepositoryImpl(
         }
     }
   }
+
+  override suspend fun cancel(order: Order): DomainResult<Unit> =
+    Either.catch(errorMapper::map) { apiService.cancelOrder(order.id).unwrap() }
 }
