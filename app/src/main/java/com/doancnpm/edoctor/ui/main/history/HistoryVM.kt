@@ -4,10 +4,7 @@ import androidx.annotation.CheckResult
 import androidx.lifecycle.MutableLiveData
 import com.doancnpm.edoctor.core.BaseVM
 import com.doancnpm.edoctor.domain.dispatchers.AppSchedulers
-import com.doancnpm.edoctor.ui.main.history.HistoryContract.Interactor
-import com.doancnpm.edoctor.ui.main.history.HistoryContract.SingleEvent
-import com.doancnpm.edoctor.ui.main.history.HistoryContract.ViewIntent
-import com.doancnpm.edoctor.ui.main.history.HistoryContract.ViewState
+import com.doancnpm.edoctor.ui.main.history.HistoryContract.*
 import com.doancnpm.edoctor.utils.*
 import com.jakewharton.rxrelay3.BehaviorRelay
 import com.jakewharton.rxrelay3.PublishRelay
@@ -73,12 +70,22 @@ class HistoryVM(
       }
 
     val cancelOrderChange = intentS.ofType<ViewIntent.Cancel>()
-      .flatMap { interactor.cancel(it.order) }
-      .doOnNext {
-        when(it) {
-          is HistoryContract.PartialChange.Cancel.Success -> SingleEvent.Cancel.Success(it.order)
-          is HistoryContract.PartialChange.Cancel.Failure -> SingleEvent.Cancel.Failure(it.order, it.error)
-          else -> return@doOnNext
+      .groupBy { it.order.id }
+      .flatMap { intents -> intents.exhaustMap { interactor.cancel(it.order) } }
+      .doOnNext { change ->
+        when (change) {
+          is PartialChange.Cancel.Success -> SingleEvent.Cancel.Success(change.order)
+          is PartialChange.Cancel.Failure -> SingleEvent.Cancel.Failure(change.order, change.error)
+        }.let { singleEventD.value = Event(it) }
+      }
+
+    val findDoctorChange = intentS.ofType<ViewIntent.FindDoctor>()
+      .groupBy { it.order.id }
+      .flatMap { intents -> intents.exhaustMap { interactor.findDoctor(it.order) } }
+      .doOnNext { change ->
+        when (change) {
+          is PartialChange.FindDoctor.Success -> SingleEvent.FindDoctor.Success(change.order)
+          is PartialChange.FindDoctor.Failure -> SingleEvent.FindDoctor.Failure(change.order, change.error)
         }.let { singleEventD.value = Event(it) }
       }
 
@@ -87,6 +94,7 @@ class HistoryVM(
         changeTypeChange,
         nextPageChange,
         cancelOrderChange,
+        findDoctorChange,
       )
       .observeOn(schedulers.main)
       .scan(initialState) { vs, change -> change.reduce(vs) }

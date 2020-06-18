@@ -72,6 +72,9 @@ interface ApiService {
 
   @PUT("orders/cancel/{order_id}")
   suspend fun cancelOrder(@Path("order_id") orderId: Long): BaseResponse<Any>
+
+  @GET("orders/find-doctors/{order_id}")
+  suspend fun findDoctor(@Path("order_id") orderId: Long): BaseResponse<Any>
   //endregion
 
   //region Promotion

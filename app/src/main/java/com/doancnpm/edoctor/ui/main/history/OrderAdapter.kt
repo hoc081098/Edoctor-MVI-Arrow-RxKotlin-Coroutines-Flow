@@ -39,6 +39,9 @@ class OrderAdapter(
   private val cancelOrderS = PublishRelay.create<ViewIntent.Cancel>()
   val cancelOrder get() = cancelOrderS.asObservable()
 
+  private val findDoctorS = PublishRelay.create<ViewIntent.FindDoctor>()
+  val findDoctor get() = findDoctorS.asObservable()
+
   @LayoutRes
   override fun getItemViewType(position: Int) = layoutIdFor(getItem(position).status)
 
@@ -80,6 +83,20 @@ class OrderAdapter(
           }
         }
         .subscribe(cancelOrderS)
+        .addTo(compositeDisposable)
+
+      binding.findDoctorButton
+        .clicks()
+        .takeUntil(parent.detaches())
+        .mapNotNull {
+          val position = bindingAdapterPosition
+          if (position == RecyclerView.NO_POSITION) {
+            null
+          } else {
+            ViewIntent.FindDoctor(getItem(position))
+          }
+        }
+        .subscribe(findDoctorS)
         .addTo(compositeDisposable)
     }
 

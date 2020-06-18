@@ -49,6 +49,12 @@ class HistoryFragment : BaseFragment(R.layout.fragment_history) {
       is SingleEvent.Cancel.Failure -> {
         view?.snack("Cancel failure: ${singleEvent.error.getMessage()}")
       }
+      is SingleEvent.FindDoctor.Success -> {
+        view?.snack("Push notifications to doctors successfully")
+      }
+      is SingleEvent.FindDoctor.Failure -> {
+        view?.snack("Push notifications to doctors failure: ${singleEvent.error.getMessage()}")
+      }
     }.exhaustive
   }
 
@@ -81,20 +87,20 @@ class HistoryFragment : BaseFragment(R.layout.fragment_history) {
         progressBar.invisible()
 
         if (firstPageState is PlaceholderState.Success) {
-          if (firstPageState.isEmpty) textEmpty.visible()
-          else textEmpty.invisible()
+          if (firstPageState.isEmpty) emptyLayout.visible()
+          else emptyLayout.invisible()
         }
       }
       PlaceholderState.Loading -> {
         errorGroup.gone()
         progressBar.visible()
-        textEmpty.invisible()
+        emptyLayout.invisible()
       }
       is PlaceholderState.Error -> {
         errorGroup.visible()
         errorMessageTextView.text = firstPageState.error.getMessage()
         progressBar.invisible()
-        textEmpty.invisible()
+        emptyLayout.invisible()
       }
     }
   }
@@ -131,9 +137,22 @@ class HistoryFragment : BaseFragment(R.layout.fragment_history) {
               title("Cancel")
               message("This action cannot be undone")
               cancelable(true)
+              iconId(R.drawable.ic_baseline_cancel_24)
             }
             .map { intent }
         },
+      orderAdapter
+        .findDoctor
+        .exhaustMap { intent ->
+          requireActivity()
+            .showAlertDialogAsObservable {
+              title("Find doctor")
+              message("Find doctor for this order")
+              cancelable(true)
+              iconId(R.drawable.ic_baseline_find_in_page_24)
+            }
+            .map { intent }
+        }
     )
   }
 
