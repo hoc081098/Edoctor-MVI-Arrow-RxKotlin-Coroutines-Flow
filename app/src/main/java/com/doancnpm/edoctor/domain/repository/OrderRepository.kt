@@ -23,4 +23,6 @@ interface OrderRepository {
     orderId: Long?,
     statuses: Set<Order.Status>?,
   ): DomainResult<List<Order>>
+
+  suspend fun cancel(order: Order): DomainResult<Unit>
 }

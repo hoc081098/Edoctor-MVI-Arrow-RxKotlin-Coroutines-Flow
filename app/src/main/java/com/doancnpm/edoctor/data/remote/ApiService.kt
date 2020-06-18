@@ -69,6 +69,9 @@ interface ApiService {
     @Query("order_id") orderId: Long?,
     @QueryMap(encoded = true) statuses: Map<String, String>,
   ): BaseResponse<OrdersResponse>
+
+  @PUT("orders/cancel/{order_id}")
+  suspend fun cancelOrder(@Path("order_id") orderId: Long): BaseResponse<Any>
   //endregion
 
   //region Promotion

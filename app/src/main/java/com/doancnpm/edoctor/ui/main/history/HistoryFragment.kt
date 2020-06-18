@@ -25,7 +25,7 @@ class HistoryFragment : BaseFragment(R.layout.fragment_history) {
   }
   private val viewModel by viewModel<HistoryVM>()
 
-  private val orderAdapter by lazy(NONE) { OrderAdapter(GlideApp.with(this)) }
+  private val orderAdapter by lazy(NONE) { OrderAdapter(GlideApp.with(this), compositeDisposable) }
   private val footerAdapter by lazy(NONE) { FooterAdapter(::onRetryNextPage) }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -42,7 +42,14 @@ class HistoryFragment : BaseFragment(R.layout.fragment_history) {
   }
 
   private fun handleEvent(singleEvent: SingleEvent) {
-    TODO("handleEvent")
+    when (singleEvent) {
+      is SingleEvent.Cancel.Success -> {
+        view?.snack("Cancel successfully")
+      }
+      is SingleEvent.Cancel.Failure -> {
+        view?.snack("Cancel failure: ${singleEvent.error.getMessage()}")
+      }
+    }.exhaustive
   }
 
   private fun setupViews() {
@@ -115,7 +122,18 @@ class HistoryFragment : BaseFragment(R.layout.fragment_history) {
         .filter { (_, _, dy) ->
           dy > 0 && linearLayoutManager.findLastVisibleItemPosition() + VISIBLE_THRESHOLD >= linearLayoutManager.itemCount
         }
-        .map { ViewIntent.LoadNextPage }
+        .map { ViewIntent.LoadNextPage },
+      orderAdapter
+        .cancelOrder
+        .exhaustMap { intent ->
+          requireActivity()
+            .showAlertDialogAsObservable {
+              title("Cancel")
+              message("This action cannot be undone")
+              cancelable(true)
+            }
+            .map { intent }
+        },
     )
   }
 

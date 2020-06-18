@@ -145,7 +145,12 @@ val viewModelModule = module {
   //endregion
 
   //region History
-  factory<HistoryContract.Interactor> { HistoryInteractor(orderRepository = get()) }
+  factory<HistoryContract.Interactor> {
+    HistoryInteractor(
+      orderRepository = get(),
+      dispatchers = get(),
+    )
+  }
 
   viewModel {
     HistoryVM(
