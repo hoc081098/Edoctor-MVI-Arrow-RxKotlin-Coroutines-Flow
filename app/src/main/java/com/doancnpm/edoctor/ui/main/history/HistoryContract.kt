@@ -39,6 +39,13 @@ interface HistoryContract {
         return page == 0
           && firstPageState is PlaceholderState.Error
       }
+
+    val canRetryNextPage: Boolean
+      get() {
+        return page > 0
+          && firstPageState is PlaceholderState.Success
+          && nextPageState.firstOrNull() is PlaceholderState.Idle
+      }
   }
 
   enum class HistoryType(val statuses: Set<Order.Status>) {

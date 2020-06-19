@@ -108,6 +108,25 @@ class HistoryVM(
           .takeUntil(changeTypeIntent)
       }
 
+    val retryNextPageChange = intentS.ofType<ViewIntent.RetryNextPage>()
+      .withLatestFrom(stateS)
+      .mapNotNull { (_, viewState) ->
+        if (viewState.canRetryNextPage) viewState.page + 1 to viewState.type
+        else null
+      }
+      .exhaustMap { (page, type) ->
+        interactor
+          .load(
+            page = page,
+            perPage = PER_PAGE,
+            serviceName = null,
+            date = null,
+            orderId = null,
+            type = type
+          )
+          .takeUntil(changeTypeIntent)
+      }
+
     Observable
       .mergeArray(
         changeTypeChange,
@@ -115,6 +134,7 @@ class HistoryVM(
         cancelOrderChange,
         findDoctorChange,
         retryFirstPageChange,
+        retryNextPageChange,
       )
       .observeOn(schedulers.main)
       .scan(initialState) { vs, change -> change.reduce(vs) }
