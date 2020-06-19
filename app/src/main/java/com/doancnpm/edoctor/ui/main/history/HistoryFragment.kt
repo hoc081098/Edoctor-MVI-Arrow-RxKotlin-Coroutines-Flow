@@ -30,7 +30,12 @@ class HistoryFragment : BaseFragment(R.layout.fragment_history) {
   private val schedulers by inject<AppSchedulers>()
 
   private val orderAdapter by lazy(NONE) { OrderAdapter(GlideApp.with(this), compositeDisposable) }
-  private val footerAdapter by lazy(NONE) { FooterAdapter(::onRetryNextPage) }
+  private val footerAdapter by lazy(NONE) {
+    FooterAdapter(
+      schedulers = schedulers,
+      compositeDisposable = compositeDisposable
+    )
+  }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
@@ -161,10 +166,9 @@ class HistoryFragment : BaseFragment(R.layout.fragment_history) {
         .clicks()
         .throttleFirst(200, TimeUnit.MILLISECONDS, schedulers.main)
         .map { ViewIntent.RetryFirstPage },
+      footerAdapter.retryNextPage,
     )
   }
-
-  private fun onRetryNextPage(): Unit = TODO()
 
   private companion object {
     const val VISIBLE_THRESHOLD = 1
