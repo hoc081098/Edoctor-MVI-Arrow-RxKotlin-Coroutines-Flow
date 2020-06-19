@@ -8,12 +8,15 @@ import com.doancnpm.edoctor.GlideApp
 import com.doancnpm.edoctor.R
 import com.doancnpm.edoctor.core.BaseFragment
 import com.doancnpm.edoctor.databinding.FragmentHistoryBinding
+import com.doancnpm.edoctor.domain.dispatchers.AppSchedulers
 import com.doancnpm.edoctor.domain.entity.getMessage
 import com.doancnpm.edoctor.ui.main.history.HistoryContract.*
 import com.doancnpm.edoctor.utils.*
 import com.jakewharton.rxbinding4.recyclerview.scrollEvents
+import com.jakewharton.rxbinding4.view.clicks
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.kotlin.addTo
+import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
@@ -24,6 +27,7 @@ class HistoryFragment : BaseFragment(R.layout.fragment_history) {
     recyclerView.adapter = null
   }
   private val viewModel by viewModel<HistoryVM>()
+  private val schedulers by inject<AppSchedulers>()
 
   private val orderAdapter by lazy(NONE) { OrderAdapter(GlideApp.with(this), compositeDisposable) }
   private val footerAdapter by lazy(NONE) { FooterAdapter(::onRetryNextPage) }
@@ -124,7 +128,7 @@ class HistoryFragment : BaseFragment(R.layout.fragment_history) {
         .map(ViewIntent::ChangeType),
       binding.recyclerView
         .scrollEvents()
-        .throttleLatest(200, TimeUnit.MILLISECONDS, true)
+        .throttleLatest(200, TimeUnit.MILLISECONDS, schedulers.main, true)
         .filter { (_, _, dy) ->
           dy > 0 && linearLayoutManager.findLastVisibleItemPosition() + VISIBLE_THRESHOLD >= linearLayoutManager.itemCount
         }
@@ -152,7 +156,11 @@ class HistoryFragment : BaseFragment(R.layout.fragment_history) {
               iconId(R.drawable.ic_baseline_find_in_page_24)
             }
             .map { intent }
-        }
+        },
+      binding.retryButton
+        .clicks()
+        .throttleFirst(200, TimeUnit.MILLISECONDS, schedulers.main)
+        .map { ViewIntent.RetryFirstPage },
     )
   }
 

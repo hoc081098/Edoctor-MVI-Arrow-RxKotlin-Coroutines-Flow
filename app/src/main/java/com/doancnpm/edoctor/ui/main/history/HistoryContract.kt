@@ -33,6 +33,12 @@ interface HistoryContract {
           && firstPageState is PlaceholderState.Success
           && nextPageState.firstOrNull() is PlaceholderState.Idle
       }
+
+    val canRetryFirstPage: Boolean
+      get() {
+        return page == 0
+          && firstPageState is PlaceholderState.Error
+      }
   }
 
   enum class HistoryType(val statuses: Set<Order.Status>) {
@@ -70,6 +76,9 @@ interface HistoryContract {
   sealed class ViewIntent {
     data class ChangeType(val historyType: HistoryType) : ViewIntent()
     object LoadNextPage : ViewIntent()
+
+    object RetryFirstPage : ViewIntent()
+    object RetryNextPage : ViewIntent()
 
     data class Cancel(val order: Order) : ViewIntent()
     data class FindDoctor(val order: Order) : ViewIntent()

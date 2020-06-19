@@ -89,12 +89,32 @@ class HistoryVM(
         }.let { singleEventD.value = Event(it) }
       }
 
+    val retryFirstPageChange = intentS.ofType<ViewIntent.RetryFirstPage>()
+      .withLatestFrom(stateS)
+      .mapNotNull { (_, viewState) ->
+        if (viewState.canRetryFirstPage) viewState.type
+        else null
+      }
+      .exhaustMap { type ->
+        interactor
+          .load(
+            page = 1,
+            perPage = PER_PAGE,
+            serviceName = null,
+            date = null,
+            orderId = null,
+            type = type,
+          )
+          .takeUntil(changeTypeIntent)
+      }
+
     Observable
       .mergeArray(
         changeTypeChange,
         nextPageChange,
         cancelOrderChange,
         findDoctorChange,
+        retryFirstPageChange,
       )
       .observeOn(schedulers.main)
       .scan(initialState) { vs, change -> change.reduce(vs) }
