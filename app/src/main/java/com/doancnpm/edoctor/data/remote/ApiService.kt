@@ -75,6 +75,9 @@ interface ApiService {
 
   @GET("orders/find-doctors/{order_id}")
   suspend fun findDoctor(@Path("order_id") orderId: Long): BaseResponse<Any>
+
+  @GET("orders/qr-code/{order_id}")
+  suspend fun getQrCode(@Path("order_id") orderId: Long): BaseResponse<String>
   //endregion
 
   //region Promotion

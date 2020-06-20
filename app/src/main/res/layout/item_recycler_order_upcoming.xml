@@ -60,7 +60,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginEnd="8dp"
+            android:layout_marginEnd="16dp"
             android:ellipsize="end"
             android:fontFamily="@font/nunito_sans_semibold"
             android:maxLines="2"
@@ -79,7 +79,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
+            android:layout_marginEnd="6dp"
             android:ellipsize="end"
             android:fontFamily="@font/google_sans"
             android:maxLines="2"
@@ -96,7 +96,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="4dp"
             android:ellipsize="end"
             android:fontFamily="@font/google_sans"
             android:maxLines="2"
@@ -123,7 +123,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/image_view"
+            app:layout_constraintTop_toBottomOf="@+id/barrier2"
             tools:text="Address: 1600 Amphitheatre Pkwy, Mountain View, CA 94043, USA" />
 
         <TextView
@@ -131,7 +131,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="4dp"
             android:layout_marginEnd="8dp"
             android:ellipsize="end"
             android:fontFamily="@font/google_sans"
@@ -148,14 +148,13 @@
             android:id="@+id/text_total_price_wrapper"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginStart="8dp"
             app:cardBackgroundColor="#DAA520"
             app:cardCornerRadius="6dp"
             app:cardElevation="0dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintBottom_toBottomOf="@+id/card_qr_code"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/text_note">
+            app:layout_constraintTop_toTopOf="@+id/card_qr_code">
 
             <TextView
                 android:id="@+id/text_total_price"
@@ -177,7 +176,6 @@
             android:id="@+id/cancel_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
             android:layout_marginEnd="8dp"
             android:elevation="4dp"
             android:fontFamily="@font/google_sans"
@@ -189,8 +187,9 @@
             android:textSize="12sp"
             app:backgroundTint="@color/colorBackground"
             app:cornerRadius="4dp"
+            app:layout_constraintBottom_toBottomOf="@+id/image_avatar"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/text_total_price_wrapper"
+            app:layout_constraintTop_toTopOf="@+id/image_avatar"
             app:strokeColor="@color/colorAccent"
             app:strokeWidth="1dp" />
 
@@ -198,8 +197,7 @@
             android:id="@+id/image_avatar"
             android:layout_width="64dp"
             android:layout_height="64dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginStart="16dp"
             android:layout_marginBottom="8dp"
             android:elevation="10dp"
             android:scaleType="centerCrop"
@@ -208,13 +206,13 @@
             app:civ_circle_background_color="#fafafa"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/text_total_price_wrapper" />
+            app:layout_constraintTop_toBottomOf="@+id/card_qr_code" />
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/card_qr_code"
-            android:layout_width="72dp"
-            android:layout_height="72dp"
-            android:layout_marginTop="8dp"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:layout_marginTop="4dp"
             android:layout_marginEnd="8dp"
             app:cardCornerRadius="1dp"
             app:cardElevation="3dp"
@@ -222,7 +220,7 @@
             app:cardUseCompatPadding="true"
             app:contentPadding="0dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toBottomOf="@+id/text_note">
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/image_qr_code"
@@ -231,6 +229,13 @@
                 android:src="@drawable/icons8_qr_code" />
 
         </com.google.android.material.card.MaterialCardView>
+
+        <androidx.constraintlayout.widget.Barrier
+            android:id="@+id/barrier2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:barrierDirection="bottom"
+            app:constraint_referenced_ids="image_view,text_end_time" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>

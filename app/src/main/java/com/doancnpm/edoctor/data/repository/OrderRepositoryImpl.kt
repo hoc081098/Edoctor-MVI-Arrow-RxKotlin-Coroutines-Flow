@@ -100,4 +100,7 @@ class OrderRepositoryImpl(
 
   override suspend fun findDoctor(order: Order): DomainResult<Unit> =
     Either.catch(errorMapper::map) { apiService.findDoctor(order.id).unwrap() }
+
+  override suspend fun getQrCode(orderId: Long): DomainResult<String>  =
+    Either.catch(errorMapper::map) { apiService.getQrCode(orderId).unwrap() }
 }

@@ -27,4 +27,6 @@ interface OrderRepository {
   suspend fun cancel(order: Order): DomainResult<Unit>
 
   suspend fun findDoctor(order: Order): DomainResult<Unit>
+
+  suspend fun getQrCode(orderId: Long): DomainResult<String>
 }
