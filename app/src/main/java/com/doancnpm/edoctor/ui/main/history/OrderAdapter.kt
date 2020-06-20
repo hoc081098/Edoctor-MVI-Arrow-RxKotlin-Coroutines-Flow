@@ -1,5 +1,7 @@
 package com.doancnpm.edoctor.ui.main.history
 
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,6 +11,8 @@ import androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.amulyakhare.textdrawable.TextDrawable
+import com.amulyakhare.textdrawable.util.ColorGenerator
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.doancnpm.edoctor.GlideRequests
 import com.doancnpm.edoctor.R
@@ -19,10 +23,7 @@ import com.doancnpm.edoctor.databinding.ItemRecyclerOrderWaitingBinding
 import com.doancnpm.edoctor.domain.entity.Order
 import com.doancnpm.edoctor.ui.main.history.HistoryContract.HistoryType.Helper.layoutIdFor
 import com.doancnpm.edoctor.ui.main.history.HistoryContract.ViewIntent
-import com.doancnpm.edoctor.utils.asObservable
-import com.doancnpm.edoctor.utils.currencyVndFormatted
-import com.doancnpm.edoctor.utils.mapNotNull
-import com.doancnpm.edoctor.utils.toString_yyyyMMdd_HHmmss
+import com.doancnpm.edoctor.utils.*
 import com.jakewharton.rxbinding4.view.clicks
 import com.jakewharton.rxbinding4.view.detaches
 import com.jakewharton.rxrelay3.PublishRelay
@@ -42,6 +43,9 @@ class OrderAdapter(
   private val findDoctorS = PublishRelay.create<ViewIntent.FindDoctor>()
   val findDoctor get() = findDoctorS.asObservable()
 
+  private val clickQRCodeS = PublishRelay.create<Order>()
+  val clickQRCode get() = clickQRCodeS.asObservable()
+
   @LayoutRes
   override fun getItemViewType(position: Int) = layoutIdFor(getItem(position).status)
 
@@ -52,7 +56,10 @@ class OrderAdapter(
         ItemRecyclerOrderWaitingBinding.inflate(inflater, parent, false),
         parent
       )
-      R.layout.item_recycler_order_upcoming -> UpComingVH(ItemRecyclerOrderUpcomingBinding.inflate(inflater, parent, false))
+      R.layout.item_recycler_order_upcoming -> UpComingVH(
+        ItemRecyclerOrderUpcomingBinding.inflate(inflater, parent, false),
+        parent
+      )
       R.layout.item_recycler_order_processing -> ProcessingVH(ItemRecyclerOrderProcessingBinding.inflate(inflater, parent, false))
       R.layout.item_recycler_order_done -> DoneVH(ItemRecyclerOrderDoneBinding.inflate(inflater, parent, false))
       else -> error("Invalid viewType: $viewType")
@@ -137,9 +144,99 @@ class OrderAdapter(
     }
   }
 
-  class UpComingVH(private val binding: ItemRecyclerOrderUpcomingBinding) : VH(binding.root) {
+  inner class UpComingVH(
+    private val binding: ItemRecyclerOrderUpcomingBinding,
+    parent: ViewGroup
+  ) : VH(binding.root) {
+    init {
+      binding.cancelButton
+        .clicks()
+        .takeUntil(parent.detaches())
+        .mapNotNull {
+          val position = bindingAdapterPosition
+          if (position == RecyclerView.NO_POSITION) {
+            null
+          } else {
+            ViewIntent.Cancel(getItem(position))
+          }
+        }
+        .subscribe(cancelOrderS)
+        .addTo(compositeDisposable)
+
+      binding.cardQrCode.clicks()
+        .takeUntil(parent.detaches())
+        .mapNotNull {
+          val position = bindingAdapterPosition
+          if (position == RecyclerView.NO_POSITION) null
+          else getItem(position)
+        }
+        .subscribe(clickQRCodeS)
+        .addTo(compositeDisposable)
+    }
+
     override fun bind(item: Order) {
-      TODO("Not yet implemented")
+      binding.run {
+        glide
+          .load(item.service.image)
+          .placeholder(R.drawable.logo)
+          .thumbnail(0.5f)
+          .centerCrop()
+          .transition(DrawableTransitionOptions.withCrossFade())
+          .into(imageView)
+        textName.text = item.service.name
+
+        //language=HTML
+        textStartTime.text = HtmlCompat.fromHtml(
+          "<b>Start time: </b>${item.startTime.toString_yyyyMMdd_HHmmss()}",
+          FROM_HTML_MODE_LEGACY
+        )
+        //language=HTML
+        textEndTime.text = HtmlCompat.fromHtml(
+          "<b>End time: </b>${item.endTime.toString_yyyyMMdd_HHmmss()}",
+          FROM_HTML_MODE_LEGACY
+        )
+        //language=HTML
+        textAddress.text = HtmlCompat.fromHtml(
+          "<b>Address: </b>${item.address}",
+          FROM_HTML_MODE_LEGACY
+        )
+        //language=HTML
+        textNote.text = HtmlCompat.fromHtml(
+          "<b>Note: </b>${item.note ?: ""}",
+          FROM_HTML_MODE_LEGACY
+        )
+
+        textTotalPrice.text = "Total: ${item.total.currencyVndFormatted}"
+
+        item.doctor!!.avatar
+          ?.let {
+            glide
+              .load(it)
+              .placeholder(R.drawable.icons8_person_96)
+              .error(R.drawable.icons8_person_96)
+              .transition(DrawableTransitionOptions.withCrossFade())
+              .into(imageAvatar)
+          }
+          ?: when (val firstLetter = item.doctor.fullName.firstOrNull()) {
+            null -> ColorDrawable(Color.parseColor("#fafafa"))
+            else -> {
+              val size = binding.root.context
+                .dpToPx(64)
+              TextDrawable
+                .builder()
+                .beginConfig()
+                .width(size)
+                .height(size)
+                .endConfig()
+                .buildRect(
+                  firstLetter.toUpperCase().toString(),
+                  ColorGenerator.MATERIAL.getColor(item.doctor.phone),
+                )
+            }
+          }.let(imageAvatar::setImageDrawable)
+
+        textDoctorName.text = item.doctor.fullName
+      }
     }
   }
 

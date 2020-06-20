@@ -14,6 +14,7 @@ import com.doancnpm.edoctor.core.BaseFragment
 import com.doancnpm.edoctor.databinding.FragmentCreateOrderBinding
 import com.doancnpm.edoctor.domain.entity.getMessage
 import com.doancnpm.edoctor.ui.main.MainActivity
+import com.doancnpm.edoctor.ui.main.history.HistoryContract
 import com.doancnpm.edoctor.ui.main.home.create_order.inputs.address.InputAddressFragment
 import com.doancnpm.edoctor.ui.main.home.create_order.inputs.confirmation.OrderConfirmationFragment
 import com.doancnpm.edoctor.ui.main.home.create_order.inputs.note.InputNoteFragment
@@ -70,6 +71,7 @@ class CreateOrderFragment : BaseFragment(R.layout.fragment_create_order), () -> 
           CreateOrderContract.SingleEvent.Success -> {
             context?.toast("Submit successfully")
             findNavController().popBackStack(R.id.servicesFragment, false)
+            (requireActivity() as MainActivity).navigateToHistory(HistoryContract.HistoryType.WAITING)
           }
         }
       }

@@ -11,9 +11,11 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.viewbinding.ViewBinding
 import com.google.android.material.chip.ChipGroup
+import com.google.android.material.tabs.TabLayout
 import com.jakewharton.rxbinding4.InitialValueObservable
 import io.reactivex.rxjava3.android.MainThreadDisposable
 import io.reactivex.rxjava3.android.MainThreadDisposable.verifyMainThread
+import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Observer
 import timber.log.Timber
 import java.lang.reflect.Method
@@ -107,5 +109,28 @@ private class ChipGroupCheckedIdObservable(private val view: ChipGroup) : Initia
     }
 
     override fun onDispose() = view.setOnCheckedChangeListener(null)
+  }
+}
+
+@CheckResult
+fun TabLayout.selectedTabPositions(): Observable<Int> {
+  return Observable.create { emitter ->
+    verifyMainThread()
+
+    val listener = object : TabLayout.OnTabSelectedListener {
+      override fun onTabReselected(tab: TabLayout.Tab?) {
+      }
+
+      override fun onTabUnselected(tab: TabLayout.Tab?) {
+      }
+
+      override fun onTabSelected(tab: TabLayout.Tab?) {
+        emitter.onNext(tab?.position ?: return)
+      }
+    }
+    addOnTabSelectedListener(listener)
+    emitter.setDisposable(object : MainThreadDisposable() {
+      override fun onDispose() = removeOnTabSelectedListener(listener)
+    })
   }
 }

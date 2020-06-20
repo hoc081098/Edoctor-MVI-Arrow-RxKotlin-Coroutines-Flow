@@ -24,7 +24,7 @@ data class OrdersResponse(
     @Json(name = "address") val address: String, // 920/6 Tôn Đức Thắng, Hoà Khánh Bắc, Liên Chiểu, Đà Nẵng 550000, Vietnam
     @Json(name = "created_at") val createdAt: String, // 2020-06-15 15:26:48
     @Json(name = "service") val service: ServicesResponse.Service,
-    @Json(name = "doctor") val doctor: LoginUserResponse.User,
+    @Json(name = "doctor") val doctor: LoginUserResponse.User?,
     @Json(name = "customer") val customer: LoginUserResponse.User,
   )
 }

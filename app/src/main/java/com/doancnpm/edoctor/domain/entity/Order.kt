@@ -4,8 +4,6 @@ import java.util.Date
 
 data class Order(
   val id: Long,
-  val customerId: Long,
-  val doctorId: Long?,
   val serviceId: Long,
   val startTime: Date,
   val endTime: Date,
@@ -19,7 +17,7 @@ data class Order(
   val address: String,
   val createdAt: Date,
   val service: Service,
-  val doctor: User,
+  val doctor: User?,
   val customer: User,
 ) {
   enum class Status {

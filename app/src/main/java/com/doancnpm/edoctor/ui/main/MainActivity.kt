@@ -11,6 +11,7 @@ import com.doancnpm.edoctor.R
 import com.doancnpm.edoctor.core.BaseActivity
 import com.doancnpm.edoctor.databinding.ActivityMainBinding
 import com.doancnpm.edoctor.ui.auth.AuthActivity
+import com.doancnpm.edoctor.ui.main.history.HistoryContract
 import com.doancnpm.edoctor.utils.dismissAlertDialog
 import com.doancnpm.edoctor.utils.setupWithNavController
 import com.doancnpm.edoctor.utils.viewBinding
@@ -100,5 +101,10 @@ class MainActivity : BaseActivity() {
       .childFragmentManager
       .fragments
       .forEach { it.onActivityResult(requestCode, resultCode, data) }
+  }
+
+  fun navigateToHistory(type: HistoryContract.HistoryType) {
+    viewModel.setHistoryType(type)
+    binding.navView.selectedItemId = R.id.history
   }
 }

@@ -155,8 +155,6 @@ private fun Int.toOrderStatus(): Order.Status {
 fun OrdersResponse.Order.toOrderDomain(baseUrl: String): Order {
   return Order(
     id = id,
-    customerId = customerId,
-    doctorId = doctorId,
     serviceId = serviceId,
     startTime = parseDate_yyyyMMdd_HHmmss(startTime)!!,
     endTime = parseDate_yyyyMMdd_HHmmss(endTime)!!,
@@ -173,7 +171,7 @@ fun OrdersResponse.Order.toOrderDomain(baseUrl: String): Order {
     address = address,
     createdAt = parseDate_yyyyMMdd_HHmmss(createdAt)!!,
     service = service.toServiceDomain(baseUrl),
-    doctor = doctor.toUserLocal(baseUrl).toUserDomain(),
+    doctor = doctor?.toUserLocal(baseUrl)?.toUserDomain(),
     customer = customer.toUserLocal(baseUrl).toUserDomain(),
   )
 }

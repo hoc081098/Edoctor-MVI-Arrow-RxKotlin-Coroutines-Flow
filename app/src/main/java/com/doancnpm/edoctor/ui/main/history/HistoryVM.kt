@@ -13,6 +13,7 @@ import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.ofType
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.kotlin.withLatestFrom
+import timber.log.Timber
 
 class HistoryVM(
   private val interactor: Interactor,
@@ -38,6 +39,7 @@ class HistoryVM(
     val changeTypeChange = changeTypeIntent
       .map { it.historyType }
       .distinctUntilChanged()
+      .doOnNext { Timber.d("[###] [2] $it") }
       .switchMap { type ->
         interactor.load(
           page = 1,
