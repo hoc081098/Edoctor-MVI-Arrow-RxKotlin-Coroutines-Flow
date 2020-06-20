@@ -110,7 +110,7 @@ class OrderAdapter(
     override fun bind(item: Order) {
       binding.run {
         glide
-          .load(item.service.image)
+          .load(item.service!!.image)
           .placeholder(R.drawable.logo)
           .thumbnail(0.5f)
           .centerCrop()
@@ -177,7 +177,7 @@ class OrderAdapter(
     override fun bind(item: Order) {
       binding.run {
         glide
-          .load(item.service.image)
+          .load(item.service!!.image)
           .placeholder(R.drawable.logo)
           .thumbnail(0.5f)
           .centerCrop()

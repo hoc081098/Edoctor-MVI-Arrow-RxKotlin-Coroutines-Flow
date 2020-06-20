@@ -14,7 +14,9 @@ import com.doancnpm.edoctor.ui.main.MainVM
 import com.doancnpm.edoctor.ui.main.history.HistoryContract.*
 import com.doancnpm.edoctor.utils.*
 import com.jakewharton.rxbinding4.recyclerview.scrollEvents
+import com.jakewharton.rxbinding4.swiperefreshlayout.refreshes
 import com.jakewharton.rxbinding4.view.clicks
+import com.jakewharton.rxrelay3.PublishRelay
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
@@ -41,13 +43,26 @@ class HistoryFragment : BaseFragment(R.layout.fragment_history) {
     )
   }
 
+  private val intentsS = PublishRelay.create<ViewIntent>()
+
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 
-    val initialHistoryType = mainVM.getHistoryType() ?: viewModel.viewState.value!!.type
+    val viewState = viewModel.viewState.value!!
+
+    var needRefresh = false
+    val initialHistoryType = mainVM.getHistoryType()?.also { needRefresh = true } ?: viewState.type
+    val orderId = mainVM.getOrderId()
 
     setupViews(initialHistoryType)
     bindVM(initialHistoryType)
+
+    // dispatch retry or refresh intent when needed
+    if (needRefresh) {
+      intentsS.accept(ViewIntent.Refresh(orderId))
+    } else if (viewState.canRetryFirstPage) {
+      intentsS.accept(ViewIntent.RetryFirstPage)
+    }
   }
 
   private fun bindVM(initialHistoryType: HistoryType) {
@@ -89,7 +104,7 @@ class HistoryFragment : BaseFragment(R.layout.fragment_history) {
 
     orderAdapter.clickQRCode
       .subscribeBy {
-        view?.snack("QR code ${it.service.name}")
+        view?.snack("QR code ${it.service!!.name}")
       }
       .addTo(compositeDisposable)
   }
@@ -97,8 +112,18 @@ class HistoryFragment : BaseFragment(R.layout.fragment_history) {
   private fun render(viewState: ViewState) = binding.run {
     Timber.d("State: $viewState")
 
-    orderAdapter.submitList(viewState.orders)
+    orderAdapter.submitList(viewState.orders) {
+      viewModel.scrollToTop
+        ?.getContentIfNotHandled()
+        ?.let { recyclerView.scrollToPosition(0) }
+    }
     footerAdapter.submitList(viewState.nextPageState)
+
+    if (viewState.isRefreshing) {
+      binding.swipeRefreshLayout.post { binding.swipeRefreshLayout.isRefreshing = true }
+    } else {
+      binding.swipeRefreshLayout.isRefreshing = false
+    }
 
     when (val firstPageState = viewState.firstPageState) {
       PlaceholderState.Idle, is PlaceholderState.Success -> {
@@ -128,6 +153,7 @@ class HistoryFragment : BaseFragment(R.layout.fragment_history) {
     val linearLayoutManager = binding.recyclerView.layoutManager as LinearLayoutManager
 
     return Observable.mergeArray(
+      intentsS,
       binding.tabLayout
         .selectedTabPositions()
         .map { HistoryType.values().getOrElse(it) { HistoryType.WAITING } }
@@ -170,6 +196,9 @@ class HistoryFragment : BaseFragment(R.layout.fragment_history) {
         .throttleFirst(200, TimeUnit.MILLISECONDS, schedulers.main)
         .map { ViewIntent.RetryFirstPage },
       footerAdapter.retryNextPage,
+      binding.swipeRefreshLayout
+        .refreshes()
+        .map { ViewIntent.Refresh(null) },
     )
   }
 

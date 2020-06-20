@@ -9,6 +9,7 @@ import com.doancnpm.edoctor.domain.entity.Order
 import com.doancnpm.edoctor.domain.repository.OrderRepository
 import com.doancnpm.edoctor.ui.main.history.HistoryContract.HistoryType
 import com.doancnpm.edoctor.ui.main.history.HistoryContract.PartialChange
+import com.doancnpm.edoctor.utils.mapNotNull
 import io.reactivex.rxjava3.core.Observable
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.rx3.rxObservable
@@ -26,6 +27,7 @@ interface HistoryContract {
     val nextPageState: List<PlaceholderState> = emptyList(),
     val page: Int = 0,
     val type: HistoryType = HistoryType.WAITING,
+    val isRefreshing: Boolean = false,
   ) {
     val canLoadNextPage: Boolean
       get() {
@@ -86,6 +88,7 @@ interface HistoryContract {
 
     object RetryFirstPage : ViewIntent()
     object RetryNextPage : ViewIntent()
+    data class Refresh(val orderId: Long?) : ViewIntent()
 
     data class Cancel(val order: Order) : ViewIntent()
     data class FindDoctor(val order: Order) : ViewIntent()
@@ -175,6 +178,20 @@ interface HistoryContract {
       data class Success(val order: Order) : FindDoctor()
       data class Failure(val order: Order, val error: AppError) : FindDoctor()
     }
+
+    sealed class Refresh : PartialChange() {
+      override fun reduce(vs: ViewState): ViewState {
+        return when (this) {
+          Refreshing -> vs.copy(isRefreshing = true)
+          is Success -> vs.copy(isRefreshing = false, orders = orders)
+          is Failure -> vs.copy(isRefreshing = false)
+        }
+      }
+
+      object Refreshing : Refresh()
+      data class Success(val orders: List<Order>) : Refresh()
+      data class Failure(val error: AppError) : Refresh()
+    }
   }
 
   interface Interactor {
@@ -190,6 +207,14 @@ interface HistoryContract {
     fun cancel(order: Order): Observable<PartialChange.Cancel>
 
     fun findDoctor(order: Order): Observable<PartialChange.FindDoctor>
+
+    fun refresh(
+      @IntRange(from = 1) perPage: Int,
+      serviceName: String?,
+      date: Date?,
+      orderId: Long?,
+      type: HistoryType
+    ): Observable<PartialChange.Refresh>
   }
 }
 
@@ -259,6 +284,33 @@ class HistoryInteractor(
           ifRight = { PartialChange.FindDoctor.Success(order) },
         )
         .let { send(it) }
+    }
+  }
+
+  override fun refresh(
+    perPage: Int,
+    serviceName: String?,
+    date: Date?,
+    orderId: Long?,
+    type: HistoryType
+  ): Observable<PartialChange.Refresh> {
+    return load(
+      page = 1,
+      perPage = perPage,
+      serviceName = serviceName,
+      date = date,
+      orderId = orderId,
+      type = type
+    ).mapNotNull {
+      if (it is PartialChange.FirstPage) {
+        when (it) {
+          PartialChange.FirstPage.Loading -> PartialChange.Refresh.Refreshing
+          is PartialChange.FirstPage.Error -> PartialChange.Refresh.Failure(it.error)
+          is PartialChange.FirstPage.Data -> PartialChange.Refresh.Success(it.orders)
+        }
+      } else {
+        null
+      }
     }
   }
 }

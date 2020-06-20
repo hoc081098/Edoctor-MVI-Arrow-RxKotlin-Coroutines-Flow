@@ -28,7 +28,7 @@ class OrderRepositoryImpl(
     card: Card,
     startTime: Date,
     endTime: Date
-  ): DomainResult<Unit> {
+  ): DomainResult<Order> {
     return Either.catch(errorMapper::map) {
       val originalPrice = service.price.toDouble()
       val total = promotion?.discount?.let { originalPrice * (1 - it) }
@@ -52,6 +52,7 @@ class OrderRepositoryImpl(
           )
         )
         .unwrap()
+        .toOrderDomain(baseUrl)
     }
   }
 

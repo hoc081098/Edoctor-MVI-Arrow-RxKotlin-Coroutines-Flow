@@ -176,6 +176,31 @@ fun OrdersResponse.Order.toOrderDomain(baseUrl: String): Order {
   )
 }
 
+fun CreateOrderResponse.toOrderDomain(baseUrl: String): Order {
+  return Order(
+    id = id,
+    serviceId = serviceId,
+    startTime = parseDate_yyyyMMdd_HHmmss(startTime)!!,
+    endTime = parseDate_yyyyMMdd_HHmmss(endTime)!!,
+    note = note,
+    originalPrice = originalPrice,
+    promotionId = promotionId,
+    total = total,
+    payCardId = payCardId,
+    status = Order.Status.PENDING_STATUS,
+    location = Location(
+      latitude = lat,
+      longitude = lng,
+    ),
+    address = address,
+    createdAt = parseDate_yyyyMMdd_HHmmss(createdAt)!!,
+    service = null,
+    doctor = null,
+    customer = null,
+  )
+}
+
+
 //endregion
 
 class ErrorMapper(private val errorResponseJsonAdapter: ErrorResponseJsonAdapter) {
