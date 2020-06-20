@@ -10,13 +10,16 @@ import com.doancnpm.edoctor.core.BaseFragment
 import com.doancnpm.edoctor.databinding.FragmentHistoryBinding
 import com.doancnpm.edoctor.domain.dispatchers.AppSchedulers
 import com.doancnpm.edoctor.domain.entity.getMessage
+import com.doancnpm.edoctor.ui.main.MainVM
 import com.doancnpm.edoctor.ui.main.history.HistoryContract.*
 import com.doancnpm.edoctor.utils.*
 import com.jakewharton.rxbinding4.recyclerview.scrollEvents
 import com.jakewharton.rxbinding4.view.clicks
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.kotlin.addTo
+import io.reactivex.rxjava3.kotlin.subscribeBy
 import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
@@ -28,6 +31,7 @@ class HistoryFragment : BaseFragment(R.layout.fragment_history) {
   }
   private val viewModel by viewModel<HistoryVM>()
   private val schedulers by inject<AppSchedulers>()
+  private val mainVM by sharedViewModel<MainVM>()
 
   private val orderAdapter by lazy(NONE) { OrderAdapter(GlideApp.with(this), compositeDisposable) }
   private val footerAdapter by lazy(NONE) {
@@ -40,14 +44,16 @@ class HistoryFragment : BaseFragment(R.layout.fragment_history) {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 
-    setupViews()
-    bindVM()
+    val initialHistoryType = mainVM.getHistoryType() ?: viewModel.viewState.value!!.type
+
+    setupViews(initialHistoryType)
+    bindVM(initialHistoryType)
   }
 
-  private fun bindVM() {
+  private fun bindVM(initialHistoryType: HistoryType) {
     viewModel.viewState.observe(owner = viewLifecycleOwner, ::render)
     viewModel.singleEvent.observeEvent(owner = viewLifecycleOwner, ::handleEvent)
-    viewModel.process(intents()).addTo(compositeDisposable)
+    viewModel.process(intents(initialHistoryType)).addTo(compositeDisposable)
   }
 
   private fun handleEvent(singleEvent: SingleEvent) {
@@ -67,21 +73,25 @@ class HistoryFragment : BaseFragment(R.layout.fragment_history) {
     }.exhaustive
   }
 
-  private fun setupViews() {
-    binding.chipGroup.check(
-      when (viewModel.viewState.value!!.type) {
-        HistoryType.WAITING -> R.id.chip_waiting
-        HistoryType.UP_COMING -> R.id.chip_up_coming
-        HistoryType.PROCESSING -> R.id.chip_processing
-        HistoryType.DONE -> R.id.chip_done
-      }
-    )
+  private fun setupViews(initialHistoryType: HistoryType) {
+    HistoryType.values()
+      .indexOf(initialHistoryType)
+      .let(binding.tabLayout::getTabAt)
+      .let(binding.tabLayout::selectTab)
+
+    Timber.d("[###] [0] $initialHistoryType")
 
     binding.recyclerView.run {
       setHasFixedSize(true)
       layoutManager = LinearLayoutManager(context)
       adapter = MergeAdapter(orderAdapter, footerAdapter)
     }
+
+    orderAdapter.clickQRCode
+      .subscribeBy {
+        view?.snack("QR code ${it.service.name}")
+      }
+      .addTo(compositeDisposable)
   }
 
   private fun render(viewState: ViewState) = binding.run {
@@ -114,22 +124,15 @@ class HistoryFragment : BaseFragment(R.layout.fragment_history) {
     }
   }
 
-  private fun intents(): Observable<ViewIntent> {
+  private fun intents(initialHistoryType: HistoryType): Observable<ViewIntent> {
     val linearLayoutManager = binding.recyclerView.layoutManager as LinearLayoutManager
 
     return Observable.mergeArray(
-      binding.chipGroup
-        .checkedIds()
-        .distinctUntilChanged()
-        .map {
-          when (it) {
-            R.id.chip_waiting -> HistoryType.WAITING
-            R.id.chip_up_coming -> HistoryType.UP_COMING
-            R.id.chip_processing -> HistoryType.PROCESSING
-            R.id.chip_done -> HistoryType.DONE
-            else -> error("Invalid checked id: $it")
-          }
-        }
+      binding.tabLayout
+        .selectedTabPositions()
+        .map { HistoryType.values().getOrElse(it) { HistoryType.WAITING } }
+        .startWithItem(initialHistoryType)
+        .doOnNext { Timber.d("[###] [1] $it") }
         .map(ViewIntent::ChangeType),
       binding.recyclerView
         .scrollEvents()
