@@ -103,8 +103,9 @@ class MainActivity : BaseActivity() {
       .forEach { it.onActivityResult(requestCode, resultCode, data) }
   }
 
-  fun navigateToHistory(type: HistoryContract.HistoryType) {
+  fun navigateToHistory(type: HistoryContract.HistoryType, orderId: Long) {
     viewModel.setHistoryType(type)
+    viewModel.setOrderId(orderId)
     binding.navView.selectedItemId = R.id.history
   }
 }

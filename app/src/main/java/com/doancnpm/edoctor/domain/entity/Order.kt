@@ -16,9 +16,9 @@ data class Order(
   val location: Location,
   val address: String,
   val createdAt: Date,
-  val service: Service,
+  val service: Service?,
   val doctor: User?,
-  val customer: User,
+  val customer: User?,
 ) {
   enum class Status {
     PENDING_STATUS,

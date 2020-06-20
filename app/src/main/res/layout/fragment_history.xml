@@ -33,15 +33,21 @@
             android:text="Done" />
     </com.google.android.material.tabs.TabLayout>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerView"
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefreshLayout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:scrollbars="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tabLayout"
-        tools:listitem="@layout/item_recycler_service"
-        tools:visibility="invisible" />
+        app:layout_constraintTop_toBottomOf="@id/tabLayout">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scrollbars="vertical"
+            tools:listitem="@layout/item_recycler_service"
+            tools:visibility="invisible" />
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/empty_layout"
@@ -50,10 +56,10 @@
         android:layout_gravity="center"
         android:visibility="gone"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        app:layout_constraintBottom_toBottomOf="@id/recyclerView"
-        app:layout_constraintEnd_toEndOf="@id/recyclerView"
-        app:layout_constraintStart_toStartOf="@id/recyclerView"
-        app:layout_constraintTop_toTopOf="@id/recyclerView"
+        app:layout_constraintBottom_toBottomOf="@id/swipeRefreshLayout"
+        app:layout_constraintEnd_toEndOf="@id/swipeRefreshLayout"
+        app:layout_constraintStart_toStartOf="@id/swipeRefreshLayout"
+        app:layout_constraintTop_toTopOf="@id/swipeRefreshLayout"
         tools:visibility="visible">
 
         <ImageView
@@ -96,7 +102,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/recyclerView"
+        app:layout_constraintTop_toTopOf="@id/swipeRefreshLayout"
         tools:visibility="invisible" />
 
     <com.google.android.material.button.MaterialButton

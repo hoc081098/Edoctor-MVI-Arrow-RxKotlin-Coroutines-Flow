@@ -63,15 +63,20 @@ class CreateOrderFragment : BaseFragment(R.layout.fragment_create_order), () -> 
       .subscribeBy { event ->
         when (event) {
           is CreateOrderContract.SingleEvent.Error -> {
+            Timber.d("Error: ${event.appError}")
             context?.toast("Submit failure: ${event.appError.getMessage()}")
           }
           CreateOrderContract.SingleEvent.MissingRequiredInput -> {
             context?.toast("Missing required input. Please fill before submitting!")
           }
-          CreateOrderContract.SingleEvent.Success -> {
+          is CreateOrderContract.SingleEvent.Success -> {
             context?.toast("Submit successfully")
+
             findNavController().popBackStack(R.id.servicesFragment, false)
-            (requireActivity() as MainActivity).navigateToHistory(HistoryContract.HistoryType.WAITING)
+            (requireActivity() as MainActivity).navigateToHistory(
+              type = HistoryContract.HistoryType.WAITING,
+              orderId = event.order.id
+            )
           }
         }
       }

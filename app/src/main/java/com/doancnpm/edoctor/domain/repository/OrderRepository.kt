@@ -13,7 +13,7 @@ interface OrderRepository {
     card: Card,
     startTime: Date,
     endTime: Date,
-  ): DomainResult<Unit>
+  ): DomainResult<Order>
 
   suspend fun getOrders(
     @IntRange(from = 1) page: Int,

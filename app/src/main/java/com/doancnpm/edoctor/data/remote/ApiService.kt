@@ -58,7 +58,7 @@ interface ApiService {
 
   //region Order
   @POST("orders")
-  suspend fun createOrder(@Body body: CreateOrderBody): BaseResponse<Any>
+  suspend fun createOrder(@Body body: CreateOrderBody): BaseResponse<CreateOrderResponse>
 
   @GET("orders")
   suspend fun getOrders(

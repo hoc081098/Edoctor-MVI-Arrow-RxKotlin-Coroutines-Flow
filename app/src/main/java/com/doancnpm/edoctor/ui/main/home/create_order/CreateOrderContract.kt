@@ -1,9 +1,6 @@
 package com.doancnpm.edoctor.ui.main.home.create_order
 
-import com.doancnpm.edoctor.domain.entity.AppError
-import com.doancnpm.edoctor.domain.entity.Card
-import com.doancnpm.edoctor.domain.entity.Location
-import com.doancnpm.edoctor.domain.entity.Promotion
+import com.doancnpm.edoctor.domain.entity.*
 import java.util.Date
 
 interface CreateOrderContract {
@@ -58,7 +55,7 @@ interface CreateOrderContract {
 
     // Create order
     object MissingRequiredInput : SingleEvent()
-    object Success : SingleEvent()
+    data class Success(val order: Order) : SingleEvent()
     data class Error(val appError: AppError) : SingleEvent()
   }
 }

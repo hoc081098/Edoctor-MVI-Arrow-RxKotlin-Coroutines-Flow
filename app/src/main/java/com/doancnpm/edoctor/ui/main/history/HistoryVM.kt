@@ -25,6 +25,8 @@ class HistoryVM(
 
   val viewState get() = stateD.asLiveData()
   val singleEvent get() = singleEventD.asLiveData()
+  var scrollToTop: Event<Unit>? = null
+    private set
 
   @CheckResult
   fun process(intents: Observable<ViewIntent>) = intents.subscribe(intentS)!!
@@ -129,6 +131,27 @@ class HistoryVM(
           .takeUntil(changeTypeIntent)
       }
 
+    val refreshChange = intentS.ofType<ViewIntent.Refresh>()
+      .withLatestFrom(stateS) { intent, vs -> intent.orderId to vs.type }
+      .exhaustMap { (orderId, type) ->
+        interactor
+          .refresh(
+            perPage = PER_PAGE,
+            serviceName = null,
+            date = null,
+            orderId = orderId,
+            type = type
+          )
+          .takeUntil(changeTypeIntent)
+          .doOnNext {
+            scrollToTop = when (it) {
+              PartialChange.Refresh.Refreshing -> null
+              is PartialChange.Refresh.Success -> Event(Unit)
+              is PartialChange.Refresh.Failure -> null
+            }
+          }
+      }
+
     Observable
       .mergeArray(
         changeTypeChange,
@@ -137,6 +160,7 @@ class HistoryVM(
         findDoctorChange,
         retryFirstPageChange,
         retryNextPageChange,
+        refreshChange,
       )
       .observeOn(schedulers.main)
       .scan(initialState) { vs, change -> change.reduce(vs) }
