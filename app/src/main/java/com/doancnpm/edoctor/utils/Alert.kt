@@ -61,6 +61,17 @@ fun FragmentActivity.showAlertDialog(init: AlertDialogFragment.Builder.() -> Uni
     .apply { show(ft, AlertDialogFragment::class.java.simpleName) }
 }
 
+fun FragmentActivity.showAlertDialog(dialog: DialogFragment) {
+  val ft = supportFragmentManager.beginTransaction().apply {
+    supportFragmentManager
+      .findFragmentByTag(dialog::class.java.simpleName)
+      ?.let(::remove)
+    addToBackStack(null)
+  }
+
+  dialog.show(ft, dialog::class.java.simpleName)
+}
+
 /**
  * Dismiss alert dialog
  */

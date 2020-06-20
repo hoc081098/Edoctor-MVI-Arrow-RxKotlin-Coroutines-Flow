@@ -103,8 +103,10 @@ class HistoryFragment : BaseFragment(R.layout.fragment_history) {
     }
 
     orderAdapter.clickQRCode
-      .subscribeBy {
-        view?.snack("QR code ${it.service!!.name}")
+      .subscribeBy { order ->
+        QRCodeFragment
+          .newInstance(order.id)
+          .let { requireActivity().showAlertDialog(it) }
       }
       .addTo(compositeDisposable)
   }
