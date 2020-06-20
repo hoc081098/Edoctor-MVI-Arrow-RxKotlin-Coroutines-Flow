@@ -240,9 +240,47 @@ class OrderAdapter(
     }
   }
 
-  class ProcessingVH(private val binding: ItemRecyclerOrderProcessingBinding) : VH(binding.root) {
+  inner class ProcessingVH(private val binding: ItemRecyclerOrderProcessingBinding) : VH(binding.root) {
     override fun bind(item: Order) {
-      TODO("Not yet implemented")
+      binding.run {
+        glide
+          .load(item.service!!.image)
+          .placeholder(R.drawable.logo)
+          .thumbnail(0.5f)
+          .centerCrop()
+          .transition(DrawableTransitionOptions.withCrossFade())
+          .into(imageView)
+        textName.text = item.service.name
+
+        //language=HTML
+        textStartTime.text = HtmlCompat.fromHtml(
+          "<b>Start time: </b>${item.startTime.toString_yyyyMMdd_HHmmss()}",
+          FROM_HTML_MODE_LEGACY
+        )
+        //language=HTML
+        textEndTime.text = HtmlCompat.fromHtml(
+          "<b>End time: </b>${item.endTime.toString_yyyyMMdd_HHmmss()}",
+          FROM_HTML_MODE_LEGACY
+        )
+        //language=HTML
+        textAddress.text = HtmlCompat.fromHtml(
+          "<b>Address: </b>${item.address}",
+          FROM_HTML_MODE_LEGACY
+        )
+        //language=HTML
+        textNote.text = HtmlCompat.fromHtml(
+          "<b>Note: </b>${item.note ?: ""}",
+          FROM_HTML_MODE_LEGACY
+        )
+
+        textTotalPrice.text = "Total: ${item.total.currencyVndFormatted}"
+
+        //language=HTML
+        textView.text =  HtmlCompat.fromHtml(
+          "Doctor <b>${item.doctor!!.fullName}</b> is doing...",
+          FROM_HTML_MODE_LEGACY
+        )
+      }
     }
   }
 
