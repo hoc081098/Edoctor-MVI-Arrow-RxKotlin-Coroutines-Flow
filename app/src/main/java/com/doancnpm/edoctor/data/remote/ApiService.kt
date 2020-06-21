@@ -40,6 +40,9 @@ interface ApiService {
 
   @PUT("profile")
   suspend fun updateProfile(@Body body: UpdateProfileBody): BaseResponse<LoginUserResponse.User>
+
+  @GET("users/{user_id}")
+  suspend fun getUserDetail(@Path("user_id") userId: Long): BaseResponse<LoginUserResponse.User>
   //endregion
 
   //region Category

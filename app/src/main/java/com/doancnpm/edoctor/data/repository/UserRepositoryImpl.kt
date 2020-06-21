@@ -147,7 +147,7 @@ class UserRepositoryImpl(
         }
 
         val requestFile = bytes.toRequestBody(type.toMediaTypeOrNull())
-        val body = MultipartBody.Part.createFormData("image", fileName, requestFile)
+        val body = MultipartBody.Part.createFormData("file", fileName, requestFile)
 
         apiService.uploadFile(body).unwrap().id
       } else {
@@ -213,10 +213,14 @@ class UserRepositoryImpl(
 
       userLocalSource.token()
         ?: return userLocalSource.removeUserAndToken()
-      userLocalSource.user()
+      val userId = userLocalSource.user()?.id
         ?: return userLocalSource.removeUserAndToken()
 
-      apiService.getCategories(page = 1, perPage = 1).unwrap()
+      apiService
+        .getUserDetail(userId)
+        .unwrap()
+        .toUserLocal(baseUrl)
+        .let { userLocalSource.saveUser(it) }
 
       Timber.d("[CHECK AUTH] success")
     } catch (e: Exception) {
@@ -232,6 +236,6 @@ class UserRepositoryImpl(
   }
 
   private companion object {
-    const val CHECK_AUTH_INTERVAL = 60_000L
+    const val CHECK_AUTH_INTERVAL = 180_000L // 3 minutes
   }
 }
