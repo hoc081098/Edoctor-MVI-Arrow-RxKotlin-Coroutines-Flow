@@ -2,6 +2,7 @@ package com.doancnpm.edoctor.koin
 
 import com.doancnpm.edoctor.domain.entity.Category
 import com.doancnpm.edoctor.domain.entity.Service
+import com.doancnpm.edoctor.domain.entity.User
 import com.doancnpm.edoctor.ui.auth.login.LoginContract
 import com.doancnpm.edoctor.ui.auth.login.LoginInteractor
 import com.doancnpm.edoctor.ui.auth.login.LoginVM
@@ -27,6 +28,7 @@ import com.doancnpm.edoctor.ui.main.home.create_order.inputs.select_card.add_car
 import com.doancnpm.edoctor.ui.main.home.services.ServicesVM
 import com.doancnpm.edoctor.ui.main.notifications.NotificationsVM
 import com.doancnpm.edoctor.ui.main.profile.ProfileVM
+import com.doancnpm.edoctor.ui.main.profile.update_profile.UpdateProfileVM
 import com.doancnpm.edoctor.ui.splash.SplashVM
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.koin.androidx.viewmodel.dsl.viewModel
@@ -138,6 +140,15 @@ val viewModelModule = module {
   //region Profile
   viewModel {
     ProfileVM(
+      userRepository = get(),
+      dispatchers = get(),
+      schedulers = get(),
+    )
+  }
+
+  viewModel { (user: User) ->
+    UpdateProfileVM(
+      user = user,
       userRepository = get(),
       dispatchers = get(),
       schedulers = get(),

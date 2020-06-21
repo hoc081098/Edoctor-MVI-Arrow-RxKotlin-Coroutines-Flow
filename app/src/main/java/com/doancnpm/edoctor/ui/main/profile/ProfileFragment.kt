@@ -7,7 +7,6 @@ import android.view.View
 import androidx.navigation.fragment.findNavController
 import com.amulyakhare.textdrawable.TextDrawable
 import com.amulyakhare.textdrawable.util.ColorGenerator
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade
 import com.doancnpm.edoctor.GlideApp
 import com.doancnpm.edoctor.R
 import com.doancnpm.edoctor.core.BaseFragment
@@ -58,7 +57,7 @@ class ProfileFragment : BaseFragment(R.layout.fragment_profile) {
                     .load(it)
                     .placeholder(R.drawable.icons8_person_96)
                     .error(R.drawable.icons8_person_96)
-                    .transition(withCrossFade())
+                    .dontAnimate()
                     .into(imageAvatar)
                 }
                 ?: when (val firstLetter = user.fullName.firstOrNull()) {
@@ -82,7 +81,7 @@ class ProfileFragment : BaseFragment(R.layout.fragment_profile) {
 
               textFullName.text = user.fullName
               textPhone.text = user.phone
-              textBirthday.text = user.birthday ?: "N/A"
+              textBirthday.text = user.birthday?.toString_yyyyMMdd() ?: "N/A"
               textStatus.text = when (user.status) {
                 User.Status.INACTIVE -> "Inactive"
                 User.Status.ACTIVE -> "Active"
