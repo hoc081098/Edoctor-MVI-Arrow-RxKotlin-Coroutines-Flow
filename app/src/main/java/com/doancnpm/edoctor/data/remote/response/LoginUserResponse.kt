@@ -9,19 +9,12 @@ data class LoginUserResponse(
   val user: User
 ) {
   data class User(
-    @Json(name = "avatar")
-    val avatar: String? = null, // null
-    @Json(name = "birthday")
-    val birthday: String?, // null
-    @Json(name = "full_name")
-    val fullName: String, // Son Vo
-    @Json(name = "id")
-    val id: Long, // 16
-    @Json(name = "phone")
-    val phone: String, // +84354658717
-    @Json(name = "role_id")
-    val roleId: Int, // 2
-    @Json(name = "status")
-    val status: Int // 1
+    @Json(name = "avatar") val avatar: Image? = null, // null
+    @Json(name = "birthday") val birthday: String?, // null
+    @Json(name = "full_name") val fullName: String, // Son Vo
+    @Json(name = "id") val id: Long, // 16
+    @Json(name = "phone") val phone: String, // +84354658717
+    @Json(name = "role_id") val roleId: Int, // 2
+    @Json(name = "status") val status: Int // 1
   )
 }

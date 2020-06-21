@@ -48,7 +48,7 @@ fun LoginUserResponse.User.toUserLocal(baseUrl: String): UserLocal {
     phone = phone,
     roleId = roleId,
     status = status,
-    avatar = avatar?.let { "$baseUrl$it" },
+    avatar = avatar?.let { baseUrl + it.url },
     birthday = birthday,
   )
 }
