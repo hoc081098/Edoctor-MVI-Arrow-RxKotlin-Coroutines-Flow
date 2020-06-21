@@ -101,6 +101,18 @@ class ProfileFragment : BaseFragment(R.layout.fragment_profile) {
       }
     }
 
+    viewModel.isLoggingOut.observe(owner = viewLifecycleOwner) {
+      binding.run {
+        if (it) {
+          logoutButton.invisible()
+          progressBar.visible()
+        } else {
+          logoutButton.visible()
+          progressBar.invisible()
+        }
+      }
+    }
+
     viewModel.process(
       binding
         .logoutButton

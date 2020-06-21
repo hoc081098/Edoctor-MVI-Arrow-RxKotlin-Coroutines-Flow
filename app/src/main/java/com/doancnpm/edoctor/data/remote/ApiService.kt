@@ -33,6 +33,12 @@ interface ApiService {
     @Field("phone") phone: String,
     @Field("code") code: String,
   ): BaseResponse<List<Any>>
+
+  @PUT("logout")
+  @FormUrlEncoded
+  suspend fun logout(
+    @Field("device_token") deviceToken: String
+  ): BaseResponse<Any>
   //endregion
 
   //region Category
