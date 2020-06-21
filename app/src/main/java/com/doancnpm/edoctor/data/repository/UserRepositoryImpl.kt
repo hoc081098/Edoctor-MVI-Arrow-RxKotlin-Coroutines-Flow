@@ -1,5 +1,8 @@
 package com.doancnpm.edoctor.data.repository
 
+import android.app.Application
+import android.net.Uri
+import android.provider.OpenableColumns
 import arrow.core.Either
 import arrow.core.Option
 import arrow.core.extensions.fx
@@ -8,6 +11,7 @@ import com.doancnpm.edoctor.data.local.UserLocalSource
 import com.doancnpm.edoctor.data.remote.ApiService
 import com.doancnpm.edoctor.data.remote.body.LoginUserBody
 import com.doancnpm.edoctor.data.remote.body.RegisterUserBody
+import com.doancnpm.edoctor.data.remote.body.UpdateProfileBody
 import com.doancnpm.edoctor.data.toInt
 import com.doancnpm.edoctor.data.toUserDomain
 import com.doancnpm.edoctor.data.toUserLocal
@@ -25,8 +29,12 @@ import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.kotlin.Observables
 import kotlinx.coroutines.*
 import kotlinx.coroutines.tasks.await
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.HttpException
 import timber.log.Timber
+import java.io.ByteArrayOutputStream
 import java.net.HttpURLConnection.HTTP_FORBIDDEN
 import java.net.HttpURLConnection.HTTP_UNAUTHORIZED
 import java.util.Date
@@ -38,6 +46,7 @@ class UserRepositoryImpl(
   private val userLocalSource: UserLocalSource,
   private val firebaseInstanceId: FirebaseInstanceId,
   private val baseUrl: String,
+  private val application: Application,
   appCoroutineScope: CoroutineScope,
 ) : UserRepository {
   private val userObservable: Observable<Either<AppError, Option<User>>> =
@@ -102,6 +111,47 @@ class UserRepositoryImpl(
           phone = phone,
           code = code
         ).unwrap()
+      }
+    }
+  }
+
+  override suspend fun updateUserProfile(fullName: String, birthday: Date?, avatar: Uri?): DomainResult<Unit> {
+    return Either.catch(errorMapper::map) {
+      val user = apiService
+        .updateProfile(
+          UpdateProfileBody(
+            fullName = fullName,
+            birthday = birthday?.toString_yyyyMMdd(),
+            avatar = uploadAvatar(avatar)
+          )
+        )
+        .unwrap()
+
+      userLocalSource.saveUser(user.toUserLocal(baseUrl))
+    }
+  }
+
+  private suspend fun uploadAvatar(avatar: Uri?): Long? {
+    return withContext(dispatchers.io) {
+      if (avatar != null) {
+        val contentResolver = application.contentResolver
+        val type = contentResolver.getType(avatar)!!
+        val inputStream = contentResolver.openInputStream(avatar)!!
+        val fileName = contentResolver.query(avatar, null, null, null, null)!!.use {
+          it.moveToFirst()
+          it.getString(it.getColumnIndex(OpenableColumns.DISPLAY_NAME))
+        }
+        val bytes = ByteArrayOutputStream().use {
+          inputStream.copyTo(it)
+          it.toByteArray()
+        }
+
+        val requestFile = bytes.toRequestBody(type.toMediaTypeOrNull())
+        val body = MultipartBody.Part.createFormData("image", fileName, requestFile)
+
+        apiService.uploadFile(body).unwrap().id
+      } else {
+        null
       }
     }
   }

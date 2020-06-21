@@ -34,7 +34,9 @@ class ProfileVM(
   val userObservable = userRepository.userObservable()
     .map { it.getOrElse { None } }
     .distinctUntilChanged()
-    .observeOn(schedulers.main)!!
+    .observeOn(schedulers.main)
+    .replay(1)
+    .refCount()!!
 
   @CheckResult
   fun process(intents: Observable<ViewIntent>) = intents.subscribe(intentS)!!

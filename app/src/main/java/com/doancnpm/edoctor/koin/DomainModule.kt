@@ -32,6 +32,7 @@ val domainModule = module {
       firebaseInstanceId = get(),
       appCoroutineScope = get(),
       baseUrl = get(BASE_URL_QUALIFIER),
+      application = get(),
     )
   }
 
