@@ -7,6 +7,7 @@ import com.doancnpm.edoctor.data.remote.response.*
 import com.doancnpm.edoctor.domain.entity.*
 import com.doancnpm.edoctor.domain.entity.User.RoleId.CUSTOMER
 import com.doancnpm.edoctor.domain.entity.User.RoleId.DOCTOR
+import com.doancnpm.edoctor.utils.parseDate_yyyyMMdd
 import com.doancnpm.edoctor.utils.parseDate_yyyyMMdd_HHmmss
 import retrofit2.HttpException
 import java.io.IOException
@@ -60,7 +61,7 @@ fun UserLocal.toUserDomain(): User {
     roleId = roleId.toRoleId(),
     status = status.toUserStatus(),
     avatar = avatar,
-    birthday = birthday,
+    birthday = birthday?.let { parseDate_yyyyMMdd(it) },
   )
 }
 

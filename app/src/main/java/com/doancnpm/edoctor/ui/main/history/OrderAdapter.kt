@@ -214,7 +214,7 @@ class OrderAdapter(
               .load(it)
               .placeholder(R.drawable.icons8_person_96)
               .error(R.drawable.icons8_person_96)
-              .transition(DrawableTransitionOptions.withCrossFade())
+              .dontAnimate()
               .into(imageAvatar)
           }
           ?: when (val firstLetter = item.doctor.fullName.firstOrNull()) {

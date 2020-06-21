@@ -144,7 +144,7 @@
                     app:helperTextEnabled="false"
                     app:hintAnimationEnabled="true"
                     app:hintEnabled="true"
-                    app:layout_constraintBottom_toTopOf="@+id/radioRole"
+                    app:layout_constraintBottom_toTopOf="@+id/button_register"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.5"
                     app:layout_constraintStart_toStartOf="parent"
@@ -186,7 +186,7 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.5"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/radioRole"
+                    app:layout_constraintTop_toBottomOf="@+id/edit_birthday"
                     app:rippleColor="@color/colorAccent"
                     app:strokeColor="@color/colorAccent"
                     app:strokeWidth="1dp" />
@@ -204,36 +204,6 @@
                     app:layout_constraintTop_toTopOf="@id/button_register"
                     tools:visibility="visible" />
 
-                <RadioGroup
-                    android:id="@+id/radioRole"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="32dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginEnd="32dp"
-                    android:checkedButton="@id/radioCustomer"
-                    android:orientation="horizontal"
-                    app:layout_constraintBottom_toTopOf="@+id/button_register"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.5"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/edit_birthday">
-
-                    <RadioButton
-                        android:id="@+id/radioCustomer"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="16dp"
-                        android:gravity="center"
-                        android:text="Customer" />
-
-                    <RadioButton
-                        android:id="@+id/radioDoctor"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:text="Doctor" />
-                </RadioGroup>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
