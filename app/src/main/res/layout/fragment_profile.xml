@@ -17,7 +17,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@drawable/gradient3">
+            android:background="@drawable/gradient4">
 
             <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/image_avatar"
@@ -34,6 +34,19 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintVertical_bias="0.35" />
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fabUpdateProfile"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:elevation="12dp"
+                android:src="@drawable/ic_baseline_edit_24"
+                app:backgroundTint="@color/colorBackground"
+                app:fabSize="mini"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -241,6 +254,16 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/status_row" />
+
+            <ProgressBar
+                android:id="@+id/progressBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="invisible"
+                app:layout_constraintBottom_toBottomOf="@id/logoutButton"
+                app:layout_constraintEnd_toEndOf="@id/logoutButton"
+                app:layout_constraintStart_toStartOf="@id/logoutButton"
+                app:layout_constraintTop_toTopOf="@id/logoutButton" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

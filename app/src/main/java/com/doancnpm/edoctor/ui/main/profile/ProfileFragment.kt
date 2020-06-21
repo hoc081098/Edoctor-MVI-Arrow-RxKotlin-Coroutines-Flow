@@ -4,9 +4,9 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.View
+import androidx.navigation.fragment.findNavController
 import com.amulyakhare.textdrawable.TextDrawable
 import com.amulyakhare.textdrawable.util.ColorGenerator
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade
 import com.doancnpm.edoctor.GlideApp
 import com.doancnpm.edoctor.R
 import com.doancnpm.edoctor.core.BaseFragment
@@ -18,6 +18,7 @@ import com.doancnpm.edoctor.utils.*
 import com.jakewharton.rxbinding4.view.clicks
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
+import io.reactivex.rxjava3.kotlin.withLatestFrom
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 
@@ -46,6 +47,8 @@ class ProfileFragment : BaseFragment(R.layout.fragment_profile) {
               textPhone.text = NOT_LOGGED_IN
               textBirthday.text = NOT_LOGGED_IN
               textStatus.text = NOT_LOGGED_IN
+
+              fabUpdateProfile.invisible()
             },
             ifSome = { user ->
               user.avatar
@@ -54,7 +57,7 @@ class ProfileFragment : BaseFragment(R.layout.fragment_profile) {
                     .load(it)
                     .placeholder(R.drawable.icons8_person_96)
                     .error(R.drawable.icons8_person_96)
-                    .transition(withCrossFade())
+                    .dontAnimate()
                     .into(imageAvatar)
                 }
                 ?: when (val firstLetter = user.fullName.firstOrNull()) {
@@ -78,12 +81,14 @@ class ProfileFragment : BaseFragment(R.layout.fragment_profile) {
 
               textFullName.text = user.fullName
               textPhone.text = user.phone
-              textBirthday.text = user.birthday ?: "N/A"
+              textBirthday.text = user.birthday?.toString_yyyyMMdd() ?: "N/A"
               textStatus.text = when (user.status) {
                 User.Status.INACTIVE -> "Inactive"
                 User.Status.ACTIVE -> "Active"
                 User.Status.PENDING -> "Pending"
               }
+
+              fabUpdateProfile.visible()
             }
           )
         }
@@ -97,6 +102,18 @@ class ProfileFragment : BaseFragment(R.layout.fragment_profile) {
         }
         is ProfileContract.SingleEvent.LogoutFailure -> {
           view?.snack("Logout failure: ${it.error.getMessage()}")
+        }
+      }
+    }
+
+    viewModel.isLoggingOut.observe(owner = viewLifecycleOwner) {
+      binding.run {
+        if (it) {
+          logoutButton.invisible()
+          progressBar.visible()
+        } else {
+          logoutButton.visible()
+          progressBar.invisible()
         }
       }
     }
@@ -118,7 +135,16 @@ class ProfileFragment : BaseFragment(R.layout.fragment_profile) {
   }
 
   private fun setupViews() {
-
+    binding.fabUpdateProfile
+      .clicks()
+      .withLatestFrom(viewModel.userObservable) { _, user -> user }
+      .mapNotNull { it.orNull() }
+      .subscribe {
+        ProfileFragmentDirections
+          .actionProfileFragmentToUpdateProfileFragment(it)
+          .let { findNavController().navigate(it) }
+      }
+      .addTo(compositeDisposable)
   }
 
   private companion object {

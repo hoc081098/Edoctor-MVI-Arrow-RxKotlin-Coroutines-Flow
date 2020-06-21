@@ -23,3 +23,9 @@ fun parseDate_yyyyMMdd_HHmmss(source: String, zone: TimeZone = UTCTimeZone): Dat
     .apply { timeZone = zone }
     .parse(source)
 }
+
+fun parseDate_yyyyMMdd(source: String, zone: TimeZone = UTCTimeZone): Date? {
+  return SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+    .apply { timeZone = zone }
+    .parse(source)
+}

@@ -1,11 +1,9 @@
 package com.doancnpm.edoctor.data.remote
 
 import androidx.annotation.IntRange
-import com.doancnpm.edoctor.data.remote.body.AddCardBody
-import com.doancnpm.edoctor.data.remote.body.CreateOrderBody
-import com.doancnpm.edoctor.data.remote.body.LoginUserBody
-import com.doancnpm.edoctor.data.remote.body.RegisterUserBody
+import com.doancnpm.edoctor.data.remote.body.*
 import com.doancnpm.edoctor.data.remote.response.*
+import okhttp3.MultipartBody
 import retrofit2.Retrofit
 import retrofit2.create
 import retrofit2.http.*
@@ -33,6 +31,18 @@ interface ApiService {
     @Field("phone") phone: String,
     @Field("code") code: String,
   ): BaseResponse<List<Any>>
+
+  @PUT("logout")
+  @FormUrlEncoded
+  suspend fun logout(
+    @Field("device_token") deviceToken: String
+  ): BaseResponse<Any>
+
+  @PUT("profile")
+  suspend fun updateProfile(@Body body: UpdateProfileBody): BaseResponse<LoginUserResponse.User>
+
+  @GET("users/{user_id}")
+  suspend fun getUserDetail(@Path("user_id") userId: Long): BaseResponse<LoginUserResponse.User>
   //endregion
 
   //region Category
@@ -58,7 +68,26 @@ interface ApiService {
 
   //region Order
   @POST("orders")
-  suspend fun createOrder(@Body body: CreateOrderBody): BaseResponse<Any>
+  suspend fun createOrder(@Body body: CreateOrderBody): BaseResponse<CreateOrderResponse>
+
+  @GET("orders")
+  suspend fun getOrders(
+    @IntRange(from = 1) @Query("page") page: Int,
+    @IntRange(from = 1) @Query("per_page") perPage: Int,
+    @Query("service_name") serviceName: String?,
+    @Query("date") date: String?,
+    @Query("order_id") orderId: Long?,
+    @QueryMap(encoded = true) statuses: Map<String, String>,
+  ): BaseResponse<OrdersResponse>
+
+  @PUT("orders/cancel/{order_id}")
+  suspend fun cancelOrder(@Path("order_id") orderId: Long): BaseResponse<Any>
+
+  @GET("orders/find-doctors/{order_id}")
+  suspend fun findDoctor(@Path("order_id") orderId: Long): BaseResponse<Any>
+
+  @GET("orders/qr-code/{order_id}")
+  suspend fun getQrCode(@Path("order_id") orderId: Long): BaseResponse<String>
   //endregion
 
   //region Promotion
@@ -87,6 +116,10 @@ interface ApiService {
     @IntRange(from = 1) @Query("per_page") perPage: Int,
   ): BaseResponse<NotificationsResponse>
   //endregion
+
+  @Multipart
+  @POST("files")
+  suspend fun uploadFile(@Part body: MultipartBody.Part): BaseResponse<Image>
 
   companion object Factory {
     operator fun invoke(retrofit: Retrofit) = retrofit.create<ApiService>()

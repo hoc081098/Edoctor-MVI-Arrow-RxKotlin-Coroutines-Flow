@@ -2,6 +2,7 @@ package com.doancnpm.edoctor.koin
 
 import com.doancnpm.edoctor.domain.entity.Category
 import com.doancnpm.edoctor.domain.entity.Service
+import com.doancnpm.edoctor.domain.entity.User
 import com.doancnpm.edoctor.ui.auth.login.LoginContract
 import com.doancnpm.edoctor.ui.auth.login.LoginInteractor
 import com.doancnpm.edoctor.ui.auth.login.LoginVM
@@ -15,6 +16,10 @@ import com.doancnpm.edoctor.ui.auth.verify.VerifyContract
 import com.doancnpm.edoctor.ui.auth.verify.VerifyInteractor
 import com.doancnpm.edoctor.ui.auth.verify.VerifyVM
 import com.doancnpm.edoctor.ui.main.MainVM
+import com.doancnpm.edoctor.ui.main.history.HistoryContract
+import com.doancnpm.edoctor.ui.main.history.HistoryInteractor
+import com.doancnpm.edoctor.ui.main.history.HistoryVM
+import com.doancnpm.edoctor.ui.main.history.QRCodeVM
 import com.doancnpm.edoctor.ui.main.home.HomeVM
 import com.doancnpm.edoctor.ui.main.home.create_order.CreateOrderVM
 import com.doancnpm.edoctor.ui.main.home.create_order.inputs.select_card.add_card.AddCardContract
@@ -23,6 +28,7 @@ import com.doancnpm.edoctor.ui.main.home.create_order.inputs.select_card.add_car
 import com.doancnpm.edoctor.ui.main.home.services.ServicesVM
 import com.doancnpm.edoctor.ui.main.notifications.NotificationsVM
 import com.doancnpm.edoctor.ui.main.profile.ProfileVM
+import com.doancnpm.edoctor.ui.main.profile.update_profile.UpdateProfileVM
 import com.doancnpm.edoctor.ui.splash.SplashVM
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.koin.androidx.viewmodel.dsl.viewModel
@@ -137,6 +143,38 @@ val viewModelModule = module {
       userRepository = get(),
       dispatchers = get(),
       schedulers = get(),
+    )
+  }
+
+  viewModel { (user: User) ->
+    UpdateProfileVM(
+      user = user,
+      userRepository = get(),
+      dispatchers = get(),
+      schedulers = get(),
+    )
+  }
+  //endregion
+
+  //region History
+  factory<HistoryContract.Interactor> {
+    HistoryInteractor(
+      orderRepository = get(),
+      dispatchers = get(),
+    )
+  }
+
+  viewModel {
+    HistoryVM(
+      interactor = get(),
+      schedulers = get()
+    )
+  }
+
+  viewModel { (orderId: Long) ->
+    QRCodeVM(
+      orderId = orderId,
+      orderRepository = get(),
     )
   }
   //endregion

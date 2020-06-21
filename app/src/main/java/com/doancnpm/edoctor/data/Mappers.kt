@@ -7,6 +7,7 @@ import com.doancnpm.edoctor.data.remote.response.*
 import com.doancnpm.edoctor.domain.entity.*
 import com.doancnpm.edoctor.domain.entity.User.RoleId.CUSTOMER
 import com.doancnpm.edoctor.domain.entity.User.RoleId.DOCTOR
+import com.doancnpm.edoctor.utils.parseDate_yyyyMMdd
 import com.doancnpm.edoctor.utils.parseDate_yyyyMMdd_HHmmss
 import retrofit2.HttpException
 import java.io.IOException
@@ -31,7 +32,7 @@ private fun Int.toRoleId(): User.RoleId {
   }
 }
 
-private fun Int.toStatus(): User.Status {
+private fun Int.toUserStatus(): User.Status {
   return when (this) {
     0 -> User.Status.INACTIVE
     1 -> User.Status.ACTIVE
@@ -47,7 +48,7 @@ fun LoginUserResponse.User.toUserLocal(baseUrl: String): UserLocal {
     phone = phone,
     roleId = roleId,
     status = status,
-    avatar = avatar?.let { "$baseUrl$it" },
+    avatar = avatar?.let { baseUrl + it.url },
     birthday = birthday,
   )
 }
@@ -58,9 +59,9 @@ fun UserLocal.toUserDomain(): User {
     fullName = fullName,
     phone = phone,
     roleId = roleId.toRoleId(),
-    status = status.toStatus(),
+    status = status.toUserStatus(),
     avatar = avatar,
-    birthday = birthday,
+    birthday = birthday?.let { parseDate_yyyyMMdd(it) },
   )
 }
 
@@ -128,6 +129,78 @@ fun NotificationsResponse.Notification.toNotificationDomain(baseUrl: String): No
     createdAt = parseDate_yyyyMMdd_HHmmss(createdAt)!!,
   )
 }
+
+fun Order.Status.toInt(): Int {
+  return when (this) {
+    Order.Status.PENDING_STATUS -> 1
+    Order.Status.ACCEPTED_STATUS -> 2
+    Order.Status.CUSTOMER_CANCELED_STATUS -> 3
+    Order.Status.DOCTOR_CANCELED_STATUS -> 4
+    Order.Status.PROCESSING_STATUS -> 5
+    Order.Status.DONE_STATUS -> 6
+  }
+}
+
+private fun Int.toOrderStatus(): Order.Status {
+  return when (this) {
+    1 -> Order.Status.PENDING_STATUS
+    2 -> Order.Status.ACCEPTED_STATUS
+    3 -> Order.Status.CUSTOMER_CANCELED_STATUS
+    4 -> Order.Status.DOCTOR_CANCELED_STATUS
+    5 -> Order.Status.PROCESSING_STATUS
+    6 -> Order.Status.DONE_STATUS
+    else -> error("Cannot convert order status: $this")
+  }
+}
+
+fun OrdersResponse.Order.toOrderDomain(baseUrl: String): Order {
+  return Order(
+    id = id,
+    serviceId = serviceId,
+    startTime = parseDate_yyyyMMdd_HHmmss(startTime)!!,
+    endTime = parseDate_yyyyMMdd_HHmmss(endTime)!!,
+    note = note,
+    originalPrice = originalPrice,
+    promotionId = promotionId,
+    total = total,
+    payCardId = payCardId,
+    status = status.toOrderStatus(),
+    location = Location(
+      latitude = lat,
+      longitude = lng,
+    ),
+    address = address,
+    createdAt = parseDate_yyyyMMdd_HHmmss(createdAt)!!,
+    service = service.toServiceDomain(baseUrl),
+    doctor = doctor?.toUserLocal(baseUrl)?.toUserDomain(),
+    customer = customer.toUserLocal(baseUrl).toUserDomain(),
+  )
+}
+
+fun CreateOrderResponse.toOrderDomain(baseUrl: String): Order {
+  return Order(
+    id = id,
+    serviceId = serviceId,
+    startTime = parseDate_yyyyMMdd_HHmmss(startTime)!!,
+    endTime = parseDate_yyyyMMdd_HHmmss(endTime)!!,
+    note = note,
+    originalPrice = originalPrice,
+    promotionId = promotionId,
+    total = total,
+    payCardId = payCardId,
+    status = Order.Status.PENDING_STATUS,
+    location = Location(
+      latitude = lat,
+      longitude = lng,
+    ),
+    address = address,
+    createdAt = parseDate_yyyyMMdd_HHmmss(createdAt)!!,
+    service = null,
+    doctor = null,
+    customer = null,
+  )
+}
+
 
 //endregion
 

@@ -9,11 +9,9 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="match_parent"
         android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/textView3">
+        android:layout_marginBottom="8dp">
 
         <ScrollView
             android:layout_width="match_parent"
@@ -24,82 +22,27 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/edit_phone"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginEnd="16dp"
-                    android:hint="Phone number"
-                    app:boxStrokeColor="@color/colorAccent"
-                    app:endIconMode="none"
-                    app:errorEnabled="true"
-                    app:errorIconDrawable="@null"
-                    app:errorTextColor="@color/colorError"
-                    app:helperTextEnabled="false"
-                    app:hintAnimationEnabled="true"
-                    app:hintEnabled="true"
-                    app:layout_constraintBottom_toTopOf="@+id/edit_password"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.5"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_chainStyle="packed"
-                    app:startIconDrawable="@drawable/ic_phone_black_24dp"
-                    app:startIconTint="@color/colorIcon">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:digits="0123456789+"
-                        android:fontFamily="@font/google_sans"
-                        android:imeOptions="actionNext"
-                        android:inputType="phone"
-                        android:singleLine="true" />
-
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/edit_password"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginEnd="16dp"
-                    android:hint="Password"
-                    app:boxStrokeColor="@color/colorAccent"
-                    app:errorEnabled="true"
-                    app:errorIconDrawable="@null"
-                    app:errorTextColor="@color/colorError"
-                    app:helperTextEnabled="false"
-                    app:hintAnimationEnabled="true"
-                    app:hintEnabled="true"
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/image_avatar"
+                    android:layout_width="96dp"
+                    android:layout_height="96dp"
+                    android:elevation="20dp"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/icons8_person_96"
+                    app:civ_border_width="0dp"
+                    app:civ_circle_background_color="#fafafa"
                     app:layout_constraintBottom_toTopOf="@+id/edit_full_name"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.5"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/edit_phone"
-                    app:passwordToggleEnabled="true"
-                    app:startIconDrawable="@drawable/ic_lock_black_24dp"
-                    app:startIconTint="@color/colorIcon">
-
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="@font/google_sans"
-                        android:imeOptions="actionNext"
-                        android:inputType="textPassword"
-                        android:singleLine="true" />
-
-                </com.google.android.material.textfield.TextInputLayout>
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/edit_full_name"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginTop="48dp"
                     android:layout_marginEnd="16dp"
                     android:hint="Full name"
                     app:boxStrokeColor="@color/colorAccent"
@@ -114,8 +57,7 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.5"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/edit_password"
-                    app:layout_constraintVertical_bias="0.4"
+                    app:layout_constraintTop_toBottomOf="@+id/image_avatar"
                     app:layout_constraintVertical_chainStyle="packed"
                     app:startIconDrawable="@drawable/ic_person_black_24dp"
                     app:startIconTint="@color/colorIcon">
@@ -144,12 +86,11 @@
                     app:helperTextEnabled="false"
                     app:hintAnimationEnabled="true"
                     app:hintEnabled="true"
-                    app:layout_constraintBottom_toTopOf="@+id/button_register"
+                    app:layout_constraintBottom_toTopOf="@+id/button_update"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.5"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/edit_full_name"
-                    app:layout_constraintVertical_bias="0.4"
                     app:layout_constraintVertical_chainStyle="packed"
                     app:startIconDrawable="@drawable/ic_date_range_black_24dp"
                     app:startIconTint="@color/colorIcon">
@@ -167,7 +108,7 @@
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/button_register"
+                    android:id="@+id/button_update"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="24dp"
@@ -176,7 +117,7 @@
                     android:fontFamily="@font/google_sans"
                     android:paddingTop="14dp"
                     android:paddingBottom="14dp"
-                    android:text="Register"
+                    android:text="Update"
                     android:textAlignment="center"
                     android:textColor="@color/colorAccentDark"
                     android:textSize="14sp"
@@ -198,40 +139,16 @@
                     android:indeterminate="true"
                     android:progressDrawable="@android:color/white"
                     android:visibility="invisible"
-                    app:layout_constraintBottom_toBottomOf="@id/button_register"
-                    app:layout_constraintEnd_toEndOf="@id/button_register"
-                    app:layout_constraintStart_toStartOf="@id/button_register"
-                    app:layout_constraintTop_toTopOf="@id/button_register"
+                    app:layout_constraintBottom_toBottomOf="@id/button_update"
+                    app:layout_constraintEnd_toEndOf="@id/button_update"
+                    app:layout_constraintStart_toStartOf="@id/button_update"
+                    app:layout_constraintTop_toTopOf="@id/button_update"
                     tools:visibility="visible" />
-
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
         </ScrollView>
     </LinearLayout>
-
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="24dp"
-        android:fontFamily="@font/nunito_sans"
-        android:text="Welcome!"
-        android:textSize="16sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/textView3"
-        style="@style/TextAppearance.AppCompat.Title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:fontFamily="@font/nunito_sans_semibold"
-        android:text="Register to contine"
-        android:textSize="20sp"
-        app:layout_constraintStart_toStartOf="@+id/textView2"
-        app:layout_constraintTop_toBottomOf="@+id/textView2" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

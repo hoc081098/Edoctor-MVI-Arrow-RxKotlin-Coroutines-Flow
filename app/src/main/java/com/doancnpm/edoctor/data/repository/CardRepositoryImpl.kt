@@ -8,7 +8,6 @@ import com.doancnpm.edoctor.data.toCardDomain
 import com.doancnpm.edoctor.domain.dispatchers.AppDispatchers
 import com.doancnpm.edoctor.domain.entity.Card
 import com.doancnpm.edoctor.domain.entity.DomainResult
-import com.doancnpm.edoctor.domain.entity.leftResult
 import com.doancnpm.edoctor.domain.entity.rightResult
 import com.doancnpm.edoctor.domain.repository.CardRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -72,10 +71,9 @@ class CardRepositoryImpl(
         .let { emitAll(it) }
     }
       .map { it.rightResult() }
-      .catch {
+      .catch { throwable ->
         errorMapper
-          .map(it)
-          .leftResult<List<Card>>()
+          .mapAsLeft<List<Card>>(throwable)
           .let { emit(it) }
       }
       .flowOn(dispatchers.io)
