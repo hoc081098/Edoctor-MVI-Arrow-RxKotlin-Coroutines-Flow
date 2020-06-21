@@ -2,6 +2,7 @@ package com.doancnpm.edoctor.ui.main.history
 
 import androidx.annotation.IntRange
 import androidx.annotation.LayoutRes
+import com.doancnpm.edoctor.BuildConfig
 import com.doancnpm.edoctor.R
 import com.doancnpm.edoctor.domain.dispatchers.AppDispatchers
 import com.doancnpm.edoctor.domain.entity.AppError
@@ -48,6 +49,22 @@ interface HistoryContract {
           && firstPageState is PlaceholderState.Success
           && nextPageState.firstOrNull() is PlaceholderState.Idle
       }
+
+    val description: String
+      get() {
+        return if (BuildConfig.DEBUG) {
+          mapOf(
+            "orders.size" to orders.size,
+            "firstPageState" to firstPageState,
+            "nextPageState" to nextPageState,
+            "page" to page,
+            "type" to type,
+            "isRefreshing" to isRefreshing,
+          ).toString()
+        } else {
+          toString()
+        }
+      }
   }
 
   enum class HistoryType(val statuses: Set<Order.Status>) {
@@ -71,7 +88,7 @@ interface HistoryContract {
       )
 
       @LayoutRes
-      fun layoutIdFor(status: Order.Status): Int = cache[status]!!
+      fun layoutIdFor(status: Order.Status): Int = cache.getValue(status)
     }
   }
 
@@ -83,12 +100,16 @@ interface HistoryContract {
   }
 
   sealed class ViewIntent {
-    data class ChangeType(val historyType: HistoryType) : ViewIntent()
+    data class ChangeType(
+      val historyType: HistoryType,
+      val orderId: Long?
+    ) : ViewIntent()
+
     object LoadNextPage : ViewIntent()
 
     object RetryFirstPage : ViewIntent()
     object RetryNextPage : ViewIntent()
-    data class Refresh(val orderId: Long?) : ViewIntent()
+    object Refresh : ViewIntent()
 
     data class Cancel(val order: Order) : ViewIntent()
     data class FindDoctor(val order: Order) : ViewIntent()
@@ -110,17 +131,18 @@ interface HistoryContract {
     abstract fun reduce(vs: ViewState): ViewState
 
     sealed class FirstPage : PartialChange() {
-      object Loading : FirstPage()
+      data class Loading(val type: HistoryType) : FirstPage()
       data class Error(val error: AppError, val type: HistoryType) : FirstPage()
       data class Data(val orders: List<Order>, val type: HistoryType) : FirstPage()
 
       override fun reduce(vs: ViewState): ViewState {
         return when (this) {
-          Loading -> vs.copy(
+          is Loading -> vs.copy(
             orders = emptyList(),
             firstPageState = PlaceholderState.Loading,
             nextPageState = emptyList(),
-            page = 0
+            page = 0,
+            type = type,
           )
           is Error -> vs.copy(
             orders = emptyList(),
@@ -183,7 +205,13 @@ interface HistoryContract {
       override fun reduce(vs: ViewState): ViewState {
         return when (this) {
           Refreshing -> vs.copy(isRefreshing = true)
-          is Success -> vs.copy(isRefreshing = false, orders = orders)
+          is Success -> vs.copy(
+            isRefreshing = false,
+            orders = orders,
+            firstPageState = PlaceholderState.Success(orders.isEmpty()),
+            nextPageState = PlaceholderStates.idle,
+            page = 1,
+          )
           is Failure -> vs.copy(isRefreshing = false)
         }
       }
@@ -232,7 +260,10 @@ class HistoryInteractor(
     type: HistoryType
   ): Observable<PartialChange> {
     return rxObservable(dispatchers.main) {
-      send(if (page == 1) PartialChange.FirstPage.Loading else PartialChange.NextPage.Loading)
+      send(
+        if (page == 1) PartialChange.FirstPage.Loading(type)
+        else PartialChange.NextPage.Loading
+      )
 
       orderRepository
         .getOrders(
@@ -304,7 +335,7 @@ class HistoryInteractor(
     ).mapNotNull {
       if (it is PartialChange.FirstPage) {
         when (it) {
-          PartialChange.FirstPage.Loading -> PartialChange.Refresh.Refreshing
+          is PartialChange.FirstPage.Loading -> PartialChange.Refresh.Refreshing
           is PartialChange.FirstPage.Error -> PartialChange.Refresh.Failure(it.error)
           is PartialChange.FirstPage.Data -> PartialChange.Refresh.Success(it.orders)
         }

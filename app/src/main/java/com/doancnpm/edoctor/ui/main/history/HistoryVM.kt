@@ -17,9 +17,13 @@ import timber.log.Timber
 
 class HistoryVM(
   private val interactor: Interactor,
-  private val schedulers: AppSchedulers,
+  schedulers: AppSchedulers,
 ) : BaseVM() {
   private val intentS = PublishRelay.create<ViewIntent>()
+    .apply {
+      subscribe { Timber.d(">>>>>>> History intent: $it") }
+        .addTo(compositeDisposable)
+    }
   private val stateD = MutableLiveData<ViewState>()
   private val singleEventD = MutableLiveData<Event<SingleEvent>>()
 
@@ -39,17 +43,16 @@ class HistoryVM(
     val changeTypeIntent = intentS.ofType<ViewIntent.ChangeType>().share()
 
     val changeTypeChange = changeTypeIntent
-      .map { it.historyType }
       .distinctUntilChanged()
       .doOnNext { Timber.d("[###] [2] $it") }
-      .switchMap { type ->
+      .switchMap { intent ->
         interactor.load(
           page = 1,
           perPage = PER_PAGE,
           serviceName = null,
           date = null,
-          orderId = null,
-          type = type
+          orderId = intent.orderId,
+          type = intent.historyType,
         )
       }
 
@@ -132,19 +135,19 @@ class HistoryVM(
       }
 
     val refreshChange = intentS.ofType<ViewIntent.Refresh>()
-      .withLatestFrom(stateS) { intent, vs -> intent.orderId to vs.type }
-      .exhaustMap { (orderId, type) ->
+      .withLatestFrom(stateS) { _, vs -> vs.type }
+      .exhaustMap { type ->
         interactor
           .refresh(
             perPage = PER_PAGE,
             serviceName = null,
             date = null,
-            orderId = orderId,
+            orderId = null,
             type = type
           )
           .takeUntil(changeTypeIntent)
-          .doOnNext {
-            scrollToTop = when (it) {
+          .doOnNext { change ->
+            scrollToTop = when (change) {
               PartialChange.Refresh.Refreshing -> null
               is PartialChange.Refresh.Success -> Event(Unit)
               is PartialChange.Refresh.Failure -> null
@@ -163,6 +166,7 @@ class HistoryVM(
         refreshChange,
       )
       .observeOn(schedulers.main)
+      .doOnNext { Timber.d(">>>>>>> Change: $it") }
       .scan(initialState) { vs, change -> change.reduce(vs) }
       .subscribe(stateS)
       .addTo(compositeDisposable)

@@ -2,6 +2,7 @@ package com.doancnpm.edoctor.ui.main.history
 
 import android.os.Bundle
 import android.view.View
+import androidx.core.view.doOnPreDraw
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.MergeAdapter
 import com.doancnpm.edoctor.GlideApp
@@ -50,25 +51,29 @@ class HistoryFragment : BaseFragment(R.layout.fragment_history) {
 
     val viewState = viewModel.viewState.value!!
 
-    var needRefresh = false
-    val initialHistoryType = mainVM.getHistoryType()?.also { needRefresh = true } ?: viewState.type
+    val initialHistoryType = mainVM.getHistoryType() ?: viewState.type
     val orderId = mainVM.getOrderId()
 
     setupViews(initialHistoryType)
-    bindVM(initialHistoryType)
+    bindVM(initialHistoryType, orderId)
 
     // dispatch retry or refresh intent when needed
-    if (needRefresh) {
-      intentsS.accept(ViewIntent.Refresh(orderId))
-    } else if (viewState.canRetryFirstPage) {
+    if (viewState.canRetryFirstPage) {
       intentsS.accept(ViewIntent.RetryFirstPage)
     }
   }
 
-  private fun bindVM(initialHistoryType: HistoryType) {
+  private fun bindVM(initialHistoryType: HistoryType, orderId: Long?) {
     viewModel.viewState.observe(owner = viewLifecycleOwner, ::render)
     viewModel.singleEvent.observeEvent(owner = viewLifecycleOwner, ::handleEvent)
-    viewModel.process(intents(initialHistoryType)).addTo(compositeDisposable)
+    viewModel
+      .process(
+        intents(
+          initialHistoryType,
+          orderId
+        )
+      )
+      .addTo(compositeDisposable)
   }
 
   private fun handleEvent(singleEvent: SingleEvent) {
@@ -89,10 +94,19 @@ class HistoryFragment : BaseFragment(R.layout.fragment_history) {
   }
 
   private fun setupViews(initialHistoryType: HistoryType) {
-    HistoryType.values()
-      .indexOf(initialHistoryType)
+    val position = HistoryType.values().indexOf(initialHistoryType)
+
+    position
       .let(binding.tabLayout::getTabAt)
       .let(binding.tabLayout::selectTab)
+
+    binding.tabLayout.doOnPreDraw {
+      binding.tabLayout.setScrollPosition(
+        position,
+        0f,
+        true
+      )
+    }
 
     Timber.d("[###] [0] $initialHistoryType")
 
@@ -112,7 +126,7 @@ class HistoryFragment : BaseFragment(R.layout.fragment_history) {
   }
 
   private fun render(viewState: ViewState) = binding.run {
-    Timber.d("State: $viewState")
+    Timber.d("State: ${viewState.description}")
 
     orderAdapter.submitList(viewState.orders) {
       viewModel.scrollToTop
@@ -151,7 +165,7 @@ class HistoryFragment : BaseFragment(R.layout.fragment_history) {
     }
   }
 
-  private fun intents(initialHistoryType: HistoryType): Observable<ViewIntent> {
+  private fun intents(initialHistoryType: HistoryType, orderId: Long?): Observable<ViewIntent> {
     val linearLayoutManager = binding.recyclerView.layoutManager as LinearLayoutManager
 
     return Observable.mergeArray(
@@ -159,9 +173,19 @@ class HistoryFragment : BaseFragment(R.layout.fragment_history) {
       binding.tabLayout
         .selectedTabPositions()
         .map { HistoryType.values().getOrElse(it) { HistoryType.WAITING } }
-        .startWithItem(initialHistoryType)
         .doOnNext { Timber.d("[###] [1] $it") }
-        .map(ViewIntent::ChangeType),
+        .map {
+          ViewIntent.ChangeType(
+            historyType = it,
+            orderId = null,
+          )
+        }
+        .startWithItem(
+          ViewIntent.ChangeType(
+            historyType = initialHistoryType,
+            orderId = orderId,
+          )
+        ),
       binding.recyclerView
         .scrollEvents()
         .throttleLatest(200, TimeUnit.MILLISECONDS, schedulers.main, true)
@@ -200,7 +224,7 @@ class HistoryFragment : BaseFragment(R.layout.fragment_history) {
       footerAdapter.retryNextPage,
       binding.swipeRefreshLayout
         .refreshes()
-        .map { ViewIntent.Refresh(null) },
+        .map { ViewIntent.Refresh },
     )
   }
 
