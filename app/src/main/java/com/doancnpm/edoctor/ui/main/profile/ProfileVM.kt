@@ -27,8 +27,10 @@ class ProfileVM(
 ) : BaseVM() {
   private val intentS = PublishRelay.create<ViewIntent>()
   private val eventD = MutableLiveData<Event<SingleEvent>>()
+  private val isLoggingOutD = MutableLiveData<Boolean>().apply { value = false }
 
   val eventLiveData get() = eventD.asLiveData()
+  val isLoggingOut get() = isLoggingOutD.asLiveData()
   val userObservable = userRepository.userObservable()
     .map { it.getOrElse { None } }
     .distinctUntilChanged()
@@ -42,8 +44,11 @@ class ProfileVM(
       .ofType<ViewIntent.Logout>()
       .exhaustMap {
         rxSingle(dispatchers.main) {
+          isLoggingOutD.value = true
+
           userRepository
             .logout()
+            .also { isLoggingOutD.value = false }
             .fold(
               ifLeft = { SingleEvent.LogoutFailure(it) },
               ifRight = { SingleEvent.LogoutSucess },

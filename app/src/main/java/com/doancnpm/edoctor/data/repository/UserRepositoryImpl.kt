@@ -29,7 +29,7 @@ import retrofit2.HttpException
 import timber.log.Timber
 import java.net.HttpURLConnection.HTTP_FORBIDDEN
 import java.net.HttpURLConnection.HTTP_UNAUTHORIZED
-import java.util.*
+import java.util.Date
 
 class UserRepositoryImpl(
   private val apiService: ApiService,
@@ -81,6 +81,8 @@ class UserRepositoryImpl(
 
   override suspend fun logout(): DomainResult<Unit> {
     return Either.catch(errorMapper::map) {
+      val deviceToken = firebaseInstanceId.instanceId.await().token
+      apiService.logout(deviceToken).unwrap()
       userLocalSource.removeUserAndToken()
     }
   }
