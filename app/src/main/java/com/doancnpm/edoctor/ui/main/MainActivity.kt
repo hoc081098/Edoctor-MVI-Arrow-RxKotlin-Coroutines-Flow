@@ -39,6 +39,31 @@ class MainActivity : BaseActivity() {
     }
 
     bindVM()
+    handleIntent(intent)
+  }
+
+  override fun onNewIntent(intent: Intent?) {
+    super.onNewIntent(intent)
+    handleIntent(intent)
+  }
+
+  private fun handleIntent(intent: Intent?) {
+    val type = intent?.getStringExtra(TYPE_KEY) ?: return
+    val orderId = intent.getLongExtra(ORDER_ID_KEY, -1).takeIf { it >= 0 } ?: return
+
+    Timber.d(">> handleIntent { orderId: $orderId, type: $type }")
+
+    navigateToHistory(
+      type = when (type) {
+        "Accepted mission" -> HistoryContract.HistoryType.UP_COMING
+        "Check QR Code" -> HistoryContract.HistoryType.PROCESSING
+        "Mission completed" -> HistoryContract.HistoryType.DONE
+        else -> HistoryContract.HistoryType.WAITING.also {
+          Timber.d("Invalid notification type: $type")
+        }
+      },
+      orderId = orderId,
+    )
   }
 
   private fun bindVM() {
@@ -107,5 +132,10 @@ class MainActivity : BaseActivity() {
     viewModel.setHistoryType(type)
     viewModel.setOrderId(orderId)
     binding.navView.selectedItemId = R.id.history
+  }
+
+  companion object {
+    val TYPE_KEY = MainActivity::class.java.name + ".type"
+    val ORDER_ID_KEY = MainActivity::class.java.name + ".order_id"
   }
 }
