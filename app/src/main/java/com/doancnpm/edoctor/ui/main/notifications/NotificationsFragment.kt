@@ -12,11 +12,11 @@ import com.doancnpm.edoctor.databinding.FragmentNotificationsBinding
 import com.doancnpm.edoctor.domain.entity.Notification
 import com.doancnpm.edoctor.domain.entity.getMessage
 import com.doancnpm.edoctor.ui.main.MainActivity
-import com.doancnpm.edoctor.ui.main.history.HistoryContract
 import com.doancnpm.edoctor.ui.main.history.HistoryContract.HistoryType
 import com.doancnpm.edoctor.ui.main.notifications.NotificationsContract.PlaceholderState
 import com.doancnpm.edoctor.utils.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import timber.log.Timber
 
 class NotificationsFragment : BaseFragment(R.layout.fragment_notifications) {
   private val binding: FragmentNotificationsBinding by viewBinding {
@@ -120,11 +120,12 @@ class NotificationsFragment : BaseFragment(R.layout.fragment_notifications) {
   private fun onClickNotification(notification: Notification) {
     (requireActivity() as MainActivity).navigateToHistory(
       type = when (val type = notification.type) {
-        "New mission" -> error("Only for doctors: $type")
         "Accepted mission" -> HistoryType.UP_COMING
         "Check QR Code" -> HistoryType.PROCESSING
         "Mission completed" -> HistoryType.DONE
-        else -> error("Invalid notification type: $type")
+        else -> HistoryType.WAITING.also {
+          Timber.d("Invalid notification type: $type")
+        }
       },
       orderId = notification.orderId,
     )
