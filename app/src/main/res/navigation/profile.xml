@@ -9,5 +9,26 @@
     <fragment
         android:id="@+id/profileFragment"
         android:name="com.doancnpm.edoctor.ui.main.profile.ProfileFragment"
-        android:label="Profile" />
+        android:label="Profile">
+
+        <action
+            android:id="@+id/action_profileFragment_to_updateProfileFragment"
+            app:destination="@id/updateProfileFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/updateProfileFragment"
+        android:name="com.doancnpm.edoctor.ui.main.profile.update_profile.UpdateProfileFragment"
+        android:label="Update profile">
+
+        <argument
+            android:name="user"
+            app:argType="com.doancnpm.edoctor.domain.entity.User"
+            app:nullable="false" />
+
+    </fragment>
 </navigation>

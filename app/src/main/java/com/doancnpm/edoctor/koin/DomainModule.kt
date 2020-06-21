@@ -32,6 +32,7 @@ val domainModule = module {
       firebaseInstanceId = get(),
       appCoroutineScope = get(),
       baseUrl = get(BASE_URL_QUALIFIER),
+      application = get(),
     )
   }
 
@@ -64,6 +65,7 @@ val domainModule = module {
     OrderRepositoryImpl(
       apiService = get(API_URL_QUALIFIER),
       errorMapper = get(),
+      baseUrl = get(BASE_URL_QUALIFIER),
     )
   }
 

@@ -235,7 +235,7 @@ class CreateOrderVM(
         .also { isSubmittingD.value = false }
         .fold(
           ifLeft = { SingleEvent.Error(it) },
-          ifRight = { SingleEvent.Success }
+          ifRight = { SingleEvent.Success(it) }
         )
         .let { singleEventS.accept(it) }
     }

@@ -1,10 +1,11 @@
 package com.doancnpm.edoctor.domain.repository
 
+import android.net.Uri
 import arrow.core.Option
 import com.doancnpm.edoctor.domain.entity.DomainResult
 import com.doancnpm.edoctor.domain.entity.User
 import io.reactivex.rxjava3.core.Observable
-import java.util.*
+import java.util.Date
 
 interface UserRepository {
   suspend fun login(phone: String, password: String): DomainResult<Unit>
@@ -29,4 +30,10 @@ interface UserRepository {
   suspend fun resendCode(phone: String): DomainResult<Unit>
 
   suspend fun verify(phone: String, code: String): DomainResult<Unit>
+
+  suspend fun updateUserProfile(
+    fullName: String,
+    birthday: Date?,
+    avatar: Uri?
+  ): DomainResult<Unit>
 }

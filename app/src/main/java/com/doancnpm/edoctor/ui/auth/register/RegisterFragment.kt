@@ -12,13 +12,11 @@ import com.doancnpm.edoctor.domain.entity.getMessage
 import com.doancnpm.edoctor.ui.auth.register.RegisterContract.*
 import com.doancnpm.edoctor.utils.*
 import com.jakewharton.rxbinding4.view.clicks
-import com.jakewharton.rxbinding4.widget.checkedChanges
 import com.jakewharton.rxbinding4.widget.textChanges
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.kotlin.addTo
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
-import java.util.*
 
 class RegisterFragment : BaseFragment(R.layout.fragment_register) {
   private val binding by viewBinding<FragmentRegisterBinding>()
@@ -60,16 +58,7 @@ class RegisterFragment : BaseFragment(R.layout.fragment_register) {
           }
           .map { ViewIntent.BirthdayChanged(it) }
           .startWithItem(ViewIntent.BirthdayChanged(null)),
-        binding.radioRole
-          .checkedChanges()
-          .map {
-            when (it) {
-              R.id.radioCustomer -> User.RoleId.CUSTOMER
-              R.id.radioDoctor -> User.RoleId.DOCTOR
-              else -> error("Invalid checked id")
-            }
-          }
-          .map { ViewIntent.RoleIdChanged(it) },
+        Observable.just(ViewIntent.RoleIdChanged(User.RoleId.CUSTOMER)),
         binding.buttonRegister
           .clicks()
           .map { ViewIntent.Submit },
@@ -148,12 +137,6 @@ class RegisterFragment : BaseFragment(R.layout.fragment_register) {
       editPhone.editText!!.setText(phone)
       editPassword.editText!!.setText(password)
       editFullName.editText!!.setText(fullName)
-      radioRole.check(
-        when (roleId) {
-          User.RoleId.CUSTOMER -> R.id.radioCustomer
-          User.RoleId.DOCTOR -> R.id.radioDoctor
-        }
-      )
       editBirthday.editText!!.setText(
         birthday?.toString_yyyyMMdd()
       )

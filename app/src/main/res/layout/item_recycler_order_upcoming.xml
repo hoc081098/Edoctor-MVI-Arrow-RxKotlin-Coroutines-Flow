@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/cardView"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?android:attr/selectableItemBackground"
+    app:cardBackgroundColor="@color/colorSurface"
+    app:cardCornerRadius="3dp"
+    app:cardElevation="2dp"
+    app:cardPreventCornerOverlap="false"
+    app:cardUseCompatPadding="true">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/image_view"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:scaleType="fitXY"
+            app:layout_constraintDimensionRatio="H,1:1"
+            app:layout_constraintEnd_toStartOf="@+id/guideline"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:srcCompat="@tools:sample/backgrounds/scenic[1]" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_begin="0dp"
+            app:layout_constraintGuide_end="0dp"
+            app:layout_constraintGuide_percent="0.26" />
+
+        <TextView
+            android:id="@+id/text_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:ellipsize="end"
+            android:fontFamily="@font/nunito_sans_semibold"
+            android:maxLines="2"
+            android:textColor="@color/colorOnSurface"
+            android:textSize="17sp"
+            app:layout_constraintEnd_toEndOf="@+id/text_start_time"
+            app:layout_constraintStart_toStartOf="@+id/guideline"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Name" />
+
+        <TextView
+            android:id="@+id/text_doctor_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:ellipsize="end"
+            android:fontFamily="@font/nunito_sans_semibold"
+            android:maxLines="2"
+            android:textColor="@color/colorOnSurface"
+            android:textSize="17sp"
+            app:layout_constraintBottom_toBottomOf="@+id/image_avatar"
+            app:layout_constraintEnd_toStartOf="@+id/cancel_button"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@+id/image_avatar"
+            app:layout_constraintTop_toTopOf="@+id/image_avatar"
+            tools:text="Name" />
+
+        <TextView
+            android:id="@+id/text_start_time"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="6dp"
+            android:ellipsize="end"
+            android:fontFamily="@font/google_sans"
+            android:maxLines="2"
+            android:textColor="@color/colorIcon"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toStartOf="@+id/card_qr_code"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@+id/image_view"
+            app:layout_constraintTop_toBottomOf="@+id/text_name"
+            tools:text="Start time: 2020-06-16 09:36:52" />
+
+        <TextView
+            android:id="@+id/text_end_time"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="4dp"
+            android:ellipsize="end"
+            android:fontFamily="@font/google_sans"
+            android:maxLines="2"
+            android:textColor="@color/colorIcon"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="@+id/text_start_time"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@+id/image_view"
+            app:layout_constraintTop_toBottomOf="@+id/text_start_time"
+            tools:text="End time: 2020-06-16 09:36:52" />
+
+        <TextView
+            android:id="@+id/text_address"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:ellipsize="end"
+            android:fontFamily="@font/google_sans"
+            android:maxLines="2"
+            android:textColor="@color/colorIcon"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/barrier2"
+            tools:text="Address: 1600 Amphitheatre Pkwy, Mountain View, CA 94043, USA" />
+
+        <TextView
+            android:id="@+id/text_note"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="8dp"
+            android:ellipsize="end"
+            android:fontFamily="@font/google_sans"
+            android:maxLines="2"
+            android:textColor="@color/colorIcon"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/text_address"
+            tools:text="Note: " />
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/text_total_price_wrapper"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            app:cardBackgroundColor="#DAA520"
+            app:cardCornerRadius="6dp"
+            app:cardElevation="0dp"
+            app:layout_constraintBottom_toBottomOf="@+id/card_qr_code"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/card_qr_code">
+
+            <TextView
+                android:id="@+id/text_total_price"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:fontFamily="@font/nunito_sans"
+                android:maxLines="1"
+                android:paddingStart="8dp"
+                android:paddingTop="4dp"
+                android:paddingEnd="8dp"
+                android:paddingBottom="4dp"
+                android:text="Total: 1.000.000đ"
+                android:textColor="@color/colorOnPrimary"
+                android:textSize="18sp" />
+        </androidx.cardview.widget.CardView>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/cancel_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:elevation="4dp"
+            android:fontFamily="@font/google_sans"
+            android:insetLeft="6dp"
+            android:insetTop="6dp"
+            android:insetRight="6dp"
+            android:text="Cancel"
+            android:textColor="@color/colorOnBackground"
+            android:textSize="12sp"
+            app:backgroundTint="@color/colorBackground"
+            app:cornerRadius="4dp"
+            app:layout_constraintBottom_toBottomOf="@+id/image_avatar"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/image_avatar"
+            app:strokeColor="@color/colorAccent"
+            app:strokeWidth="1dp" />
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/image_avatar"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginBottom="8dp"
+            android:elevation="10dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/icons8_person_96"
+            app:civ_border_width="0dp"
+            app:civ_circle_background_color="#fafafa"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/card_qr_code" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_qr_code"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="8dp"
+            app:cardCornerRadius="1dp"
+            app:cardElevation="3dp"
+            app:cardPreventCornerOverlap="true"
+            app:cardUseCompatPadding="true"
+            app:contentPadding="0dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/text_note">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/image_qr_code"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/icons8_qr_code" />
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <androidx.constraintlayout.widget.Barrier
+            android:id="@+id/barrier2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:barrierDirection="bottom"
+            app:constraint_referenced_ids="image_view,text_end_time" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.cardview.widget.CardView>
+

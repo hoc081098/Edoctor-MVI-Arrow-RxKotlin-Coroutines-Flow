@@ -11,6 +11,8 @@ import com.doancnpm.edoctor.R
 import com.doancnpm.edoctor.core.BaseActivity
 import com.doancnpm.edoctor.databinding.ActivityMainBinding
 import com.doancnpm.edoctor.ui.auth.AuthActivity
+import com.doancnpm.edoctor.ui.main.history.HistoryContract
+import com.doancnpm.edoctor.utils.dismissAlertDialog
 import com.doancnpm.edoctor.utils.setupWithNavController
 import com.doancnpm.edoctor.utils.viewBinding
 import io.reactivex.rxjava3.kotlin.addTo
@@ -32,9 +34,36 @@ class MainActivity : BaseActivity() {
 
     if (savedInstanceState === null) {
       setupBottomNavigationBar()
+    } else {
+      dismissAlertDialog()
     }
 
     bindVM()
+    handleIntent(intent)
+  }
+
+  override fun onNewIntent(intent: Intent?) {
+    super.onNewIntent(intent)
+    handleIntent(intent)
+  }
+
+  private fun handleIntent(intent: Intent?) {
+    val type = intent?.getStringExtra(TYPE_KEY) ?: return
+    val orderId = intent.getLongExtra(ORDER_ID_KEY, -1).takeIf { it >= 0 } ?: return
+
+    Timber.d(">> handleIntent { orderId: $orderId, type: $type }")
+
+    navigateToHistory(
+      type = when (type) {
+        "Accepted mission" -> HistoryContract.HistoryType.UP_COMING
+        "Check QR Code" -> HistoryContract.HistoryType.PROCESSING
+        "Mission completed" -> HistoryContract.HistoryType.DONE
+        else -> HistoryContract.HistoryType.WAITING.also {
+          Timber.d("Invalid notification type: $type")
+        }
+      },
+      orderId = orderId,
+    )
   }
 
   private fun bindVM() {
@@ -97,5 +126,16 @@ class MainActivity : BaseActivity() {
       .childFragmentManager
       .fragments
       .forEach { it.onActivityResult(requestCode, resultCode, data) }
+  }
+
+  fun navigateToHistory(type: HistoryContract.HistoryType, orderId: Long) {
+    viewModel.setHistoryType(type)
+    viewModel.setOrderId(orderId)
+    binding.navView.selectedItemId = R.id.history
+  }
+
+  companion object {
+    val TYPE_KEY = MainActivity::class.java.name + ".type"
+    val ORDER_ID_KEY = MainActivity::class.java.name + ".order_id"
   }
 }

@@ -4,12 +4,18 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.graphics.BitmapFactory
 import android.media.RingtoneManager
 import androidx.core.app.NotificationCompat
-import com.doancnpm.edoctor.ui.splash.SplashActivity
+import com.doancnpm.edoctor.ui.main.MainActivity
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
+import java.net.URL
 
 class AppFirebaseMessagingService : FirebaseMessagingService() {
 
@@ -37,6 +43,7 @@ class AppFirebaseMessagingService : FirebaseMessagingService() {
     // Check if message contains a data payload.
     remoteMessage.data.isNotEmpty().let {
       Timber.d("Message data payload: %s", remoteMessage.data)
+      GlobalScope.launch { sendNotification(remoteMessage.data.withDefault { "" }) }
 
       if (/* Check if data needs to be processed by long running job */ true) {
         // For long-running tasks (10 seconds or more) use WorkManager.
@@ -108,26 +115,59 @@ class AppFirebaseMessagingService : FirebaseMessagingService() {
    *
    * @param messageBody FCM message body received.
    */
-  private fun sendNotification(messageBody: String) {
-    val intent = Intent(this, SplashActivity::class.java)
-    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+  private suspend fun sendNotification(data: Map<String, String>) {
+    val orderId = data.getValue("order_id").toLongOrNull() ?: -1
+    val type = data.getValue("type")
+
+    val intent = Intent(this, MainActivity::class.java).apply {
+      addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
+      putExtra(MainActivity.TYPE_KEY, type)
+      putExtra(MainActivity.ORDER_ID_KEY, orderId)
+    }
     val pendingIntent = PendingIntent.getActivity(
-      this, 0 /* Request code */, intent,
-      PendingIntent.FLAG_ONE_SHOT
+      this,
+      orderId.toInt() /* Request code */,
+      intent,
+      PendingIntent.FLAG_UPDATE_CURRENT,
     )
 
     val channelId = getString(R.string.notification_channel_id)
     val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
-    val notificationBuilder = NotificationCompat.Builder(this, channelId)
+    val notificationBuilder = NotificationCompat
+      .Builder(this, channelId)
       .setSmallIcon(R.mipmap.ic_launcher)
-      .setContentTitle(getString(R.string.fcm_message))
-      .setContentText(messageBody)
+      .setDefaults(NotificationCompat.DEFAULT_ALL)
+      .setPriority(NotificationCompat.PRIORITY_MAX)
+      .setContentTitle(data.getValue("title"))
+      .setContentText(data.getValue("body"))
       .setAutoCancel(true)
       .setSound(defaultSoundUri)
+      .setShowWhen(true)
       .setContentIntent(pendingIntent)
 
     val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-    notificationManager.notify(0 /* ID of notification */, notificationBuilder.build())
-  }
+    notificationManager.notify(
+      type,
+      orderId.toInt(),
+      notificationBuilder.build(),
+    )
 
+    val myBitmap = withContext(Dispatchers.IO) {
+      try {
+        URL(BuildConfig.BASE_URL + data.getValue("image"))
+          .openStream()
+          .let { BitmapFactory.decodeStream(it) }
+      } catch (_: Exception) {
+        null
+      }
+    }
+
+    notificationManager.notify(
+      type,
+      orderId.toInt(),
+      notificationBuilder
+        .setStyle(NotificationCompat.BigPictureStyle().bigPicture(myBitmap))
+        .build(),
+    )
+  }
 }

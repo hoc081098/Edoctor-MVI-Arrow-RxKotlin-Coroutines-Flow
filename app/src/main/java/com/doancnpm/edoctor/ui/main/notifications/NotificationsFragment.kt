@@ -9,10 +9,14 @@ import com.doancnpm.edoctor.GlideApp
 import com.doancnpm.edoctor.R
 import com.doancnpm.edoctor.core.BaseFragment
 import com.doancnpm.edoctor.databinding.FragmentNotificationsBinding
+import com.doancnpm.edoctor.domain.entity.Notification
 import com.doancnpm.edoctor.domain.entity.getMessage
+import com.doancnpm.edoctor.ui.main.MainActivity
+import com.doancnpm.edoctor.ui.main.history.HistoryContract.HistoryType
 import com.doancnpm.edoctor.ui.main.notifications.NotificationsContract.PlaceholderState
 import com.doancnpm.edoctor.utils.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import timber.log.Timber
 
 class NotificationsFragment : BaseFragment(R.layout.fragment_notifications) {
   private val binding: FragmentNotificationsBinding by viewBinding {
@@ -26,9 +30,7 @@ class NotificationsFragment : BaseFragment(R.layout.fragment_notifications) {
   private val serviceAdapter by lazy(LazyThreadSafetyMode.NONE) {
     NotificationsAdapter(
       GlideApp.with(this),
-      {
-        //TODO
-      }
+      ::onClickNotification,
     )
   }
 
@@ -114,6 +116,20 @@ class NotificationsFragment : BaseFragment(R.layout.fragment_notifications) {
   }
 
   private fun onRetry() = viewModel.retryNextPage()
+
+  private fun onClickNotification(notification: Notification) {
+    (requireActivity() as MainActivity).navigateToHistory(
+      type = when (val type = notification.type) {
+        "Accepted mission" -> HistoryType.UP_COMING
+        "Check QR Code" -> HistoryType.PROCESSING
+        "Mission completed" -> HistoryType.DONE
+        else -> HistoryType.WAITING.also {
+          Timber.d("Invalid notification type: $type")
+        }
+      },
+      orderId = notification.orderId,
+    )
+  }
 
   private companion object {
     const val VISIBLE_THRESHOLD = 1
