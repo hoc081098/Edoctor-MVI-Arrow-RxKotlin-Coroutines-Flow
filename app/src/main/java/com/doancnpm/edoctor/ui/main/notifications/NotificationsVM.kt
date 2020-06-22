@@ -146,6 +146,6 @@ class NotificationsVM(
   }
 
   private companion object {
-    const val PER_PAGE = 4
+    const val PER_PAGE = 12
   }
 }
