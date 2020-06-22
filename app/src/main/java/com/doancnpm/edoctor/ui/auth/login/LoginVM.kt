@@ -73,6 +73,8 @@ class LoginVM(
                 is PartialChange.PhoneChanged -> return@doOnNext
                 is PartialChange.PasswordChanged -> return@doOnNext
                 PartialChange.Loading -> return@doOnNext
+                PartialChange.PhoneChangedFirstTime -> return@doOnNext
+                PartialChange.PasswordChangedFirstTime -> return@doOnNext
               }
             )
           }
@@ -84,6 +86,12 @@ class LoginVM(
       phoneObservable.map { PartialChange.PhoneChanged(it.first) },
       passwordObservable.map { PartialChange.PasswordChanged(it.first) },
       loginChanges,
+      intentS
+        .ofType<ViewIntent.PhoneChangedFirstTime>()
+        .map { PartialChange.PhoneChangedFirstTime },
+      intentS
+        .ofType<ViewIntent.PasswordChangedFirstTime>()
+        .map { PartialChange.PasswordChangedFirstTime }
     )
       .observeOn(schedulers.main)
       .scan(initialState) { state, change -> change.reduce(state) }

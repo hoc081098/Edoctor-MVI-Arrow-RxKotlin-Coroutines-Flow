@@ -8,6 +8,7 @@ import com.doancnpm.edoctor.koin.dataModule
 import com.doancnpm.edoctor.koin.domainModule
 import com.doancnpm.edoctor.koin.viewModelModule
 import com.google.android.libraries.places.api.Places
+import io.reactivex.rxjava3.plugins.RxJavaPlugins
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import org.koin.android.ext.koin.androidContext
@@ -29,7 +30,14 @@ class MyApp : Application() {
     setupPlaceApi()
     startKoin()
     setupTimber()
+    setupRx()
     createNotificationChannel()
+  }
+
+  private fun setupRx() {
+    if (!BuildConfig.DEBUG) {
+      RxJavaPlugins.setErrorHandler { }
+    }
   }
 
   private fun setupPlaceApi() {

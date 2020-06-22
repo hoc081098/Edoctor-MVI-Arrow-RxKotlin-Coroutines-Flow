@@ -20,6 +20,8 @@ interface LoginContract {
     // keep latest state when replace fragment
     val phone: String?,
     val password: String?,
+    val phoneChanged: Boolean,
+    val passwordChanged: Boolean,
   ) {
     companion object {
       @JvmStatic
@@ -29,6 +31,8 @@ interface LoginContract {
         passwordErrors = emptySet(),
         phone = null,
         password = null,
+        phoneChanged = false,
+        passwordChanged = false,
       )
     }
   }
@@ -37,6 +41,9 @@ interface LoginContract {
     data class PhoneChanged(val phone: String) : ViewIntent()
     data class PasswordChange(val password: String) : ViewIntent()
     object SubmitLogin : ViewIntent()
+
+    object PhoneChangedFirstTime : ViewIntent()
+    object PasswordChangedFirstTime : ViewIntent()
   }
 
   sealed class SingleEvent {
@@ -54,6 +61,8 @@ interface LoginContract {
         is LoginFailure -> state.copy(isLoading = false)
         is PhoneChanged -> state.copy(phone = phone)
         is PasswordChanged -> state.copy(password = password)
+        PhoneChangedFirstTime -> state.copy(phoneChanged = true)
+        PasswordChangedFirstTime -> state.copy(passwordChanged = true)
       }
     }
 
@@ -66,6 +75,9 @@ interface LoginContract {
     object Loading : PartialChange()
     object LoginSuccess : PartialChange()
     data class LoginFailure(val error: AppError) : PartialChange()
+
+    object PhoneChangedFirstTime : PartialChange()
+    object PasswordChangedFirstTime : PartialChange()
   }
 
   interface Interactor {
