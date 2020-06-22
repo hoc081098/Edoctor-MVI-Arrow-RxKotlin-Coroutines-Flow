@@ -9,7 +9,9 @@ import com.doancnpm.edoctor.R
 import com.doancnpm.edoctor.core.BaseFragment
 import com.doancnpm.edoctor.databinding.FragmentLoginBinding
 import com.doancnpm.edoctor.domain.entity.getMessage
-import com.doancnpm.edoctor.ui.auth.login.LoginContract.*
+import com.doancnpm.edoctor.ui.auth.login.LoginContract.SingleEvent
+import com.doancnpm.edoctor.ui.auth.login.LoginContract.ValidationError
+import com.doancnpm.edoctor.ui.auth.login.LoginContract.ViewIntent
 import com.doancnpm.edoctor.ui.main.MainActivity
 import com.doancnpm.edoctor.utils.*
 import com.jakewharton.rxbinding4.view.clicks
@@ -57,20 +59,20 @@ class LoginFragment : BaseFragment(R.layout.fragment_login) {
   }
 
   private fun bindVM() {
-    viewModel.stateLiveData.observe(owner = viewLifecycleOwner) { (emailErrors, passwordErrors, isLoading) ->
+    viewModel.stateLiveData.observe(owner = viewLifecycleOwner) { (phoneErrors, passwordErrors, isLoading, _, _, phoneChanged, passwordChanged) ->
       binding.run {
 
-        if (ValidationError.INVALID_PHONE_NUMBER in emailErrors) {
+        if (ValidationError.INVALID_PHONE_NUMBER in phoneErrors) {
           "Invalid phone number"
         } else {
           null
-        }.let { if (editPhone.error != it) editPhone.error = it }
+        }.let { if (editPhone.error != it && phoneChanged) editPhone.error = it }
 
         if (ValidationError.TOO_SHORT_PASSWORD in passwordErrors) {
           "Too short password"
         } else {
           null
-        }.let { if (editPassword.error != it) editPassword.error = it }
+        }.let { if (editPassword.error != it && passwordChanged) editPassword.error = it }
 
         if (isLoading) {
           progressBar.visible()
@@ -110,6 +112,10 @@ class LoginFragment : BaseFragment(R.layout.fragment_login) {
           .map { ViewIntent.PasswordChange(it.toString()) },
         binding.buttonLogin.clicks()
           .map { ViewIntent.SubmitLogin },
+        binding.editPhone.editTextFirstChange()
+          .map { ViewIntent.PhoneChangedFirstTime },
+        binding.editPassword.editTextFirstChange()
+          .map { ViewIntent.PasswordChangedFirstTime }
       )
     ).addTo(compositeDisposable)
   }
