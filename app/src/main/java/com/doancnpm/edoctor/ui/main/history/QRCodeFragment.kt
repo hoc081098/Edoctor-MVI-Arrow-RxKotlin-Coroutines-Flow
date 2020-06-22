@@ -1,8 +1,15 @@
 package com.doancnpm.edoctor.ui.main.history
 
+import android.app.Dialog
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.PictureDrawable
 import android.os.Bundle
 import android.view.View
+import android.view.ViewGroup
+import android.view.ViewGroup.LayoutParams.MATCH_PARENT
+import android.view.Window
+import android.widget.RelativeLayout
 import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.observe
@@ -25,13 +32,27 @@ class QRCodeFragment : DialogFragment(R.layout.fragment_qr_code) {
   }
   private val binding by viewBinding<FragmentQrCodeBinding>()
 
-  override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
-    setStyle(STYLE_NO_FRAME, R.style.AppTheme)
+  override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+    val root = RelativeLayout(activity).apply {
+      layoutParams = ViewGroup.LayoutParams(
+        MATCH_PARENT,
+        MATCH_PARENT
+      )
+    }
+
+    return Dialog(requireActivity()).apply {
+      requestWindowFeature(Window.FEATURE_NO_TITLE)
+      setContentView(root)
+      window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+      window!!.setLayout(MATCH_PARENT, MATCH_PARENT)
+    }
   }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
+
+    binding.imageView.setOnClickListener { }
+    binding.overlay.setOnClickListener { dismiss() }
 
     viewModel.image.observe(owner = viewLifecycleOwner) {
       val svg = SVG.getFromString(it ?: return@observe)
@@ -45,8 +66,6 @@ class QRCodeFragment : DialogFragment(R.layout.fragment_qr_code) {
     }
     viewModel.fetchImage()
   }
-
-  override fun getTheme() = R.style.FullScreenDialog
 
   companion object Factory {
     private const val ORDER_ID_KEY =

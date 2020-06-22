@@ -150,6 +150,6 @@ class ServicesVM(
   }
 
   private companion object {
-    const val PER_PAGE = 6
+    const val PER_PAGE = 12
   }
 }
