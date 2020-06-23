@@ -39,6 +39,10 @@ class AddCardFragment : BaseFragment(R.layout.fragment_add_card) {
           editExpiredDate.editText!!.textChanges().map { ViewIntent.ExpiredDateChanged(it.toString()) },
           editCvc.editText!!.textChanges().map { ViewIntent.CvcChanged(it.toString()) },
           buttonAdd.clicks().map { ViewIntent.Submit },
+          editHolderName.editTextFirstChange().map { ViewIntent.HolderNameChangedFirstTime },
+          editCardNumber.editTextFirstChange().map { ViewIntent.NumberChangedFirstTime },
+          editExpiredDate.editTextFirstChange().map { ViewIntent.ExpiredDateChangedFirstTime },
+          editCvc.editTextFirstChange().map { ViewIntent.CvcChangedFirstTime },
         )
       }
     )
@@ -58,7 +62,7 @@ class AddCardFragment : BaseFragment(R.layout.fragment_add_card) {
   }
 
   private fun render(state: ViewState) {
-    val (errors, isLoading, formData) = state
+    val (errors, isLoading, _, changed) = state
     Timber.d("State: $state")
 
     binding.run {
@@ -66,25 +70,25 @@ class AddCardFragment : BaseFragment(R.layout.fragment_add_card) {
         "Blank holder name"
       } else {
         null
-      }.let { if (it != editHolderName.error) editHolderName.error = it }
+      }.let { if (it != editHolderName.error && changed.holderName) editHolderName.error = it }
 
       if (ValidationError.INVALID_NUMBER in errors) {
         "Invalid card number"
       } else {
         null
-      }.let { if (editCardNumber.error != it) editCardNumber.error = it }
+      }.let { if (editCardNumber.error != it && changed.number) editCardNumber.error = it }
 
       if (ValidationError.INVALID_EXPIRED_DATE in errors) {
         "Invalid expired date"
       } else {
         null
-      }.let { if (editExpiredDate.error != it) editExpiredDate.error = it }
+      }.let { if (editExpiredDate.error != it && changed.expiredDate) editExpiredDate.error = it }
 
       if (ValidationError.INVALID_CVC in errors) {
         "Invalid cvc"
       } else {
         null
-      }.let { if (editCvc.error != it) editCvc.error = it }
+      }.let { if (editCvc.error != it && changed.cvc) editCvc.error = it }
 
       if (isLoading) {
         progressBar.visible()

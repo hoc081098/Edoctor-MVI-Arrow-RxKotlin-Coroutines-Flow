@@ -35,7 +35,7 @@
             android:fontFamily="@font/google_sans"
             android:imeOptions="actionDone"
             android:inputType="textMultiLine"
-            android:lines="3"
+            android:lines="8"
             android:textSize="18sp" />
 
     </com.google.android.material.textfield.TextInputLayout>

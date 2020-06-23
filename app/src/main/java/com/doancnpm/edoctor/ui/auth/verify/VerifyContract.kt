@@ -16,6 +16,7 @@ interface VerifyContract {
     val code: String? = null,
     val errors: Set<ValidationError> = emptySet(),
     val isLoading: Boolean = false,
+    val codeChanged: Boolean = false
   )
 
   sealed class SingleEvent {
@@ -28,6 +29,8 @@ interface VerifyContract {
   sealed class ViewIntent {
     data class CodeChanged(val code: String) : ViewIntent()
     object Submit : ViewIntent()
+
+    object CodeChangedFirstTime : ViewIntent()
   }
 
   sealed class PartialStateChange {
@@ -38,6 +41,7 @@ interface VerifyContract {
         Loading -> state.copy(isLoading = true)
         is Success -> state.copy(isLoading = false)
         is Failure -> state.copy(isLoading = false)
+        CodeChangedFirstTime -> state.copy(codeChanged = true)
       }
     }
 
@@ -47,6 +51,8 @@ interface VerifyContract {
     object Loading : PartialStateChange()
     object Success : PartialStateChange()
     data class Failure(val error: AppError) : PartialStateChange()
+
+    object CodeChangedFirstTime : PartialStateChange()
   }
   //endregion
 

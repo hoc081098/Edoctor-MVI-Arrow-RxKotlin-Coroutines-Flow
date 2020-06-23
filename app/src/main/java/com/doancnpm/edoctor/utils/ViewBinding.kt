@@ -2,6 +2,7 @@ package com.doancnpm.edoctor.utils
 
 import android.view.LayoutInflater
 import android.view.View
+import android.widget.EditText
 import androidx.annotation.CheckResult
 import androidx.annotation.MainThread
 import androidx.appcompat.app.AppCompatActivity
@@ -12,9 +13,12 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.viewbinding.ViewBinding
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.tabs.TabLayout
+import com.google.android.material.textfield.TextInputLayout
 import com.jakewharton.rxbinding4.InitialValueObservable
+import com.jakewharton.rxbinding4.widget.textChanges
 import io.reactivex.rxjava3.android.MainThreadDisposable
 import io.reactivex.rxjava3.android.MainThreadDisposable.verifyMainThread
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Observer
 import timber.log.Timber
@@ -134,3 +138,13 @@ fun TabLayout.selectedTabPositions(): Observable<Int> {
     })
   }
 }
+
+fun EditText.firstChange(): Observable<Unit> {
+  return textChanges()
+    .skipInitialValue()
+    .unsubscribeOn(AndroidSchedulers.mainThread())
+    .take(1)
+    .map { Unit }
+}
+
+fun TextInputLayout.editTextFirstChange() = editText!!.firstChange()

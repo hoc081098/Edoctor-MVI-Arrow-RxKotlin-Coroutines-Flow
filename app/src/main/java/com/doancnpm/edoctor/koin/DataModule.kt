@@ -10,9 +10,11 @@ import com.doancnpm.edoctor.data.local.UserLocalSource
 import com.doancnpm.edoctor.data.local.UserLocalSourceImpl
 import com.doancnpm.edoctor.data.local.model.UserLocalJsonAdapter
 import com.doancnpm.edoctor.data.remote.ApiService
+import com.doancnpm.edoctor.data.remote.GeocoderApiService
 import com.doancnpm.edoctor.data.remote.interceptor.ApiKeyInterceptor
 import com.doancnpm.edoctor.data.remote.interceptor.AuthInterceptor
 import com.doancnpm.edoctor.data.remote.response.ErrorResponseJsonAdapter
+import com.doancnpm.edoctor.data.remote.response.GeocoderErrorResponseJsonAdapter
 import com.doancnpm.edoctor.domain.dispatchers.AppDispatchers
 import com.google.firebase.iid.FirebaseInstanceId
 import com.squareup.moshi.Moshi
@@ -28,12 +30,15 @@ import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
-import java.util.*
+import java.util.Date
 import java.util.concurrent.TimeUnit
 
 val API_URL_QUALIFIER = named("com.doancnpm.edoctor.api_url")
 val BASE_URL_QUALIFIER = named("com.doancnpm.edoctor.base_url")
 private val API_KEY_QUALIFIER = named("com.doancnpm.edoctor.api_key")
+
+val GEOCODE_URL_QUALIFIER = named("com.doancnpm.edoctor.geocode_url")
+val GEOCODE_API_KEY_QUALIFIER = named("com.doancnpm.edoctor.geocode_api_key")
 
 val dataModule = module {
   /*
@@ -54,7 +59,7 @@ val dataModule = module {
     )
   }
 
-  factory {
+  single {
     provideOkHttpClient(
       authInterceptor = get(),
       apiKeyInterceptor = get(),
@@ -70,6 +75,24 @@ val dataModule = module {
   single(API_URL_QUALIFIER) { provideApiService(retrofit = get(API_URL_QUALIFIER)) }
 
   single { provideErrorMapper(errorResponseJsonAdapter = get()) }
+
+  //region Geocoder
+  factory(GEOCODE_API_KEY_QUALIFIER) { BuildConfig.GEOCODE_API_KEY }
+
+  factory(GEOCODE_URL_QUALIFIER) { "https://maps.googleapis.com/maps/api/" }
+
+  factory(GEOCODE_URL_QUALIFIER) { GeocoderApiService(retrofit = get(GEOCODE_URL_QUALIFIER)) }
+
+  factory(GEOCODE_URL_QUALIFIER) {
+    Retrofit.Builder()
+      .client(get())
+      .addConverterFactory(MoshiConverterFactory.create(get()))
+      .baseUrl(get<String>(GEOCODE_URL_QUALIFIER))
+      .build()
+  }
+
+  factory { GeocoderErrorResponseJsonAdapter(moshi = get()) }
+  //endregion
 
   /*
    * Local

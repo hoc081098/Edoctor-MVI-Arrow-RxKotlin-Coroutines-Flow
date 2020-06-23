@@ -4,6 +4,7 @@ import android.icu.text.DecimalFormat
 import android.os.Bundle
 import android.view.View
 import androidx.lifecycle.Observer
+import androidx.lifecycle.observe
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.doancnpm.edoctor.BuildConfig
 import com.doancnpm.edoctor.GlideApp
@@ -12,10 +13,12 @@ import com.doancnpm.edoctor.core.BaseFragment
 import com.doancnpm.edoctor.databinding.FragmentOrderConfirmationBinding
 import com.doancnpm.edoctor.ui.main.home.create_order.CreateOrderVM
 import com.doancnpm.edoctor.utils.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.koin.androidx.viewmodel.ext.android.getViewModel
 import kotlin.LazyThreadSafetyMode.NONE
 import kotlin.math.roundToInt
 
+@ExperimentalCoroutinesApi
 class OrderConfirmationFragment : BaseFragment(R.layout.fragment_order_confirmation) {
   private val binding by viewBinding<FragmentOrderConfirmationBinding>()
   private val viewModel by lazy(NONE) { requireParentFragment().getViewModel<CreateOrderVM>() }
@@ -50,12 +53,6 @@ class OrderConfirmationFragment : BaseFragment(R.layout.fragment_order_confirmat
       }
 
       viewModel.locationLiveData.observe(owner = viewLifecycleOwner) { location ->
-        val numberFormat = DecimalFormat("#.##")
-        textAddress.text =
-          "Latitude and longitude: ${numberFormat.format(location.lat)}, ${numberFormat.format(
-            location.lng
-          )}"
-
         val url =
           "https://api.mapbox.com/styles/v1/mapbox/light-v10/static/${location.lng},${location.lat},15,0/128x128?access_token=${BuildConfig.MAPBOX_ACCESS_TOKEN}"
         glide
@@ -64,6 +61,8 @@ class OrderConfirmationFragment : BaseFragment(R.layout.fragment_order_confirmat
           .transition(DrawableTransitionOptions.withCrossFade())
           .into(imageAddress)
       }
+
+      viewModel.addressLiveData.observe(viewLifecycleOwner, Observer { textAddress.text = it })
 
       textNote.run {
         maxLines = Int.MAX_VALUE

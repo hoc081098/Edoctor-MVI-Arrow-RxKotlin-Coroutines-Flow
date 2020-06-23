@@ -57,7 +57,11 @@ val domainModule = module {
   factory<LocationRepository> {
     LocationRepositoryImpl(
       errorMapper = get(),
-      application = androidApplication()
+      application = androidApplication(),
+      geocoderApiService = get(GEOCODE_URL_QUALIFIER),
+      geocoderApiKey = get(GEOCODE_API_KEY_QUALIFIER),
+      geocoderErrorResponseJsonAdapter = get(),
+      dispatchers = get(),
     )
   }
 
