@@ -16,6 +16,7 @@ interface ResendCodeContract {
     val phone: String? = null,
     val errors: Set<ValidationError> = emptySet(),
     val isLoading: Boolean = false,
+    val phoneChanged: Boolean = false,
   )
 
   sealed class SingleEvent {
@@ -28,6 +29,8 @@ interface ResendCodeContract {
   sealed class ViewIntent {
     data class PhoneChanged(val phone: String) : ViewIntent()
     object Submit : ViewIntent()
+
+    object PhoneChangedFirstTime : ViewIntent()
   }
 
   sealed class PartialStateChange {
@@ -38,6 +41,7 @@ interface ResendCodeContract {
         Loading -> state.copy(isLoading = true)
         is Success -> state.copy(isLoading = false)
         is Failure -> state.copy(isLoading = false)
+        PhoneChangedFirstTime -> state.copy(phoneChanged = true)
       }
     }
 
@@ -47,6 +51,8 @@ interface ResendCodeContract {
     object Loading : PartialStateChange()
     data class Success(val phone: String) : PartialStateChange()
     data class Failure(val phone: String, val error: AppError) : PartialStateChange()
+
+    object PhoneChangedFirstTime : PartialStateChange()
   }
   //endregion
 

@@ -39,13 +39,13 @@ class ResendCodeFragment : BaseFragment(R.layout.fragment_resend_code) {
   }
 
   private fun bindVM() {
-    viewModel.viewState.observe(owner = viewLifecycleOwner) { (_, errors, isLoading) ->
+    viewModel.viewState.observe(owner = viewLifecycleOwner) { (_, errors, isLoading, phoneChanged) ->
       binding.run {
         if (ValidationError.INVALID_PHONE_NUMBER in errors) {
           "Invalid phone number"
         } else {
           null
-        }.let { if (editPhone.error != it) editPhone.error = it }
+        }.let { if (editPhone.error != it && phoneChanged) editPhone.error = it }
 
         if (isLoading) {
           progressBar.visible()
@@ -78,6 +78,8 @@ class ResendCodeFragment : BaseFragment(R.layout.fragment_resend_code) {
           .map { ViewIntent.PhoneChanged(it.toString()) },
         binding.buttonGetOtp.clicks()
           .map { ViewIntent.Submit },
+        binding.editPhone.editTextFirstChange()
+          .map { ViewIntent.PhoneChangedFirstTime },
       )
     ).addTo(compositeDisposable)
   }
