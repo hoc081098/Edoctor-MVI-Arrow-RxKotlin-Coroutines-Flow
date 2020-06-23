@@ -6,7 +6,10 @@ import android.app.Application
 import androidx.annotation.RequiresPermission
 import arrow.core.Either
 import com.doancnpm.edoctor.data.ErrorMapper
+import com.doancnpm.edoctor.data.remote.GeocoderApiService
+import com.doancnpm.edoctor.data.remote.response.GeocoderErrorResponseJsonAdapter
 import com.doancnpm.edoctor.data.toLocationDomain
+import com.doancnpm.edoctor.domain.dispatchers.AppDispatchers
 import com.doancnpm.edoctor.domain.entity.AppError
 import com.doancnpm.edoctor.domain.entity.DomainResult
 import com.doancnpm.edoctor.domain.entity.Location
@@ -14,11 +17,8 @@ import com.doancnpm.edoctor.domain.repository.LocationRepository
 import com.doancnpm.edoctor.utils.retrySuspend
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.TimeoutCancellationException
-import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.*
 import kotlinx.coroutines.tasks.await
-import kotlinx.coroutines.withTimeout
 import timber.log.Timber
 import kotlin.time.ExperimentalTime
 import kotlin.time.milliseconds
@@ -30,7 +30,11 @@ import android.location.Location as AndroidLocation
 @ExperimentalTime
 class LocationRepositoryImpl(
   private val errorMapper: ErrorMapper,
-  private val application: Application
+  private val application: Application,
+  private val geocoderApiService: GeocoderApiService,
+  private val geocoderApiKey: String,
+  private val geocoderErrorResponseJsonAdapter: GeocoderErrorResponseJsonAdapter,
+  private val dispatchers: AppDispatchers,
 ) : LocationRepository {
 
   private val fusedLocationClient by lazy {
@@ -80,6 +84,37 @@ class LocationRepositoryImpl(
         }.toLocationDomain()
       } catch (e: TimeoutCancellationException) {
         throw AppError.LocationError.TimeoutGetCurrentLocation
+      }
+    }
+  }
+
+  override suspend fun getAddressForCoordinates(location: Location): DomainResult<String> {
+    return Either.catch(errorMapper::map) {
+      withContext(dispatchers.io) {
+        val response = geocoderApiService
+          .getAddressForCoordinates(
+            latlng = "${location.latitude},${location.longitude}",
+            key = geocoderApiKey
+          )
+
+        if (!response.isSuccessful) {
+          response
+            .errorBody()!!
+            .use { geocoderErrorResponseJsonAdapter.fromJson(it.toString())!! }
+            .let {
+              throw AppError.Remote.ServerError(
+                errorMessage = it.errorMessage,
+                statusCode = response.code(),
+                cause = null,
+              )
+            }
+        }
+
+        (response
+          .body()!!
+          .results
+          .firstOrNull() ?: throw AppError.LocationError.GeocoderEmptyResult)
+          .formattedAddress
       }
     }
   }

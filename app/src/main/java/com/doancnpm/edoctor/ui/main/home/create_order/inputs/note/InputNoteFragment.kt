@@ -11,11 +11,13 @@ import com.doancnpm.edoctor.utils.viewBinding
 import com.jakewharton.rxbinding4.widget.textChanges
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener
 import org.koin.androidx.viewmodel.ext.android.getViewModel
 import kotlin.LazyThreadSafetyMode.NONE
 
+@ExperimentalCoroutinesApi
 class InputNoteFragment : BaseFragment(R.layout.fragment_input_note) {
   private val binding by viewBinding<FragmentInputNoteBinding>()
   private val viewModel by lazy(NONE) { requireParentFragment().getViewModel<CreateOrderVM>() }

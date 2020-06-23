@@ -11,6 +11,7 @@ import com.doancnpm.edoctor.ui.main.home.create_order.CreateOrderVM
 import com.doancnpm.edoctor.utils.*
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx3.await
 import org.koin.androidx.viewmodel.ext.android.getViewModel
@@ -19,6 +20,7 @@ import java.util.Calendar.HOUR_OF_DAY
 import java.util.Calendar.MINUTE
 import kotlin.LazyThreadSafetyMode.NONE
 
+@ExperimentalCoroutinesApi
 class InputTimeFragment : BaseFragment(R.layout.fragment_input_time) {
   private val binding by viewBinding<FragmentInputTimeBinding>()
   private val viewModel by lazy(NONE) { requireParentFragment().getViewModel<CreateOrderVM>() }

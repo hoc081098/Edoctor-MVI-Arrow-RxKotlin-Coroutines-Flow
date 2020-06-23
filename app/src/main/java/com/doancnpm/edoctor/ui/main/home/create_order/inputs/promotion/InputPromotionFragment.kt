@@ -10,9 +10,11 @@ import com.doancnpm.edoctor.domain.entity.getMessage
 import com.doancnpm.edoctor.ui.main.home.create_order.CreateOrderContract.InputPromotionContract.PromotionItem
 import com.doancnpm.edoctor.ui.main.home.create_order.CreateOrderVM
 import com.doancnpm.edoctor.utils.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.koin.androidx.viewmodel.ext.android.getViewModel
 import kotlin.LazyThreadSafetyMode.NONE
 
+@ExperimentalCoroutinesApi
 class InputPromotionFragment : BaseFragment(R.layout.fragment_input_promotion) {
   private val binding by viewBinding<FragmentInputPromotionBinding>() {
     recyclerView.adapter = null

@@ -9,4 +9,6 @@ import com.doancnpm.edoctor.domain.entity.Location
 interface LocationRepository {
   @RequiresPermission(anyOf = [ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION])
   suspend fun getCurrentLocation(): DomainResult<Location>
+
+  suspend fun getAddressForCoordinates(location: Location): DomainResult<String>
 }

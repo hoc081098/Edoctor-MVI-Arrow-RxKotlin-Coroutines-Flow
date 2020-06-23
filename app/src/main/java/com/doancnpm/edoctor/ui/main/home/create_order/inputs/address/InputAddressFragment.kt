@@ -12,7 +12,9 @@ import androidx.activity.result.contract.ActivityResultContracts.RequestPermissi
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.observe
 import com.doancnpm.edoctor.R
 import com.doancnpm.edoctor.core.BaseFragment
 import com.doancnpm.edoctor.databinding.FragmentInputAddressBinding
@@ -72,6 +74,10 @@ class InputAddressFragment : BaseFragment(R.layout.fragment_input_address) {
     viewModel.locationLiveData.observe(owner = viewLifecycleOwner) {
       moveCameraToLocation(it)
     }
+    val autocompleteSupportFragment = childFragmentManager.findFragmentById(R.id.autocomplete_fragment) as AutocompleteSupportFragment
+    viewModel.addressLiveData.observe(viewLifecycleOwner, Observer {
+      autocompleteSupportFragment.setText(it)
+    })
     viewModel.singleEventObservable.subscribeBy { event ->
       if (event is CreateOrderContract.SingleEvent.AddressError) {
         val error = event.locationError
@@ -139,7 +145,8 @@ class InputAddressFragment : BaseFragment(R.layout.fragment_input_address) {
                   Location(
                     lat = latLng.latitude,
                     lng = latLng.longitude
-                  )
+                  ),
+                  null,
                 )
               }
             }
@@ -166,7 +173,8 @@ class InputAddressFragment : BaseFragment(R.layout.fragment_input_address) {
             Location(
               lat = latLng.latitude,
               lng = latLng.longitude,
-            )
+            ),
+            place.address
           )
         }
 

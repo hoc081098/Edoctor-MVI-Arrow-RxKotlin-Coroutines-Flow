@@ -54,6 +54,7 @@ class CreateOrderVM(
   private val singleEventS = PublishRelay.create<SingleEvent>()
   private val isSubmittingD = MutableLiveData<Boolean>().apply { value = false }
 
+  private var addressD = MutableLiveData<String?>().apply { value = null }
   private val locationD = MutableLiveData<Location>()
   private val timesD = MutableLiveData<Times>().apply { value = Times() }
   private val noteD = MutableLiveData<String?>().apply { value = null }
@@ -84,6 +85,7 @@ class CreateOrderVM(
   )
 
   val locationLiveData get() = locationD.asLiveData()
+  val addressLiveData get() = addressD.asLiveData()
   val timesLiveData get() = timesD.asLiveData()
   val noteLiveData get() = noteD.asLiveData()
   val promotionItemLiveData get() = inputPromotionVM.selectedItem
@@ -116,18 +118,50 @@ class CreateOrderVM(
               }
             )
           },
-          ifRight = {
+          ifRight = { location ->
             locationD.value = Location(
-              lat = it.latitude,
-              lng = it.longitude
+              lat = location.latitude,
+              lng = location.longitude
             )
+            addressD.value = locationRepository
+              .getAddressForCoordinates(location)
+              .fold(
+                ifLeft = {
+                  Timber.d("getAddressForCoordinates $location -> failure: $it")
+                  null
+                },
+                ifRight = {
+                  Timber.d("getAddressForCoordinates $location -> success: $it")
+                  it
+                }
+              )
           }
         )
     }
   }
 
-  fun setLocation(location: Location) {
+  fun setLocation(location: Location, address: String?) {
     locationD.value = location
+
+    if (address !== null) {
+      addressD.value = address
+      return
+    }
+
+    viewModelScope.launch {
+      addressD.value = locationRepository
+        .getAddressForCoordinates(location.toDomain())
+        .fold(
+          ifLeft = {
+            Timber.d("getAddressForCoordinates $location -> failure: $it")
+            null
+          },
+          ifRight = {
+            Timber.d("getAddressForCoordinates $location -> success: $it")
+            it
+          }
+        )
+    }
   }
   //endregion
 
