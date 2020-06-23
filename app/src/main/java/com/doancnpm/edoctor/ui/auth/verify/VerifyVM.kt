@@ -56,6 +56,7 @@ class VerifyVM(
                 PartialStateChange.Loading -> return@sendEvent
                 is PartialStateChange.Success -> SingleEvent.Success
                 is PartialStateChange.Failure -> SingleEvent.Failure(change.error, )
+                PartialStateChange.CodeChangedFirstTime -> return@sendEvent
               }
             )
           }
@@ -66,6 +67,8 @@ class VerifyVM(
         resendChange,
         phoneObservable.map { PartialStateChange.CodeChanged(code = it.second) },
         phoneObservable.map { PartialStateChange.CodeErrors(errors = it.first) },
+        intentS.ofType<ViewIntent.CodeChangedFirstTime>()
+          .map { PartialStateChange.CodeChangedFirstTime },
       )
       .observeOn(schedulers.main)
       .scan(initialViewState) { state, change -> change.reduce(state) }
