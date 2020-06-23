@@ -59,6 +59,7 @@ class ResendCodeVM(
                   phone = phone,
                   error = change.error,
                 )
+                PartialStateChange.PhoneChangedFirstTime -> return@sendEvent
               }
             )
           }
@@ -69,6 +70,8 @@ class ResendCodeVM(
         resendChange,
         phoneObservable.map { PartialStateChange.PhoneChanged(phone = it.second) },
         phoneObservable.map { PartialStateChange.PhoneErrors(errors = it.first) },
+        intentS.ofType<ViewIntent.PhoneChangedFirstTime>()
+          .map { PartialStateChange.PhoneChangedFirstTime },
       )
       .observeOn(schedulers.main)
       .scan(initialViewState) { state, change -> change.reduce(state) }
