@@ -51,10 +51,18 @@ interface AddCardContract {
     INVALID_CVC,
   }
 
+  data class Changed(
+    val holderName: Boolean = false,
+    val number: Boolean = false,
+    val expiredDate: Boolean = false,
+    val cvc: Boolean = false,
+  )
+
   data class ViewState(
     val errors: Set<ValidationError>,
     val isLoading: Boolean,
     val formData: FormData, // keep latest state when replace fragment
+    val changed: Changed,
   ) {
     companion object Factory {
       @JvmStatic
@@ -62,6 +70,7 @@ interface AddCardContract {
         isLoading = false,
         errors = emptySet(),
         formData = Initial,
+        changed = Changed(),
       )
     }
   }
@@ -73,6 +82,11 @@ interface AddCardContract {
     data class CvcChanged(val cvc: String) : ViewIntent()
 
     object Submit : ViewIntent()
+
+    object HolderNameChangedFirstTime : ViewIntent()
+    object NumberChangedFirstTime : ViewIntent()
+    object ExpiredDateChangedFirstTime : ViewIntent()
+    object CvcChangedFirstTime : ViewIntent()
   }
 
   sealed class SingleEvent {
@@ -90,6 +104,10 @@ interface AddCardContract {
           errors = errors,
           formData = formData,
         )
+        HolderNameChangedFirstTime -> state.copy(changed = state.changed.copy(holderName = true))
+        NumberChangedFirstTime -> state.copy(changed = state.changed.copy(number = true))
+        ExpiredDateChangedFirstTime -> state.copy(changed = state.changed.copy(expiredDate = true))
+        CvcChangedFirstTime -> state.copy(changed = state.changed.copy(cvc = true))
       }
     }
 
@@ -101,6 +119,11 @@ interface AddCardContract {
     object Loading : PartialChange()
     object Success : PartialChange()
     data class Failure(val error: AppError) : PartialChange()
+
+    object HolderNameChangedFirstTime : PartialChange()
+    object NumberChangedFirstTime : PartialChange()
+    object ExpiredDateChangedFirstTime : PartialChange()
+    object CvcChangedFirstTime : PartialChange()
   }
 
   interface Interactor {

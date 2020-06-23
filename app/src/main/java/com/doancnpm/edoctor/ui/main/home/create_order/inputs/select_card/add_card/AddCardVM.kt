@@ -100,6 +100,10 @@ class AddCardVM(
                 PartialChange.Loading -> return@sendEvent
                 is PartialChange.Success -> SingleEvent.Success
                 is PartialChange.Failure -> SingleEvent.Failure(change.error)
+                PartialChange.HolderNameChangedFirstTime -> return@sendEvent
+                PartialChange.NumberChangedFirstTime -> return@sendEvent
+                PartialChange.ExpiredDateChangedFirstTime -> return@sendEvent
+                PartialChange.CvcChangedFirstTime -> return@sendEvent
               }
             )
           }
@@ -113,6 +117,10 @@ class AddCardVM(
         )
       },
       registerChange,
+      intentS.ofType<ViewIntent.HolderNameChangedFirstTime>().map { PartialChange.HolderNameChangedFirstTime },
+      intentS.ofType<ViewIntent.NumberChangedFirstTime>().map { PartialChange.NumberChangedFirstTime },
+      intentS.ofType<ViewIntent.ExpiredDateChangedFirstTime>().map { PartialChange.ExpiredDateChangedFirstTime },
+      intentS.ofType<ViewIntent.CvcChangedFirstTime>().map { PartialChange.CvcChangedFirstTime },
     )
       .observeOn(schedulers.main)
       .scan(initialState) { state, change -> change.reduce(state) }
