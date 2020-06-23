@@ -8,7 +8,7 @@ import com.doancnpm.edoctor.ui.auth.register.RegisterContract.PartialChange
 import io.reactivex.rxjava3.core.Observable
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.rx3.rxObservable
-import java.util.*
+import java.util.Date
 
 interface RegisterContract {
   sealed class FormData {
@@ -35,6 +35,12 @@ interface RegisterContract {
     ) : FormData()
   }
 
+  data class Changed(
+    val phone: Boolean = false,
+    val password: Boolean = false,
+    val fullName: Boolean = false,
+  )
+
   enum class ValidationError {
     INVALID_PHONE_NUMBER,
     TOO_SHORT_PASSWORD,
@@ -45,7 +51,8 @@ interface RegisterContract {
   data class ViewState(
     val errors: Set<ValidationError>,
     val isLoading: Boolean,
-    val formData: FormData, // keep latest state when replace fragment
+    val formData: FormData, // keep latest state when replace fragment,
+    val changed: Changed,
   ) {
     companion object Factory {
       @JvmStatic
@@ -53,6 +60,7 @@ interface RegisterContract {
         isLoading = false,
         errors = emptySet(),
         formData = FormData.Initial,
+        changed = Changed(),
       )
     }
   }
@@ -64,6 +72,10 @@ interface RegisterContract {
     data class FullNameChanged(val fullName: String) : ViewIntent()
     data class BirthdayChanged(val date: Date?) : ViewIntent()
     object Submit : ViewIntent()
+
+    object PhoneChangedFirstTime : ViewIntent()
+    object PasswordChangedFirstTime : ViewIntent()
+    object FullNameChangedFirstTime : ViewIntent()
   }
 
   sealed class SingleEvent {
@@ -81,6 +93,9 @@ interface RegisterContract {
           errors = errors,
           formData = formData,
         )
+        PhoneChangedFirstTime -> state.copy(changed = state.changed.copy(phone = true))
+        PasswordChangedFirstTime -> state.copy(changed = state.changed.copy(password = true))
+        FullNameChangedFirstTime -> state.copy(changed = state.changed.copy(fullName = true))
       }
     }
 
@@ -92,6 +107,10 @@ interface RegisterContract {
     object Loading : PartialChange()
     data class Success(val phone: String) : PartialChange()
     data class Failure(val error: AppError) : PartialChange()
+
+    object PhoneChangedFirstTime : PartialChange()
+    object PasswordChangedFirstTime : PartialChange()
+    object FullNameChangedFirstTime : PartialChange()
   }
 
   interface Interactor {

@@ -62,6 +62,12 @@ class RegisterFragment : BaseFragment(R.layout.fragment_register) {
         binding.buttonRegister
           .clicks()
           .map { ViewIntent.Submit },
+        binding.editPhone.editTextFirstChange()
+          .map { ViewIntent.PhoneChangedFirstTime },
+        binding.editPassword.editTextFirstChange()
+          .map { ViewIntent.PasswordChangedFirstTime },
+        binding.editFullName.editTextFirstChange()
+          .map { ViewIntent.FullNameChangedFirstTime },
       )
     ).addTo(compositeDisposable)
   }
@@ -83,7 +89,7 @@ class RegisterFragment : BaseFragment(R.layout.fragment_register) {
   }
 
   private fun render(state: ViewState) {
-    val (errors, isLoading, formData) = state
+    val (errors, isLoading, formData, changed) = state
     Timber.d("State: $state")
 
     binding.run {
@@ -91,19 +97,19 @@ class RegisterFragment : BaseFragment(R.layout.fragment_register) {
         "Invalid phone number"
       } else {
         null
-      }.let { if (it != editPhone.error) editPhone.error = it }
+      }.let { if (it != editPhone.error && changed.phone) editPhone.error = it }
 
       if (ValidationError.TOO_SHORT_PASSWORD in errors) {
         "Too short password"
       } else {
         null
-      }.let { if (editPassword.error != it) editPassword.error = it }
+      }.let { if (editPassword.error != it && changed.password) editPassword.error = it }
 
       if (ValidationError.TOO_SHORT_FULL_NAME in errors) {
         "Too short full name"
       } else {
         null
-      }.let { if (editFullName.error != it) editFullName.error = it }
+      }.let { if (editFullName.error != it && changed.fullName) editFullName.error = it }
 
       if (ValidationError.INVALID_BIRTH_DAY in errors) {
         "Invalid birthday"
