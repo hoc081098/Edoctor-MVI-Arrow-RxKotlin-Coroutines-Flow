@@ -150,4 +150,5 @@ dependencies {
     implementation 'com.github.florent37:shapeofview:1.4.7'
     implementation 'com.amulyakhare:com.amulyakhare.textdrawable:1.0.1'
     implementation 'com.caverock:androidsvg-aar:1.4'
+    implementation 'net.yslibrary.keyboardvisibilityevent:keyboardvisibilityevent:3.0.0-RC2'
 }
