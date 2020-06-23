@@ -8,7 +8,9 @@ import com.doancnpm.edoctor.R
 import com.doancnpm.edoctor.core.BaseFragment
 import com.doancnpm.edoctor.databinding.FragmentVerifyBinding
 import com.doancnpm.edoctor.domain.entity.getMessage
-import com.doancnpm.edoctor.ui.auth.verify.VerifyContract.*
+import com.doancnpm.edoctor.ui.auth.verify.VerifyContract.SingleEvent
+import com.doancnpm.edoctor.ui.auth.verify.VerifyContract.ValidationError
+import com.doancnpm.edoctor.ui.auth.verify.VerifyContract.ViewIntent
 import com.doancnpm.edoctor.utils.*
 import com.jakewharton.rxbinding4.view.clicks
 import com.jakewharton.rxbinding4.widget.textChanges
@@ -30,13 +32,13 @@ class VerifyFragment : BaseFragment(R.layout.fragment_verify) {
   }
 
   private fun bindVM() {
-    viewModel.viewState.observe(owner = viewLifecycleOwner) { (_, errors, isLoading) ->
+    viewModel.viewState.observe(owner = viewLifecycleOwner) { (_, errors, isLoading, codeChanged) ->
       binding.run {
         if (ValidationError.EMPTY_CODE in errors) {
           "Empty code"
         } else {
           null
-        }.let { if (editCode.error != it) editCode.error = it }
+        }.let { if (editCode.error != it && codeChanged) editCode.error = it }
 
         if (isLoading) {
           progressBar.visible()
@@ -71,6 +73,8 @@ class VerifyFragment : BaseFragment(R.layout.fragment_verify) {
         binding.buttonVerify
           .clicks()
           .map { ViewIntent.Submit },
+        binding.editCode.editTextFirstChange()
+          .map { ViewIntent.CodeChangedFirstTime },
       )
     ).addTo(compositeDisposable)
   }
