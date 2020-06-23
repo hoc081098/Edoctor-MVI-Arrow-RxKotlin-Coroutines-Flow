@@ -12,9 +12,7 @@ import com.doancnpm.edoctor.core.BaseActivity
 import com.doancnpm.edoctor.databinding.ActivityMainBinding
 import com.doancnpm.edoctor.ui.auth.AuthActivity
 import com.doancnpm.edoctor.ui.main.history.HistoryContract
-import com.doancnpm.edoctor.utils.dismissAlertDialog
-import com.doancnpm.edoctor.utils.setupWithNavController
-import com.doancnpm.edoctor.utils.viewBinding
+import com.doancnpm.edoctor.utils.*
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -133,6 +131,10 @@ class MainActivity : BaseActivity() {
     viewModel.setOrderId(orderId)
     binding.navView.selectedItemId = R.id.history
   }
+
+  fun hideBottomNav() = binding.navView.gone()
+
+  fun showBottomNav() = binding.navView.visible()
 
   companion object {
     val TYPE_KEY = MainActivity::class.java.name + ".type"
