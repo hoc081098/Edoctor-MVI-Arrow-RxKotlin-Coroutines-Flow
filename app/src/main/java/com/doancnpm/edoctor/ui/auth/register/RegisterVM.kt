@@ -95,6 +95,9 @@ class RegisterVM(
                 PartialChange.Loading -> return@sendEvent
                 is PartialChange.Success -> SingleEvent.Success(change.phone)
                 is PartialChange.Failure -> SingleEvent.Failure(change.error)
+                PartialChange.PhoneChangedFirstTime -> return@sendEvent
+                PartialChange.PasswordChangedFirstTime -> return@sendEvent
+                PartialChange.FullNameChangedFirstTime -> return@sendEvent
               }
             )
           }
@@ -108,6 +111,9 @@ class RegisterVM(
         )
       },
       registerChange,
+      intentS.ofType<ViewIntent.PhoneChangedFirstTime>().map { PartialChange.PhoneChangedFirstTime },
+      intentS.ofType<ViewIntent.PasswordChangedFirstTime>().map { PartialChange.PasswordChangedFirstTime },
+      intentS.ofType<ViewIntent.FullNameChangedFirstTime>().map { PartialChange.FullNameChangedFirstTime },
     )
       .observeOn(schedulers.main)
       .scan(initialState) { state, change -> change.reduce(state) }
