@@ -26,6 +26,7 @@ sealed class AppError(cause: Throwable?) : Throwable(cause) {
   sealed class LocationError(cause: Throwable?) : AppError(cause) {
     object TimeoutGetCurrentLocation : LocationError(null)
     data class LocationSettingsDisabled(val throwable: Throwable) : LocationError(throwable)
+    object GeocoderEmptyResult : LocationError(null)
   }
 }
 
@@ -37,6 +38,7 @@ fun AppError.getMessage(): String {
     is AppError.UnexpectedError -> "Unexpected error"
     AppError.LocationError.TimeoutGetCurrentLocation -> "Timeout to get current location. Please try again!"
     is AppError.LocationError.LocationSettingsDisabled -> "Location settings disabled. Please enable to continue!"
+    AppError.LocationError.GeocoderEmptyResult -> "Cannot get address from coordinates"
   }
 }
 
