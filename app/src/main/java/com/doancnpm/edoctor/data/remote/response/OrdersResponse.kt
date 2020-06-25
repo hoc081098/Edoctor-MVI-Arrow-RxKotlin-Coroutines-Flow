@@ -14,9 +14,9 @@ data class OrdersResponse(
     @Json(name = "start_time") val startTime: String, // 2020-06-23 15:26:27
     @Json(name = "end_time") val endTime: String, // 2020-06-24 15:26:31
     @Json(name = "note") val note: String?, // null
-    @Json(name = "original_price") val originalPrice: Int, // 4308000
+    @Json(name = "original_price") val originalPrice: Double, // 4308000
     @Json(name = "promotion_id") val promotionId: Long?, // null
-    @Json(name = "total") val total: Int, // 4308000
+    @Json(name = "total") val total: Double, // 4308000
     @Json(name = "pay_card_id") val payCardId: String, // pm_1Gu7vZC98CIg3r8PIs6r6aZq
     @Json(name = "status") val status: Int, // 1
     @Json(name = "lat") val lat: Double, // 16.0723965

@@ -15,9 +15,9 @@ data class CreateOrderResponse(
   @Json(name = "note")
   val note: String?, // null
   @Json(name = "original_price")
-  val originalPrice: Int, // 4308000
+  val originalPrice: Double, // 4308000
   @Json(name = "total")
-  val total: Int, // 4308000
+  val total: Double, // 4308000
   @Json(name = "promotion_id")
   val promotionId: Long?, // null
   @Json(name = "pay_card_id")
