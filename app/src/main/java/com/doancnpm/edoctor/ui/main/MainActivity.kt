@@ -46,9 +46,10 @@ class MainActivity : BaseActivity() {
   }
 
   private fun handleIntent(intent: Intent?) {
-    val type = intent?.getStringExtra(TYPE_KEY) ?: return
-    val orderId = intent.getLongExtra(ORDER_ID_KEY, -1).takeIf { it >= 0 } ?: return
+    intent ?: return
 
+    val type = intent.getStringExtra(TYPE_KEY) ?: return
+    val orderId = intent.getSerializableExtra(ORDER_ID_KEY) as? Long ?: return
     Timber.d(">> handleIntent { orderId: $orderId, type: $type }")
 
     navigateToHistory(

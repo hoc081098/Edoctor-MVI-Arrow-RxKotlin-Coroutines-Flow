@@ -43,7 +43,7 @@ class AppFirebaseMessagingService : FirebaseMessagingService() {
     // Check if message contains a data payload.
     remoteMessage.data.isNotEmpty().let {
       Timber.d("Message data payload: %s", remoteMessage.data)
-      GlobalScope.launch { sendNotification(remoteMessage.data.withDefault { "" }) }
+      GlobalScope.launch { sendNotification(remoteMessage.data) }
 
       if (/* Check if data needs to be processed by long running job */ true) {
         // For long-running tasks (10 seconds or more) use WorkManager.
@@ -116,8 +116,9 @@ class AppFirebaseMessagingService : FirebaseMessagingService() {
    * @param messageBody FCM message body received.
    */
   private suspend fun sendNotification(data: Map<String, String>) {
-    val orderId = data.getValue("order_id").toLongOrNull() ?: -1
-    val type = data.getValue("type")
+    val orderId = data["order_id"]?.toLongOrNull()
+    val type = data["type"]
+    val id = (orderId ?: System.currentTimeMillis()).toInt()
 
     val intent = Intent(this, MainActivity::class.java).apply {
       addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
@@ -126,7 +127,7 @@ class AppFirebaseMessagingService : FirebaseMessagingService() {
     }
     val pendingIntent = PendingIntent.getActivity(
       this,
-      orderId.toInt() /* Request code */,
+      id /* Request code */,
       intent,
       PendingIntent.FLAG_UPDATE_CURRENT,
     )
@@ -137,9 +138,9 @@ class AppFirebaseMessagingService : FirebaseMessagingService() {
       .Builder(this, channelId)
       .setSmallIcon(R.mipmap.ic_launcher)
       .setDefaults(NotificationCompat.DEFAULT_ALL)
-      .setPriority(NotificationCompat.PRIORITY_MAX)
-      .setContentTitle(data.getValue("title"))
-      .setContentText(data.getValue("body"))
+      .setPriority(NotificationCompat.PRIORITY_HIGH)
+      .setContentTitle(data.getOrDefault("title", "Edoctor app"))
+      .setContentText(data.getOrDefault("body", ""))
       .setAutoCancel(true)
       .setSound(defaultSoundUri)
       .setShowWhen(true)
@@ -148,13 +149,14 @@ class AppFirebaseMessagingService : FirebaseMessagingService() {
     val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     notificationManager.notify(
       type,
-      orderId.toInt(),
+      id,
       notificationBuilder.build(),
     )
 
+    val image = data["image"] ?: return
     val myBitmap = withContext(Dispatchers.IO) {
       try {
-        URL(BuildConfig.BASE_URL + data.getValue("image"))
+        URL(BuildConfig.BASE_URL + image)
           .openStream()
           .let { BitmapFactory.decodeStream(it) }
       } catch (_: Exception) {
@@ -164,7 +166,7 @@ class AppFirebaseMessagingService : FirebaseMessagingService() {
 
     notificationManager.notify(
       type,
-      orderId.toInt(),
+      id,
       notificationBuilder
         .setStyle(NotificationCompat.BigPictureStyle().bigPicture(myBitmap))
         .build(),

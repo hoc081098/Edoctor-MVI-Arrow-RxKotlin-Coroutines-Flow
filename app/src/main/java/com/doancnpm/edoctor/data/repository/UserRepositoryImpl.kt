@@ -170,8 +170,14 @@ class UserRepositoryImpl(
           )
         ).unwrap()
 
+        val userLocal = user.toUserLocal(baseUrl)
+
+        if (userLocal.toUserDomain().roleId != User.RoleId.CUSTOMER) {
+          throw AppError.WrongRole
+        }
+
         userLocalSource.saveToken(token)
-        userLocalSource.saveUser(user.toUserLocal(baseUrl))
+        userLocalSource.saveUser(userLocal)
       }
     }
   }

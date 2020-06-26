@@ -3,6 +3,8 @@ package com.doancnpm.edoctor.domain.entity
 import arrow.core.Either
 
 sealed class AppError(cause: Throwable?) : Throwable(cause) {
+  object WrongRole : AppError(null)
+
   sealed class Remote(cause: Throwable?) : AppError(cause) {
     data class NetworkError(override val cause: Throwable) : Remote(cause)
 
@@ -39,6 +41,7 @@ fun AppError.getMessage(): String {
     AppError.LocationError.TimeoutGetCurrentLocation -> "Timeout to get current location. Please try again!"
     is AppError.LocationError.LocationSettingsDisabled -> "Location settings disabled. Please enable to continue!"
     AppError.LocationError.GeocoderEmptyResult -> "Cannot get address from coordinates"
+    AppError.WrongRole -> "This app only supports customer roles"
   }
 }
 
