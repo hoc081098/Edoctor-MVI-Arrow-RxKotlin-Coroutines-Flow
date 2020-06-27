@@ -7,7 +7,7 @@ data class Notification(
   val type: String,
   val title: String,
   val body: String,
-  val image: String,
-  val orderId: Long,
+  val image: String?,
+  val orderId: Long?,
   val createdAt: Date
 )

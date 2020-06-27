@@ -127,7 +127,7 @@ class NotificationsFragment : BaseFragment(R.layout.fragment_notifications) {
           Timber.d("Invalid notification type: $type")
         }
       },
-      orderId = notification.orderId,
+      orderId = notification.orderId ?: return,
     )
   }
 

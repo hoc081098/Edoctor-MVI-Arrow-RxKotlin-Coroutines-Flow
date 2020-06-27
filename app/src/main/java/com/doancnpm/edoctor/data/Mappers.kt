@@ -124,7 +124,7 @@ fun NotificationsResponse.Notification.toNotificationDomain(baseUrl: String): No
     type = type,
     title = title,
     body = body,
-    image = baseUrl + image,
+    image = image?.let { baseUrl + it },
     orderId = orderId,
     createdAt = parseDate_yyyyMMdd_HHmmss(createdAt)!!,
   )

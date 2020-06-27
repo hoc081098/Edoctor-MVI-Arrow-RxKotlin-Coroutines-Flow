@@ -44,6 +44,7 @@ class NotificationsAdapter(
         glide
           .load(item.image)
           .placeholder(R.drawable.logo)
+          .error(R.drawable.logo)
           .thumbnail(0.5f)
           .centerCrop()
           .transition(withCrossFade())

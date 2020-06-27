@@ -18,9 +18,9 @@ data class NotificationsResponse(
     @Json(name = "body")
     val body: String, // Petrus Hoc asked new mission for Edna
     @Json(name = "image")
-    val image: String, // system/services/service.jpg
+    val image: String?, // system/services/service.jpg
     @Json(name = "order_id")
-    val orderId: Long, // 65
+    val orderId: Long?, // 65
     @Json(name = "created_at")
     val createdAt: String // 2020-06-15 09:37:14
   )
