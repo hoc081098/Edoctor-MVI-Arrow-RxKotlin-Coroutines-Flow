@@ -3,9 +3,9 @@ package com.doancnpm.edoctor.utils
 import android.content.SharedPreferences
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener
 import androidx.core.content.edit
-import arrow.core.Option
 import arrow.core.getOrElse
-import arrow.core.toOption
+import com.doancnpm.edoctor.domain.entity.Option
+import com.doancnpm.edoctor.domain.entity.toOption
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.ObservableEmitter
 import timber.log.Timber

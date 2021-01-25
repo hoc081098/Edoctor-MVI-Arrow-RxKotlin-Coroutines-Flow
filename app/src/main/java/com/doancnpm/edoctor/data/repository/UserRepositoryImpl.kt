@@ -4,8 +4,7 @@ import android.app.Application
 import android.net.Uri
 import android.provider.OpenableColumns
 import arrow.core.Either
-import arrow.core.Option
-import arrow.core.extensions.fx
+import arrow.core.computations.either
 import com.doancnpm.edoctor.data.ErrorMapper
 import com.doancnpm.edoctor.data.local.UserLocalSource
 import com.doancnpm.edoctor.data.remote.ApiService
@@ -16,17 +15,14 @@ import com.doancnpm.edoctor.data.toInt
 import com.doancnpm.edoctor.data.toUserDomain
 import com.doancnpm.edoctor.data.toUserLocal
 import com.doancnpm.edoctor.domain.dispatchers.AppDispatchers
-import com.doancnpm.edoctor.domain.entity.AppError
-import com.doancnpm.edoctor.domain.entity.DomainResult
-import com.doancnpm.edoctor.domain.entity.User
-import com.doancnpm.edoctor.domain.entity.rightResult
+import com.doancnpm.edoctor.domain.entity.*
 import com.doancnpm.edoctor.domain.repository.UserRepository
 import com.doancnpm.edoctor.utils.UTCTimeZone
 import com.doancnpm.edoctor.utils.catchError
 import com.doancnpm.edoctor.utils.toString_yyyyMMdd
+import com.doancnpm.edoctor.utils.unit
 import com.google.firebase.iid.FirebaseInstanceId
 import io.reactivex.rxjava3.core.Observable
-import io.reactivex.rxjava3.kotlin.Observables
 import kotlinx.coroutines.*
 import kotlinx.coroutines.tasks.await
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -37,7 +33,7 @@ import timber.log.Timber
 import java.io.ByteArrayOutputStream
 import java.net.HttpURLConnection.HTTP_FORBIDDEN
 import java.net.HttpURLConnection.HTTP_UNAUTHORIZED
-import java.util.Date
+import java.util.*
 
 class UserRepositoryImpl(
   private val apiService: ApiService,
@@ -50,15 +46,14 @@ class UserRepositoryImpl(
   appCoroutineScope: CoroutineScope,
 ) : UserRepository {
   private val userObservable: Observable<Either<AppError, Option<User>>> =
-    Observables
+    Observable
       .combineLatest(
         userLocalSource.tokenObservable(),
         userLocalSource.userObservable(),
       ) { tokenOptional, userOptional ->
-        Option.fx {
+        either.eager<Unit, User> {
           !tokenOptional
-          val user = !userOptional
-          user.toUserDomain()
+          userOptional.bind().toUserDomain()
         }.rightResult()
       }
       .catchError(errorMapper)
@@ -82,41 +77,45 @@ class UserRepositoryImpl(
    */
 
   override suspend fun checkAuth(): DomainResult<Boolean> {
-    return Either.catch(errorMapper::map) {
+    return Either.catch {
       checkAuthDeferred.await()
       userLocalSource.token() !== null && userLocalSource.user() !== null
-    }
+    }.mapLeft(errorMapper::map)
   }
 
   override suspend fun logout(): DomainResult<Unit> {
-    return Either.catch(errorMapper::map) {
+    return Either.catch {
       val deviceToken = firebaseInstanceId.instanceId.await().token
       apiService.logout(deviceToken).unwrap()
       userLocalSource.removeUserAndToken()
-    }
+    }.mapLeft(errorMapper::map)
   }
 
   override suspend fun resendCode(phone: String): DomainResult<Unit> {
-    return Either.catch(errorMapper::map) {
+    return Either.catch {
       withContext(dispatchers.io) {
-        apiService.resendCode(phone).unwrap()
+        apiService.resendCode(phone).unwrap().unit
       }
-    }
+    }.mapLeft(errorMapper::map)
   }
 
   override suspend fun verify(phone: String, code: String): DomainResult<Unit> {
-    return Either.catch(errorMapper::map) {
+    return Either.catch {
       withContext(dispatchers.io) {
         apiService.verifyUser(
           phone = phone,
           code = code
-        ).unwrap()
+        ).unwrap().unit
       }
-    }
+    }.mapLeft(errorMapper::map)
   }
 
-  override suspend fun updateUserProfile(fullName: String, birthday: Date?, avatar: Uri?): DomainResult<Unit> {
-    return Either.catch(errorMapper::map) {
+  override suspend fun updateUserProfile(
+    fullName: String,
+    birthday: Date?,
+    avatar: Uri?
+  ): DomainResult<Unit> {
+    return Either.catch {
       val user = apiService
         .updateProfile(
           UpdateProfileBody(
@@ -128,7 +127,7 @@ class UserRepositoryImpl(
         .unwrap()
 
       userLocalSource.saveUser(user.toUserLocal(baseUrl))
-    }
+    }.mapLeft(errorMapper::map)
   }
 
   private suspend fun uploadAvatar(avatar: Uri?): Long? {
@@ -157,7 +156,7 @@ class UserRepositoryImpl(
   }
 
   override suspend fun login(phone: String, password: String): DomainResult<Unit> {
-    return Either.catch(errorMapper::map) {
+    return Either.catch {
       withContext(dispatchers.io) {
         val deviceToken = firebaseInstanceId.instanceId.await().token
         Timber.d("Device token: $deviceToken")
@@ -179,7 +178,7 @@ class UserRepositoryImpl(
         userLocalSource.saveToken(token)
         userLocalSource.saveUser(userLocal)
       }
-    }
+    }.mapLeft(errorMapper::map)
   }
 
   override suspend fun register(
@@ -189,7 +188,7 @@ class UserRepositoryImpl(
     fullName: String,
     birthday: Date?,
   ): DomainResult<String> {
-    return Either.catch(errorMapper::map) {
+    return Either.catch {
       withContext(dispatchers.io) {
         apiService
           .registerUser(
@@ -204,7 +203,7 @@ class UserRepositoryImpl(
           .unwrap()
           .phone
       }
-    }
+    }.mapLeft(errorMapper::map)
   }
 
   override fun userObservable() = userObservable

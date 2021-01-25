@@ -18,7 +18,6 @@ import com.doancnpm.edoctor.utils.*
 import com.jakewharton.rxbinding4.view.clicks
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
-import io.reactivex.rxjava3.kotlin.withLatestFrom
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 
@@ -40,7 +39,7 @@ class ProfileFragment : BaseFragment(R.layout.fragment_profile) {
       .subscribeBy {
         binding.run {
           it.fold(
-            ifEmpty = {
+            ifLeft = {
               imageAvatar.setImageResource(R.drawable.icons8_person_96)
 
               textFullName.text = NOT_LOGGED_IN
@@ -50,7 +49,7 @@ class ProfileFragment : BaseFragment(R.layout.fragment_profile) {
 
               fabUpdateProfile.invisible()
             },
-            ifSome = { user ->
+            ifRight = { user ->
               user.avatar
                 ?.let {
                   glide
@@ -139,9 +138,9 @@ class ProfileFragment : BaseFragment(R.layout.fragment_profile) {
       .clicks()
       .withLatestFrom(viewModel.userObservable) { _, user -> user }
       .mapNotNull { it.orNull() }
-      .subscribe {
+      .subscribe { user ->
         ProfileFragmentDirections
-          .actionProfileFragmentToUpdateProfileFragment(it)
+          .actionProfileFragmentToUpdateProfileFragment(user)
           .let { findNavController().navigate(it) }
       }
       .addTo(compositeDisposable)

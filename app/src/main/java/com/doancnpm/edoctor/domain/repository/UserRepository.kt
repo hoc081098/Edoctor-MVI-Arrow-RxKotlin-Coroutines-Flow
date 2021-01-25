@@ -1,8 +1,8 @@
 package com.doancnpm.edoctor.domain.repository
 
 import android.net.Uri
-import arrow.core.Option
 import com.doancnpm.edoctor.domain.entity.DomainResult
+import com.doancnpm.edoctor.domain.entity.Option
 import com.doancnpm.edoctor.domain.entity.User
 import io.reactivex.rxjava3.core.Observable
 import java.util.Date

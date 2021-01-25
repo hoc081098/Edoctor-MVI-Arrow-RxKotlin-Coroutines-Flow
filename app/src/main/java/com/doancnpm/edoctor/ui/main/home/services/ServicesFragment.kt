@@ -5,7 +5,7 @@ import android.view.View
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.MergeAdapter
+import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.doancnpm.edoctor.GlideApp
 import com.doancnpm.edoctor.R
@@ -122,7 +122,7 @@ class ServicesFragment : BaseFragment(R.layout.fragment_services) {
     binding.recyclerView.run {
       setHasFixedSize(true)
       layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
-      adapter = MergeAdapter(serviceAdapter, footerAdapter)
+      adapter = ConcatAdapter(serviceAdapter, footerAdapter)
     }
   }
 

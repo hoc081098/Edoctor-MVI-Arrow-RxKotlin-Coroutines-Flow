@@ -4,7 +4,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.core.view.doOnPreDraw
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.MergeAdapter
+import androidx.recyclerview.widget.ConcatAdapter
 import com.doancnpm.edoctor.GlideApp
 import com.doancnpm.edoctor.R
 import com.doancnpm.edoctor.core.BaseFragment
@@ -113,7 +113,7 @@ class HistoryFragment : BaseFragment(R.layout.fragment_history) {
     binding.recyclerView.run {
       setHasFixedSize(true)
       layoutManager = LinearLayoutManager(context)
-      adapter = MergeAdapter(orderAdapter, footerAdapter)
+      adapter = ConcatAdapter(orderAdapter, footerAdapter)
     }
 
     orderAdapter.clickQRCode

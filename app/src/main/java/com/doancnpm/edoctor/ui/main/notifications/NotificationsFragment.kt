@@ -3,7 +3,7 @@ package com.doancnpm.edoctor.ui.main.notifications
 import android.os.Bundle
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.MergeAdapter
+import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.doancnpm.edoctor.GlideApp
 import com.doancnpm.edoctor.R
@@ -111,7 +111,7 @@ class NotificationsFragment : BaseFragment(R.layout.fragment_notifications) {
     binding.recyclerView.run {
       setHasFixedSize(true)
       layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
-      adapter = MergeAdapter(serviceAdapter, footerAdapter)
+      adapter = ConcatAdapter(serviceAdapter, footerAdapter)
     }
   }
 

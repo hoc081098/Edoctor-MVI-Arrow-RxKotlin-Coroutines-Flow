@@ -1,6 +1,6 @@
 package com.doancnpm.edoctor.domain.entity
 
-import arrow.core.Either
+import arrow.core.*
 
 sealed class AppError(cause: Throwable?) : Throwable(cause) {
   object WrongRole : AppError(null)
@@ -45,7 +45,11 @@ fun AppError.getMessage(): String {
   }
 }
 
+typealias Option<T> = Either<Unit, T>
 typealias DomainResult<T> = Either<AppError, T>
+
+@Suppress("NOTHING_TO_INLINE")
+inline fun <T> T?.toOption(): Option<T> = this?.let { Right(it) } ?: Left(Unit)
 
 @Suppress("NOTHING_TO_INLINE")
 inline fun <R> AppError.leftResult(): Either<AppError, R> = Either.Left(this)

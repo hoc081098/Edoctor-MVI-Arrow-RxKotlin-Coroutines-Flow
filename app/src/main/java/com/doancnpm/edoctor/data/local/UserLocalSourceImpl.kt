@@ -1,12 +1,16 @@
 package com.doancnpm.edoctor.data.local
 
 import android.content.SharedPreferences
+import arrow.core.Either
+import arrow.core.flatMap
 import com.doancnpm.edoctor.data.local.model.UserLocal
 import com.doancnpm.edoctor.data.local.model.UserLocalJsonAdapter
 import com.doancnpm.edoctor.domain.dispatchers.AppDispatchers
 import com.doancnpm.edoctor.domain.dispatchers.AppSchedulers
+import com.doancnpm.edoctor.domain.entity.toOption
 import com.doancnpm.edoctor.utils.delegate
 import com.doancnpm.edoctor.utils.observeString
+import io.reactivex.rxjava3.core.Observable
 import kotlinx.coroutines.withContext
 
 class UserLocalSourceImpl(
@@ -26,7 +30,7 @@ class UserLocalSourceImpl(
 
   private val userObservable = sharedPreferences.observeString(USER_KEY)
     .subscribeOn(schedulers.io)
-    .map { json -> json.mapNotNull { it.toUserLocal() } }
+    .map { json -> json.flatMap { it.toUserLocal().toOption() } }
     .replay(1)
     .refCount()!!
 

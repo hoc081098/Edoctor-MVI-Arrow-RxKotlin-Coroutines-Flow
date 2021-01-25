@@ -1,7 +1,7 @@
 package com.doancnpm.edoctor.data.local
 
-import arrow.core.Option
 import com.doancnpm.edoctor.data.local.model.UserLocal
+import com.doancnpm.edoctor.domain.entity.Option
 import io.reactivex.rxjava3.core.Observable
 
 interface UserLocalSource {

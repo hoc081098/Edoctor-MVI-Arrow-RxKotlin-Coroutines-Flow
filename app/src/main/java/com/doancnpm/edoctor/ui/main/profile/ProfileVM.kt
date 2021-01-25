@@ -2,11 +2,14 @@ package com.doancnpm.edoctor.ui.main.profile
 
 import androidx.annotation.CheckResult
 import androidx.lifecycle.MutableLiveData
-import arrow.core.None
+import arrow.core.Either
 import arrow.core.getOrElse
+import arrow.core.left
 import com.doancnpm.edoctor.core.BaseVM
 import com.doancnpm.edoctor.domain.dispatchers.AppDispatchers
 import com.doancnpm.edoctor.domain.dispatchers.AppSchedulers
+import com.doancnpm.edoctor.domain.entity.Option
+import com.doancnpm.edoctor.domain.entity.User
 import com.doancnpm.edoctor.domain.repository.UserRepository
 import com.doancnpm.edoctor.ui.main.profile.ProfileContract.SingleEvent
 import com.doancnpm.edoctor.ui.main.profile.ProfileContract.ViewIntent
@@ -31,8 +34,8 @@ class ProfileVM(
 
   val eventLiveData get() = eventD.asLiveData()
   val isLoggingOut get() = isLoggingOutD.asLiveData()
-  val userObservable = userRepository.userObservable()
-    .map { it.getOrElse { None } }
+  val userObservable: Observable<Option<User>> = userRepository.userObservable()
+    .map { it.getOrElse { Unit.left() } }
     .distinctUntilChanged()
     .observeOn(schedulers.main)
     .replay(1)
